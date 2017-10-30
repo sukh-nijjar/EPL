@@ -1,0 +1,27 @@
+{%extends "master_layout.html"%}
+{%block content%}
+    <div id="results_list">
+      
+        <table>
+          <tr>
+            <th scope="col">Home</th>
+            <th scope="col">FT</th>
+            <th scope="col">HT</th>
+            <th scope="col">HT</th>
+            <th scope="col">FT</th>
+            <th scope="col">Away</th>
+          </tr>
+          {% for result in results %}
+            <tr>
+              <td>{{result.home_team}}</td>
+              <td>{{result.home_ftg}}</td>
+              <td>({{result.home_htg}})</td>
+              <td>({{result.away_htg}})</td>
+              <td>{{result.away_ftg}}</td>
+              <td>{{result.away_team}}</td>
+            </tr>
+          {% endfor %}
+        </table>
+
+      </div> <!--results_list-->
+{%endblock%}
