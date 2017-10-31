@@ -15,7 +15,6 @@
       </tr>
       {% for team in teams %}
         <tr class="team_rows">
-          <!-- <td class="team_column">{{team.name.title()}}</td> -->
           <td class="team_column"><a href="{{ url_for('drill_down', team=team.name) }}">{{team.name.title()}}</a></td>
           <td>{{team.points()}}</td>
           <td>GD</td>

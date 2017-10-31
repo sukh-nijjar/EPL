@@ -8,6 +8,7 @@
         <form action="/create_result/" method="post">
           <p class="teamDropDowns">
             <span>Home Team</span>
+            <!-- <input id="autocomplete" class="ui-widget"> -->
             <select name="home_team" class="selectmenu">
               {% for team in team_dd %}
                 <option value='{{team.name}}'>{{team.name}}</option>
@@ -34,40 +35,6 @@
             <!-- Away FT -->
             <input class="spinner" name="aftg" value="0">
           </p>
-          <!-- ----------- -->
-          <!-- <p class="goals_spinner">
-            <input class="spinner"> -->
-            <!-- Home HT
-            <select name="hhtg" class="ui-widget">
-              {% for val in goals_dd %}
-                <option value='{{val}}'>{{val}}</option>
-              {% endfor %}
-            </select> -->
-            <!-- Away HT
-            <input class="spinner"> -->
-            <!-- <select name="ahtg" class="ui-widget">
-              {% for val in goals_dd %}
-                <option value='{{val}}'>{{val}}</option>
-              {% endfor %}
-            </select> -->
-          <!-- </p>
-
-          <p>
-            Home FT
-            <input class="spinner"> -->
-            <!-- <select name="hftg" class="ui-widget">
-              {% for val in goals_dd %}
-                <option value='{{val}}'>{{val}}</option>
-              {% endfor %}
-            </select> -->
-            <!-- Away FT
-            <input class="spinner"> -->
-            <!-- <select name="aftg" class="ui-widget">
-              {% for val in goals_dd %}
-                <option value='{{val}}'>{{val}}</option>
-              {% endfor %}
-            </select> -->
-          <!-- </p> -->
 
           <p><input type="submit" value="save result" class="ui-button ui-corner-all ui-widget" id="submitSaveResult"></p>
         </form>

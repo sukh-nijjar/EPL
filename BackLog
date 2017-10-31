@@ -1,14 +1,23 @@
-Tidy up UI - controls and error messages
-present
+Tidy up UI
+-----------
+- error message and display
 
-Enter result page:
-- team HT goals cannot be greater than FT goals:
-when
-- team has 2 ht goals
-then ft goals must be 2 or greater
+Validation
+-----------
+
+
+Business logic
+---------------
+Update team stats based on results
+
+Features
+--------
+Add in ability to record goal details
+
 
 add a tool tip to explain GD column
 
 SQL: SELECT "t1"."team_id", "t1"."name", "t1"."won", "t1"."drawn", "t1"."lost" FROM "team" AS t1 WHERE ("t1"."name" = ?)
 
 Added GIT Repo on 30 Oct 2017
+files to add:

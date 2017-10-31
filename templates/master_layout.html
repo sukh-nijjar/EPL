@@ -34,11 +34,14 @@
         {%block content%}
         {%endblock%}
       </section>
-    
+
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}">></script>
+      <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+      </script>
     </div> <!--end div wrapper-->
 </body>
 </html>

@@ -36,8 +36,23 @@ $(document).ready(function() {
 
        $( ".selectmenu" ).selectmenu();
        $(".spinner").spinner({
-         min: 0
+          min: 0
        });
+
+      //  $( "#autocomplete" ).autocomplete({
+      //     source: $.getJSON($SCRIPT_ROOT + '/get_teams_autocompletion_data'),
+      //     minLength: 2
+      //   });
+
+      var availableTags = [
+        	"Sen City",
+          "Arsenal",
+          "Man City",
+        	"Man Utd"
+                      ];
+$( "#autocomplete" ).autocomplete({
+	source: availableTags
+});
 
 
      });//end top document.ready function
