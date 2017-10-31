@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Premiership 2017/18</title>
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/MyCV.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.css')}}">
+  <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play" rel="stylesheet">
+  <meta charset="UTF-8">
+  <style>
+  .ui-widget-overlay {
+    position: absolute;
+  }
+  </style>
+</head>
+<body>
+    <div id="wrapper">
+
+      <header>
+        <h1><a href="/">Premier League</a></h1>
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="{{ url_for('new_team') }}">Add a new team</a></li>
+            <li><a href="{{ url_for('enter_result') }}">Enter result</a></li>
+            <li><a href="{{ url_for('view_results') }}">See results</a></li>
+            <!-- <li><a href="{{ url_for('delete_all_results') }}">Delete <strong>ALL</strong> results</a></li>
+            <li><a href="{{ url_for('delete_all_teees') }}">Delete <strong>ALL</strong> teams</a></li> -->
+        </ul>
+      </nav>
+
+      <section>
+        <div id="usr_messages"></div>
+        {%block content%}
+        {%endblock%}
+      </section>
+
+      <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
+      <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
+      <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
+      <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}">></script>
+      <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+      </script>
+    </div> <!--end div wrapper-->
+</body>
+</html>

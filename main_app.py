@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, url_for, redirect, flash
+from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
 from models import *
-#from domain import FBTeam
+from playhouse.shortcuts import model_to_dict
 
 #create application instance
 app = Flask(__name__)
@@ -32,9 +32,6 @@ def create_team():
         won = 0,
         drawn = 0,
         lost = 0,
-        # won = request.form['won'],
-        # drawn = request.form['drawn'],
-        # lost = request.form['lost'],
         )
         return redirect(url_for('home'))
     except IntegrityError:
@@ -43,22 +40,29 @@ def create_team():
 
 @app.route('/enter_result/')
 def enter_result():
-    goals_dd = create_dd_of_ints(11)
     team_dd = Team.select().order_by(Team.name)
-    return render_template('enterResult.html',team_dd = team_dd, goals_dd = goals_dd)
+    return render_template('enterResult.html',team_dd = team_dd)
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
-    Result.create(
-    home_team = request.form.get('home_team'),
-    away_team = request.form.get('away_team'),
-    home_htg = request.form['hhtg'],
-    away_htg = request.form['ahtg'],
-    home_ftg = request.form['hftg'],
-    away_ftg = request.form['aftg']
-    )
-    #at this point do Team update for games w/d/l
-    return redirect(url_for('home'))
+    error = None
+    # check half-time goals are not greater than full-time goals
+    # before saving result:
+    if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
+        Result.create(
+        home_team = request.form.get('home_team'),
+        away_team = request.form.get('away_team'),
+        home_htg = request.form['hhtg'],
+        away_htg = request.form['ahtg'],
+        home_ftg = request.form['hftg'],
+        away_ftg = request.form['aftg']
+        )
+        update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
+        return redirect(url_for('home'))
+    else:
+        error = "INVALID RESULT"
+        team_dd = Team.select().order_by(Team.name)
+        return render_template('enterResult.html', error = error, team_dd = team_dd)
 
 @app.route('/view_results/')
 def view_results():
@@ -80,11 +84,35 @@ def delete_all_teees():
 def drill_down(team):
     return render_template('teamDetails.html', team=Team.get(Team.name == team))
 
+@app.route('/get_teams_autocompletion_data', methods=['GET'])
+def team_autocompletion_src():
+    team_source=["arsenal","rs","Man Utd","Man City"]
+    return jsonify(team_source)
+    # team_source = Team.select(Team.name).order_by(Team.name)
+    # print (team_source)
+    # print (json.dumps(model_to_dict(team_source.get())))
+    # return json.dumps(model_to_dict(team_source.get()))
+
 def create_dd_of_ints(required_range):
     dd = []
     for i in range(required_range):
         dd.append(i)
     return dd
+
+def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
+    if goals_scored_by_home_team > goals_scored_by_away_team:
+        update_query = Team.update(won = Team.won + 1).where(Team.name == home_team)
+        update_query.execute()
+        update_query = Team.update(lost = Team.lost + 1).where(Team.name == away_team)
+        update_query.execute()
+    elif goals_scored_by_home_team < goals_scored_by_away_team:
+        update_query = Team.update(won = Team.won + 1).where(Team.name == away_team)
+        update_query.execute()
+        update_query = Team.update(lost = Team.lost + 1).where(Team.name == home_team)
+        update_query.execute()
+    else:
+        update_query = Team.update(drawn = Team.drawn + 1).where(Team.name << [home_team, away_team])
+        update_query.execute()
 
 if __name__ == '__main__':
     app.secret_key ='sum fink' #THIS SHOULD BE IN CONFIG - SECRET_KEY = 'string'

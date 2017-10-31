@@ -1,0 +1,44 @@
+{%extends "master_layout.html"%}
+{%block content%}
+    {% if error %}
+      <h3>{{error}}</h3>
+    {% endif %}
+
+      <div id="enter_result_form">
+        <form action="/create_result/" method="post">
+          <p class="teamDropDowns">
+            <span>Home Team</span>
+            <!-- <input id="autocomplete" class="ui-widget"> -->
+            <select name="home_team" class="selectmenu">
+              {% for team in team_dd %}
+                <option value='{{team.name}}'>{{team.name}}</option>
+              {% endfor %}
+            </select>
+
+            <!-- Home HT -->
+            <input class="spinner" name="hhtg" value="0">
+
+            <!-- Home FT -->
+            <input class="spinner" name="hftg" value="0">
+          </p>
+          <p class="teamDropDowns">
+            <span>Away Team</span>
+            <select name="away_team" class="selectmenu">
+              {% for team in team_dd %}
+                <option value='{{team.name}}'>{{team.name}}</option>
+              {% endfor %}
+            </select>
+
+            <!-- Away HT -->
+            <input class="spinner" name="ahtg" value="0">
+
+            <!-- Away FT -->
+            <input class="spinner" name="aftg" value="0">
+          </p>
+
+          <p><input type="submit" value="save result" class="ui-button ui-corner-all ui-widget" id="submitSaveResult"></p>
+        </form>
+
+      </div> <!--create_team_form-->
+
+{%endblock%}
