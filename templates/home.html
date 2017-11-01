@@ -17,13 +17,13 @@
         <tr class="team_rows">
           <td class="team_column"><a href="{{ url_for('drill_down', team=team.name) }}">{{team.name.title()}}</a></td>
           <td>{{team.points()}}</td>
-          <td>GD</td>
+          <td>{{team.goals_scored - team.goals_conceded}}</td>
           <td>{{team.games_played()}}</td>
           <td>{{team.won}}</td>
           <td>{{team.drawn}}</td>
           <td>{{team.lost}}</td>
-          <td>SCORED</td>
-          <td>CONCEDED</td>
+          <td>{{team.goals_scored}}</td>
+          <td>{{team.goals_conceded}}</td>
         </tr>
       {% endfor %}
     </table>

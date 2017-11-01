@@ -32,6 +32,8 @@ def create_team():
         won = 0,
         drawn = 0,
         lost = 0,
+        goals_scored = 0,
+        goals_conceded = 0
         )
         return redirect(url_for('home'))
     except IntegrityError:
@@ -101,17 +103,34 @@ def create_dd_of_ints(required_range):
 
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
     if goals_scored_by_home_team > goals_scored_by_away_team:
-        update_query = Team.update(won = Team.won + 1).where(Team.name == home_team)
+        update_query = Team.update(
+        won = Team.won + 1,
+        goals_scored = Team.goals_scored + goals_scored_by_home_team,
+        goals_conceded = Team.goals_conceded + goals_scored_by_away_team
+        ).where(Team.name == home_team)
         update_query.execute()
-        update_query = Team.update(lost = Team.lost + 1).where(Team.name == away_team)
+        update_query = Team.update(
+        lost = Team.lost + 1,
+        goals_scored = Team.goals_scored + goals_scored_by_away_team,
+        goals_conceded = Team.goals_conceded + goals_scored_by_home_team
+        ).where(Team.name == away_team)
         update_query.execute()
     elif goals_scored_by_home_team < goals_scored_by_away_team:
-        update_query = Team.update(won = Team.won + 1).where(Team.name == away_team)
+        update_query = Team.update(won = Team.won + 1,
+        goals_scored = Team.goals_scored + goals_scored_by_away_team,
+        goals_conceded = Team.goals_conceded + goals_scored_by_home_team
+        ).where(Team.name == away_team)
         update_query.execute()
-        update_query = Team.update(lost = Team.lost + 1).where(Team.name == home_team)
+        update_query = Team.update(lost = Team.lost + 1,
+        goals_scored = Team.goals_scored + goals_scored_by_home_team,
+        goals_conceded = Team.goals_conceded + goals_scored_by_away_team
+        ).where(Team.name == home_team)
         update_query.execute()
     else:
-        update_query = Team.update(drawn = Team.drawn + 1).where(Team.name << [home_team, away_team])
+        update_query = Team.update(drawn = Team.drawn + 1,
+        goals_scored = Team.goals_scored + goals_scored_by_home_team,
+        goals_conceded = Team.goals_conceded + goals_scored_by_away_team
+        ).where(Team.name << [home_team, away_team])
         update_query.execute()
 
 if __name__ == '__main__':

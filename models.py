@@ -15,8 +15,8 @@ class Team(BaseModel):
     won = IntegerField()
     drawn = IntegerField()
     lost = IntegerField()
-    pts = 0
-    played = 0
+    goals_scored = IntegerField()
+    goals_conceded = IntegerField()
 
     def points(self):
         """Returns the number of points a team has based on
@@ -27,6 +27,11 @@ class Team(BaseModel):
         """returns the total number of matches played
             by the team"""
         return self.won + self.drawn + self.lost
+
+    def update_goal_stats(self,scored,conceded):
+        print(scored,conceded)
+        self.goals_scored += scored
+        self.goals_conceded += conceded
 
     #class Meta:
         #order_by = ('lost',)
