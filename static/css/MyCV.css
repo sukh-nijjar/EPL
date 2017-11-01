@@ -1,0 +1,180 @@
+/*Premier League CSS*/
+*{
+	margin: 0 auto 0 auto; /*auto ensure all elements are 'reset' to a consistent start point*/
+	text-align:left;
+}
+
+a, a:visited{
+  text-decoration: none;
+	color: inherit;
+	/*outline: 1px solid pink;*/
+}
+
+body{
+	margin-top: 5px;
+}
+
+div[class='error']{
+	font-family: 'News Cycle', sans-serif;
+	font-weight: bold;
+	color: green;
+	border: 3px solid green;
+	text-align: center;
+}
+
+li{
+  list-style: none;
+}
+
+/*the validate plug-in adds to the dom a label element to display errors.
+By making it block level it appears on a new line underneath the fieldset
+with the error*/
+/*label {
+	display:block;
+	color: red;
+}*/
+
+table {
+	border-collapse: collapse; /*this allows border property to be applied to <tr>*/
+	margin-left: 80px;
+}
+
+th, td{
+	padding: 5px 5px;
+	text-align: center;
+}
+
+tr[class='team_rows']:hover{ /*ensures top row does not have hover effect applied to it*/
+	background-color: pink;
+	/*border-bottom: 1px solid blue;*/
+}
+
+#wrapper{
+  width:1200px;
+}
+
+header{
+	font-family: 'Bungee Shade';
+  width: 1200px;
+  height: 120px;
+	text-align: center;
+	border-bottom: thick solid black;
+	margin-bottom: 5px; /*this specifies the gap downwards from header's bottom boundary*/
+	/*outline:  1px solid red;*/
+}
+
+header h1{
+	font-size: 53px;
+	height: 120px;
+	text-align: center;
+	/*outline: 1px solid green;*/
+}
+
+header h1 a{
+	display: inline-block; /*this allows height to be set*/
+	height: 120px;
+	/*outline: 2px solid yellow;*/
+}
+
+nav{
+  width: 240px;
+  float: left; /*otherwise it would be centered*/
+  font-family: 'Unica One', cursive;
+	/*outline: 1px solid blue;*/
+}
+
+
+nav ul{
+	padding: 0px; /*this makes the menu options sit flush on the left of screen*/
+	/*border : 1px solid green;*/
+}
+
+nav li{
+	margin-bottom: 10px;
+	margin-left: 0px;
+	font-size: 36px;
+	float: left;
+	width: 240px;
+	/*outline: 1px dashed red;*/
+}
+
+nav li:hover{
+	background-color: orange;
+	font-weight: bolder;
+}
+
+/*
+nav a{
+	border: 1px solid black;
+}*/
+
+#create_team_form{
+	margin-left: 62px;
+	margin-top: 20px;
+	/*outline: 2px solid purple;*/
+}
+
+#enter_result_form{
+	margin-top: 20px;
+}
+
+section{
+  width: 900px;
+	float: left;
+	/*margin-top: 15px;*/
+	padding-left: 15px;
+	font-family: 'News Cycle', sans-serif;
+	font-size: 18px;
+	/*outline: 2px solid purple;*/
+}
+
+#submitSaveResult{
+	margin-left: 143px;
+}
+
+#teamName{
+	width: 300px;
+	margin-bottom: 15px;
+	width:555px;
+}
+
+#usr_messages{
+	  width: 300px;
+		/*border: 1px solid green;*/
+}
+
+.integrity_error{
+	font-family: 'Unica One', cursive;
+	font-weight: bold;
+	color: pink;
+}
+
+.error{
+	font-family: 'Unica One', cursive;
+	/*font-weight: bold;*/
+	color: white;
+	background: #ff0000;
+	/*border: 3px solid pink;*/
+	width: 500px;
+}
+
+.goals_spinner {
+	margin: 20px;
+}
+
+.spinner{
+	width: 25px;
+}
+
+.team_column{
+	text-align: left;
+	border-right: 1px solid red;
+}
+
+.teamDropDowns{
+	padding: 0px 0px 25px 60px;
+}
+
+.team_rows{
+	border-bottom: 1px solid red;
+}
