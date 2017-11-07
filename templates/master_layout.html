@@ -25,12 +25,15 @@
             <li><a href="{{ url_for('enter_result') }}">Enter result</a></li>
             <li><a href="{{ url_for('view_results') }}">See results</a></li>
             <li><a href="{{ url_for('delete_all_results') }}">Delete <strong>ALL</strong> results</a></li>
-            <li><a href="{{ url_for('delete_all_teees') }}">Delete <strong>ALL</strong> teams</a></li>
+            <form id="deleteAllTeams" action="delete_all_teams/" method="post">
+              <li><a  id="submitDeleteAllTeams" href="#">Delete <strong>ALL</strong> teams</a></li>
+              <input type="hidden">
+            </form>
         </ul>
       </nav>
 
       <section>
-        <div id="usr_messages"></div>
+        <!-- <div id="usr_messages"></div> -->
         {%block content%}
         {%endblock%}
       </section>
@@ -43,5 +46,8 @@
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
       </script>
     </div> <!--end div wrapper-->
+    <div id="dialog-confirm" class="ui-helper-hidden">
+      <span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>CONFIRM ACTION
+    </div>
 </body>
 </html>

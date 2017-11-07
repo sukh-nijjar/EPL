@@ -138,24 +138,37 @@ section{
 	width:555px;
 }
 
-#usr_messages{
+/*#usr_messages{
 	  width: 300px;
-		/*border: 1px solid green;*/
-}
+		border: 1px solid green;
+}*/
 
-.integrity_error{
+/*.integrity_error{
 	font-family: 'Unica One', cursive;
 	font-weight: bold;
-	color: pink;
-}
+	color: DarkCyan;
+}*/
 
 .error{
-	font-family: 'Unica One', cursive;
-	/*font-weight: bold;*/
-	color: white;
+	/*font-family: 'Unica One', cursive;*/
+	border-radius: 15px;
 	background: #ff0000;
-	/*border: 3px solid pink;*/
-	width: 500px;
+	color: white;
+	/*display: none;*/
+	font-weight: bold;
+	text-align: center;
+	width: 675px;
+}
+
+.feedback{
+	/*font-family: 'Unica One', cursive;*/
+	border-radius: 15px;
+	background: Blue;
+	color: white;
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	width: 675px;
 }
 
 .goals_spinner {
@@ -168,7 +181,7 @@ section{
 
 .team_column{
 	text-align: left;
-	border-right: 1px solid red;
+	/*border-right: 1px solid red;*/
 }
 
 .teamDropDowns{

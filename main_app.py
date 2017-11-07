@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
+from operator import itemgetter, attrgetter, methodcaller
 from models import *
 from playhouse.shortcuts import model_to_dict
 
@@ -15,7 +16,15 @@ def teardown_request(exception):
 
 @app.route('/')
 def home():
-    return render_template('home.html', teams=Team.select())
+    feedback = None
+    teams = Team.select()
+    if len(teams) > 0:
+        teams_in_GD_order = sorted(teams, key=methodcaller('goal_difference'), reverse=True)
+        teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
+        return render_template('home.html', teams=teams_in_points_order)
+    else:
+        feedback = "No teams exist yet me lad"
+        return render_template('feedback.html', feedback = feedback)
 
 @app.route('/new_team/')
 def new_team():
@@ -28,7 +37,7 @@ def create_team():
     wdl_dd = create_dd_of_ints(39)
     try:
         Team.create(
-        name = request.form['team'].lower(),
+        name = request.form['team'].lower().strip(),
         won = 0,
         drawn = 0,
         lost = 0,
@@ -42,8 +51,13 @@ def create_team():
 
 @app.route('/enter_result/')
 def enter_result():
+    feedback = None
     team_dd = Team.select().order_by(Team.name)
-    return render_template('enterResult.html',team_dd = team_dd)
+    if len(team_dd) > 1:
+        return render_template('enterResult.html',team_dd = team_dd)
+    else:
+        feedback = "Add at least a couple o teams me lad before trying add a result!"
+        return render_template("feedback.html", feedback = feedback)
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
@@ -68,7 +82,13 @@ def create_result():
 
 @app.route('/view_results/')
 def view_results():
-    return render_template('results.html', results = Result.select())
+    feedback = None
+    results = Result.select()
+    if len(results) > 0:
+        return render_template('results.html', results = results)
+    else:
+        feedback = "No results available"
+        return render_template("feedback.html", feedback = feedback)
 
 @app.route('/delete_all_results/')
 def delete_all_results():
@@ -76,7 +96,7 @@ def delete_all_results():
     delete_query.execute()
     return redirect(url_for('home'))
 
-@app.route('/delete_all_teams/')
+@app.route('/delete_all_teams/', methods=['POST'])
 def delete_all_teees():
     delete_query = Team.delete()
     delete_query.execute()

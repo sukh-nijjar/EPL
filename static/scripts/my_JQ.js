@@ -15,20 +15,37 @@ $(document).ready(function() {
     });
 
     $('#submitSaveTeam').on('click', function(e) {
+        e.preventDefault();
+        if ( $('.error').length ){
+          $('.error').remove();
+        }
+        var teamName = $('#teamName').val();
+        // if (is_msg_displaying){
+        //   alert("FROm IF" + is_msg_displaying)
+        // }
+        if (teamName.trim().length > 0){
+          $('#create_team').submit();
+        }
+        else {
+          $('section').prepend('<h3 class="error">Team name is mandatory</h3>');
+        }
+     });
+
+    $('#submitDeleteAllTeams').on('click', function(e) {
            e.preventDefault();
            $("#dialog-confirm").dialog({
-             title: "save team?",
+             title: "Delete all teams?",
              resizable: false,
              //autoOpen: false,
              height: "auto",
              width: 400,
              modal: true,
              buttons: {
-               "No, don't save team": function() {
+               "No, do not delete all teams": function() {
                  $( this ).dialog( "close" );
                },
-               "Yes, save team": function() {
-                 $("#create_team").submit();
+               "Yes, delete all teams": function() {
+                 $("#deleteAllTeams").submit();
                }
              } //end buttons
            });
@@ -38,6 +55,8 @@ $(document).ready(function() {
        $(".spinner").spinner({
           min: 0
        });
+
+       $(" #GDToolTip ").tooltip();
 
       //  $( "#autocomplete" ).autocomplete({
       //     source: $.getJSON($SCRIPT_ROOT + '/get_teams_autocompletion_data'),
@@ -50,12 +69,14 @@ $(document).ready(function() {
           "Man City",
         	"Man Utd"
                       ];
-$( "#autocomplete" ).autocomplete({
-	source: availableTags
-});
+      $( "#autocomplete" ).autocomplete({
+      	source: availableTags
+      });
 
+      $('.feedback').fadeIn("slow");
+      // $('.error').fadeIn("slow");
 
-     });//end top document.ready function
+});//end top document.ready function
 
 //set focus on team name input on create team form
 document.getElementById("teamName").focus();

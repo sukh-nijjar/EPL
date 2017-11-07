@@ -1,13 +1,13 @@
 {%extends "master_layout.html"%}
 {%block content%}
     {% if error %}
-      <h3 class='error'>{{error}}</h3>
+      <h3 class="error">{{error}}</h3>
     {% endif %}
 
       <div id="create_team_form">
         <form action="/create/" method="post" id="create_team">
           <p>
-            <input type="text" name="team" class="required ui-widget" id="teamName" placeholder="Enter team name">
+            <input type="text" name="team" class="ui-widget" id="teamName" placeholder="Enter team name">
           </p>
           <!-- <p>
             Won
@@ -39,8 +39,8 @@
 
       </div> <!--create_team_form-->
 
-    <div id="dialog-confirm" class="ui-helper-hidden">
+    <!-- <div id="dialog-confirm" class="ui-helper-hidden">
       <span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Let me see
-    </div>
+    </div> -->
 
 {%endblock%}
