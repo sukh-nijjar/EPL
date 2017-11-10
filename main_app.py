@@ -1,6 +1,7 @@
+import csv
 from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
-from operator import itemgetter, attrgetter, methodcaller
 from models import *
+from operator import methodcaller
 from playhouse.shortcuts import model_to_dict
 
 #create application instance
@@ -23,18 +24,17 @@ def home():
         teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
         return render_template('home.html', teams=teams_in_points_order)
     else:
-        feedback = "No teams exist yet me lad"
+        feedback = "There are no teams in the system. Please add some."
         return render_template('feedback.html', feedback = feedback)
 
 @app.route('/new_team/')
 def new_team():
-    wdl_dd = create_dd_of_ints(39)
-    return render_template('createTeam.html', drop_down_values = wdl_dd)
+    # wdl_dd = create_dd_of_ints(39) > no longer using this on creat team view
+    return render_template('createTeam.html')
 
 @app.route('/create/', methods=['POST'])
 def create_team():
     error = None
-    wdl_dd = create_dd_of_ints(39)
     try:
         Team.create(
         name = request.form['team'].lower().strip(),
@@ -47,7 +47,58 @@ def create_team():
         return redirect(url_for('home'))
     except IntegrityError:
         error = 'Team already exists'
-        return render_template('createTeam.html',error=error, drop_down_values = wdl_dd)
+        return render_template('createTeam.html',error=error)
+
+@app.route('/load_data/')
+def display_upload_form():
+    return render_template('upload.html')
+
+@app.route('/upload_teams/', methods=['POST'])
+def perform_teams_upload():
+    error = None
+    try:
+        with open('Teams.csv') as team_csv:
+            csv_reader = csv.reader(team_csv)
+            next(csv_reader)
+
+            for row in csv_reader:
+                Team.create(
+                name = row[0],
+                won = 0,
+                drawn = 0,
+                lost = 0,
+                goals_scored = 0,
+                goals_conceded = 0
+                )
+                #print (row)
+            return redirect(url_for('home'))
+    except IOError:
+        error = 'That file has not been found'
+        return render_template('upload.html',error=error)
+
+@app.route('/upload_results/', methods=['POST'])
+def perform_results_upload():
+    error = None
+    try:
+        with open('2017Results.csv') as results_csv:
+            csv_reader = csv.reader(results_csv)
+            next(csv_reader)
+
+            for row in csv_reader:
+                Result.create(
+                home_team = row[0],
+                away_team = row[1],
+                home_ftg = row[2],
+                away_ftg = row[3],
+                home_htg = row[4],
+                away_htg = row[5]
+                )
+                update_team_stats(row[0],row[1],int(row[2]),int(row[3]))
+                #print (row)
+            return redirect(url_for('view_results'))
+    except IOError:
+        error = 'That file has not been found'
+        return render_template('upload.html',error=error)
 
 @app.route('/enter_result/')
 def enter_result():
@@ -56,12 +107,17 @@ def enter_result():
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd)
     else:
-        feedback = "Add at least a couple o teams me lad before trying add a result!"
+        feedback = "There must be a minimum of 2 teams before a result can be added"
         return render_template("feedback.html", feedback = feedback)
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
     error = None
+    # check home and away teams are different
+    if request.form.get('home_team') == request.form.get('away_team'):
+        error = request.form.get('home_team').title() + " cannot play themselves!"
+        team_dd = Team.select().order_by(Team.name)
+        return render_template('enterResult.html', error = error, team_dd = team_dd)
     # check half-time goals are not greater than full-time goals
     # before saving result:
     if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
@@ -76,7 +132,11 @@ def create_result():
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
         return redirect(url_for('home'))
     else:
-        error = "INVALID RESULT"
+        error = ("INVALID RESULT - half time goals " +
+        str(int(request.form['ahtg']) + int(request.form['hhtg'])) +
+        " cannot be higher than full time goals total of " +
+        str(int(request.form['aftg']) + int(request.form['hftg']))
+        )
         team_dd = Team.select().order_by(Team.name)
         return render_template('enterResult.html', error = error, team_dd = team_dd)
 
