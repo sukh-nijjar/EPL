@@ -14,7 +14,7 @@
         <th scope="col">Conceded</th>
       </tr>
       {% for team in teams %}
-        <tr class="team_rows">
+        <tr class="table_rows">
           <td class="team_column"><a href="{{ url_for('drill_down', team=team.name) }}">{{team.name.title()}}</a></td>
           <td>{{team.points()}}</td>
           <td>{{team.goals_scored - team.goals_conceded}}</td><!--this shows direct use of properties for calculation-->

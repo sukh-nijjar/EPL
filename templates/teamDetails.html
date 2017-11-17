@@ -1,8 +1,35 @@
 {%extends "master_layout.html"%}
 {%block content%}
-      <div id="team_drill_down">
-        <p>Team details for : {{team.name}}</p>
-        <p>Points : {{team.points()}}</p>
-      </div> <!--team_drill_down-->
+      <div id="team_details_Headline">
+        <p id="team_details_name">{{team.name}}</p>
+        <p id="team_details_percentages">TBI - percentage breakdown of WDL's</p>
+      </div> <!--team_details_Headline-->
+
+      <div id="team_results">
+        <table>
+          <tr>
+            <th scope="col">Team</th>
+            <th scope="col">FT goals</th>
+            <th scope="col">HT goals</th>
+            <th scope="col">HT goals</th>
+            <th scope="col">FT - goals</th>
+            <th scope="col">Team</th>
+            <th scope="col">Result Type</th>
+          </tr>
+          {% for result in results %}
+            <tr>
+              <td>{{result.home_team}}</td>
+              <td>{{result.home_ftg}}</td>
+              <td>{{result.home_htg}}</td>
+              <td>{{result.away_htg}}</td>
+              <td>{{result.away_ftg}}</td>
+              <td>{{result.away_team}}</td>
+              <td>TBI</td>
+            </tr>
+          {% endfor %}
+
+        </table>
+
+      </div> <!--END team's_results-->
 
 {%endblock%}

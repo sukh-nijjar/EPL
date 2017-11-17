@@ -44,7 +44,8 @@ th, td{
 	text-align: center;
 }
 
-tr[class='team_rows']:hover{ /*ensures top row does not have hover effect applied to it*/
+/*ensures only rows of the class have hover effect applied*/
+tr[class='table_rows']:hover{
 	background-color: pink;
 	/*border-bottom: 1px solid blue;*/
 }
@@ -128,6 +129,10 @@ section{
 	/*outline: 2px solid purple;*/
 }
 
+#invalid_results{
+	margin: 25px 0 0 50px;
+}
+
 #submitSaveResult{
 	margin-left: 143px;
 }
@@ -171,6 +176,17 @@ section{
 	width: 675px;
 }
 
+.warning{
+	border-radius: 15px;
+	background: #fcc438;
+	border: 2px solid #ef8d22;
+	color: black;
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	width: 675px;
+}
+
 .goals_spinner {
 	margin: 20px;
 }
@@ -188,6 +204,6 @@ section{
 	padding: 0px 0px 25px 60px;
 }
 
-.team_rows{
+.table_rows{
 	border-bottom: 1px solid red;
 }

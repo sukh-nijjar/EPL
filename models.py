@@ -28,13 +28,12 @@ class Team(BaseModel):
             by the team"""
         return self.won + self.drawn + self.lost
 
-    def update_goal_stats(self,scored,conceded):
-        print(scored,conceded)
-        self.goals_scored += scored
-        self.goals_conceded += conceded
+    def goal_difference(self):
+        """returns the goals difference for the team"""
+        return self.goals_scored - self.goals_conceded
 
-    #class Meta:
-        #order_by = ('lost',)
+    # class Meta:
+    #     order_by = ('won',)
 
 class Result(BaseModel):
     result_id = PrimaryKeyField()

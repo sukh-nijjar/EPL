@@ -20,14 +20,12 @@ $(document).ready(function() {
           $('.error').remove();
         }
         var teamName = $('#teamName').val();
-        // if (is_msg_displaying){
-        //   alert("FROm IF" + is_msg_displaying)
-        // }
         if (teamName.trim().length > 0){
           $('#create_team').submit();
         }
         else {
           $('section').prepend('<h3 class="error">Team name is mandatory</h3>');
+          // $('.error').css('display','block');
         }
      });
 
@@ -73,8 +71,9 @@ $(document).ready(function() {
       	source: availableTags
       });
 
+      $('.error').fadeIn("slow");
       $('.feedback').fadeIn("slow");
-      // $('.error').fadeIn("slow");
+      $('.warning').fadeIn("slow");
 
 });//end top document.ready function
 
