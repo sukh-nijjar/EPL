@@ -1,4 +1,4 @@
-import csv
+import csv, re
 from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
 from models import *
 from operator import methodcaller, attrgetter
@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 @app.before_request
 def before_request():
+    print("calling def before_request()")
     init_db()
 
 @app.teardown_request
@@ -36,18 +37,23 @@ def new_team():
 @app.route('/create/', methods=['POST'])
 def create_team():
     error = None
-    try:
-        Team.create(
-        name = request.form['team'].lower().strip(),
-        won = 0,
-        drawn = 0,
-        lost = 0,
-        goals_scored = 0,
-        goals_conceded = 0
-        )
-        return redirect(url_for('home'))
-    except IntegrityError:
-        error = 'Team already exists'
+    team_name_to_validate = request.form['team'].lower().strip()
+    if team_name_valid(team_name_to_validate):
+        try:
+            Team.create(
+            name = request.form['team'].lower().strip(),
+            won = 0,
+            drawn = 0,
+            lost = 0,
+            goals_scored = 0,
+            goals_conceded = 0
+            )
+            return redirect(url_for('home'))
+        except IntegrityError:
+            error = 'Team already exists'
+            return render_template('createTeam.html',error=error)
+    else:
+        error = team_name_to_validate + ' contains invalid characters'
         return render_template('createTeam.html',error=error)
 
 @app.route('/load_data/')
@@ -57,25 +63,39 @@ def display_upload_form():
 @app.route('/upload_teams/', methods=['POST'])
 def perform_teams_upload():
     error = None
-    try:
-        with open('Teams.csv') as team_csv:
-            csv_reader = csv.reader(team_csv)
-            next(csv_reader)
+    invalid_rows = []
+    with db.atomic() as transaction:
+        try:
+            with open('2017Teams.csv') as team_csv:
+                csv_reader = csv.reader(team_csv)
+                next(csv_reader)
+                for row in csv_reader:
+                    #if mandatory_data_present(row):
+                    if team_name_valid(row[0]):
+                        Team.create(
+                        name = row[0].lower().strip(),
+                        won = 0,
+                        drawn = 0,
+                        lost = 0,
+                        goals_scored = 0,
+                        goals_conceded = 0
+                        )
+                    else:
+                        raise ValueError(row[0] + " contains invalid characters")
+                return redirect(url_for('home'))
 
-            for row in csv_reader:
-                Team.create(
-                name = row[0],
-                won = 0,
-                drawn = 0,
-                lost = 0,
-                goals_scored = 0,
-                goals_conceded = 0
-                )
-                #print (row)
-            return redirect(url_for('home'))
-    except IOError:
-        error = 'That file has not been found'
-        return render_template('upload.html',error=error)
+        except IOError:
+            error = 'That file has not been found'
+            return render_template('upload.html',error=error)
+        except IntegrityError:
+            error = 'IntegrityError detected'
+            db.rollback()
+            return render_template('upload.html',error=error)
+        except ValueError as v_err:
+            print(v_err.args)
+            error = ('{} '.format(v_err.args[0]))
+            db.rollback()
+            return render_template('upload.html',error=error)
 
 @app.route('/upload_results/', methods=['POST'])
 def perform_results_upload():
@@ -86,22 +106,22 @@ def perform_results_upload():
         feedback = "Teams must be loaded before loading results"
         return render_template('feedback.html', feedback=feedback)
     try:
-        with open('2017ResultsShortVersion.csv') as results_csv:
+        with open('2017Results.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
 
             for row in csv_reader:
                 if row_is_valid(row):
                     Result.create(
-                    home_team = row[0],
-                    away_team = row[1],
+                    home_team = row[0].lower().strip(),
+                    away_team = row[1].lower().strip(),
                     home_ftg = row[2],
                     away_ftg = row[3],
                     home_htg = row[4],
                     away_htg = row[5]
                     )
-                    #print (row)
-                    update_team_stats(row[0],row[1],int(row[2]),int(row[3]))
+                    print ("calling update_team_stats")
+                    update_team_stats(row[0].lower(),row[1].lower(),int(row[2]),int(row[3]))
                 else:
                     invalid_rows.append(row)
             #in the case of errors show the upload errors view
@@ -109,10 +129,10 @@ def perform_results_upload():
                 with open('result_upload_errors.csv', 'w') as results_errors_csv:
                     csv_writer = csv.writer(results_errors_csv)
                     csv_writer.writerows(invalid_rows)
+                    print('number of invalid rows = {} '.format(len(invalid_rows)))
                 return render_template('uploadErrors.html',invalid_rows=invalid_rows)
             else:
                 return redirect(url_for('view_results'))
-
     except IOError:
         error = 'That file has not been found'
         return render_template('upload.html',error=error)
@@ -144,6 +164,7 @@ def create_result():
         home_ftg = request.form['hftg'],
         away_ftg = request.form['aftg']
         )
+        print("home team is {} ".format(request.form.get('home_team')))
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
         return redirect(url_for('home'))
     else:
@@ -183,11 +204,13 @@ def delete_all_teees():
 
 @app.route('/team_drill_down/<team>', methods=['GET'])
 def drill_down(team):
-    return render_template(
-    'teamDetails.html', team=Team.get(Team.name == team),
-    results=Result.select()
-                  .where((Result.away_team == team) | (Result.home_team == team))
-    )
+    team=Team.get(Team.name == team)
+    #print(str(team.name))
+    results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
+    return render_template('teamDetails.html',team=team,results=results)
+    # return render_template(
+    # 'teamDetails.html', team=Team.get(Team.name == team),
+    # results=Result.select().where((Result.away_team == team) | (Result.home_team == team))
 
 @app.route('/get_teams_autocompletion_data', methods=['GET'])
 def team_autocompletion_src():
@@ -209,10 +232,9 @@ def row_is_valid(row):
     check half times don't exceed full time goals
     check all data presents
     check team actually exist
-    check if valid result already exists > TODO
+    check if valid result already exists (i.e. not a duplicate) > TODO
     """
-    # rules = [goals_valid(row),mandatory_data_present(row),teams_exist(row),result_is_new()]
-    rules = [goals_valid(row),mandatory_data_present(row),teams_exists(row)]
+    rules = [goals_valid(row),mandatory_data_present(row),teams_exists(row),is_result_new(row)]
     return all(rules)
 
 def goals_valid(row):
@@ -223,21 +245,38 @@ def goals_valid(row):
 
 def mandatory_data_present(row):
     for item in row:
+        #print(item)
         if item == '':
             return False
     else:
         return True
 
 def teams_exists(row):
-        home_team = Team.select().where(Team.name == row[0])
-        away_team = Team.select().where(Team.name == row[1])
-
-        if home_team.exists() & away_team.exists():
+        # home_team = Team.select().where(Team.name == row[0])
+        # away_team = Team.select().where(Team.name == row[1])
+        home_team = Team.select().where(Team.name == row[0].lower()).get()
+        away_team = Team.select().where(Team.name == row[1].lower()).get()
+        if ((home_team) and (away_team)):
             return True
         else:
             return False
 
+def is_result_new(row):
+    result = Result.select().where((Result.home_team == row[0]) & (Result.away_team == row[1]))
+    if result.exists():
+        return False
+    else:
+        return True
+
+def team_name_valid(team_name):
+    match = re.search(r'^[a-z A-Z 0-9 &]+\Z', team_name)
+    if match:
+        return True
+    else:
+        return False
+
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
+    print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
         update_query = Team.update(
         won = Team.won + 1,

@@ -4,7 +4,7 @@
   <title>Premiership 2017/18</title>
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/MyCV.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.css')}}">
-  <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play|Baloo|Bungee" rel="stylesheet">
   <meta charset="UTF-8">
   <style>
   .ui-widget-overlay {
@@ -30,6 +30,12 @@
               <input type="hidden">
             </form>
             <li><a href="{{url_for('display_upload_form')}}">Load data</a></li>
+            <!-- <li><a href="#">Load Data</a>
+              <ul>
+                <li>Upload Teams</li>
+                <li>Upload Result</li>
+              </ul>
+            </li> -->
         </ul>
       </nav>
 
@@ -42,7 +48,7 @@
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
-      <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}">></script>
+      <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}"></script>
       <script type=text/javascript>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
       </script>

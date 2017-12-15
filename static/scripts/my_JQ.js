@@ -47,29 +47,43 @@ $(document).ready(function() {
                }
              } //end buttons
            });
-       });
+    });
+
+    var team = $('#team_details_name').text();
+    $("tr.result_row").each(function() {
+      // alert(team + '\n' + row_team);
+      $this = $(this);
+      var row_team = $this.find("td.home_team").text();
+      var home = $this.find("td.home").text();
+      var away = $this.find("td.away").text();
+      if (row_team === team){
+        if (home > away) {
+          $(this).addClass('win');
+        } else if (away > home) {
+          $(this).addClass('loss');
+        } else {
+          $(this).addClass('drawn');
+        }
+      }
+      if (row_team != team) {
+        if (home > away) {
+          $(this).addClass('loss');
+        } else if (away > home) {
+          $(this).addClass('win');
+        } else {
+          $(this).addClass('drawn');
+        }
+      }
+    });
 
        $( ".selectmenu" ).selectmenu();
        $(".spinner").spinner({
           min: 0
        });
 
+       $( "#menu" ).menu();
        $(" #GDToolTip ").tooltip();
 
-      //  $( "#autocomplete" ).autocomplete({
-      //     source: $.getJSON($SCRIPT_ROOT + '/get_teams_autocompletion_data'),
-      //     minLength: 2
-      //   });
-
-      var availableTags = [
-        	"Sen City",
-          "Arsenal",
-          "Man City",
-        	"Man Utd"
-                      ];
-      $( "#autocomplete" ).autocomplete({
-      	source: availableTags
-      });
 
       $('.error').fadeIn("slow");
       $('.feedback').fadeIn("slow");

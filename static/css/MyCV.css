@@ -50,10 +50,6 @@ tr[class='table_rows']:hover{
 	/*border-bottom: 1px solid blue;*/
 }
 
-#wrapper{
-  width:1200px;
-}
-
 header{
 	font-family: 'Bungee Shade';
   width: 1200px;
@@ -104,6 +100,16 @@ nav li:hover{
 	font-weight: bolder;
 }
 
+section{
+  width: 900px;
+	float: left;
+	/*margin-top: 15px;*/
+	padding-left: 15px;
+	font-family: 'News Cycle', sans-serif;
+	font-size: 18px;
+	/*outline: 2px solid purple;*/
+}
+
 /*
 nav a{
 	border: 1px solid black;
@@ -119,16 +125,6 @@ nav a{
 	margin-top: 20px;
 }
 
-section{
-  width: 900px;
-	float: left;
-	/*margin-top: 15px;*/
-	padding-left: 15px;
-	font-family: 'News Cycle', sans-serif;
-	font-size: 18px;
-	/*outline: 2px solid purple;*/
-}
-
 #invalid_results{
 	margin: 25px 0 0 50px;
 }
@@ -137,11 +133,36 @@ section{
 	margin-left: 143px;
 }
 
+#td_draws{
+	background: #DDFF11;
+}
+
+#td_losses{
+	background: #DD0048;
+}
+
+#td_wins{
+	background: #0bff01;
+}
+
 #teamName{
 	width: 300px;
 	margin-bottom: 15px;
 	width:555px;
 }
+
+#team_details_name{
+	font-family: 'Bungee', cursive;
+	font-size: 40px;
+}
+
+#team_details_table{
+	/*border: 1px solid red;*/
+	left:45px;
+	position: relative;
+	padding: 0px 0px;
+}
+
 
 /*#usr_messages{
 	  width: 300px;
@@ -153,6 +174,10 @@ section{
 	font-weight: bold;
 	color: DarkCyan;
 }*/
+
+#wrapper{
+  width:1200px;
+}
 
 .error{
 	/*font-family: 'Unica One', cursive;*/
@@ -174,6 +199,16 @@ section{
 	font-weight: bold;
 	text-align: center;
 	width: 675px;
+}
+
+.full_time{
+	font-weight: bold;
+}
+
+.team_details_rows{
+	font-family: 'Baloo', cursive;
+	font-size: 30px;
+	font-weight:lighter;
 }
 
 .warning{
@@ -207,3 +242,19 @@ section{
 .table_rows{
 	border-bottom: 1px solid red;
 }
+/*next 3 classes used in team details view  */
+.win{
+  background-color: green;
+}
+
+.loss{
+  background-color: red;
+}
+
+.drawn{
+  background-color: orange;
+}
+/* ------------------------------ */
+/*Fonts
+font-family: 'Bungee', cursive;
+font-family: 'Baloo', cursive;*/

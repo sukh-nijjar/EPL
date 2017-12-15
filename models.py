@@ -32,6 +32,18 @@ class Team(BaseModel):
         """returns the goals difference for the team"""
         return self.goals_scored - self.goals_conceded
 
+    def win_rate(self):
+        """returns the percentage of games won by a team"""
+        return round((100/self.games_played())*self.won)
+
+    def draw_rate(self):
+        """returns the percentage of games drawn by a team"""
+        return round((100/self.games_played())*self.drawn)
+
+    def loss_rate(self):
+        """returns the percentage of games lost by a team"""
+        return round((100/self.games_played())*self.lost)
+
     # class Meta:
     #     order_by = ('won',)
 
