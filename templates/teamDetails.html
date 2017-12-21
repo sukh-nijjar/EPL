@@ -7,11 +7,11 @@
             <!-- <td id="team_details_name" colspan="3">{{team.name.title()}} - {{team.points()}} pts</td> -->
             <td id="team_details_name" colspan="3">{{team.name.title()}}</td>
           </tr>
-          <tr class="team_details_rows">
+          <!-- <tr class="team_details_rows">
             <td id="td_wins">Wins = {{team.win_rate()}}%</td>
             <td id="td_draws">Draws = {{team.draw_rate()}}%</td>
             <td id="td_losses">Losses = {{team.loss_rate()}}%</td>
-          </tr>
+          </tr> -->
         </table>
       </div> <!--team_details_Headline-->
 <!-- just loop thru table elements and add required class..TRY IT! -->
@@ -26,7 +26,7 @@
             <th scope="col">Away</th>
             <th scope="col">Result Type</th>
           </tr>
-          {% for result in results %}
+          {% for result in object_list %}
             <tr class="result_row">
               <td class="home_team">{{result.home_team.title()}}</td>
               <td>[{{result.home_htg}}]</td>
@@ -34,10 +34,21 @@
               <td class="away">{{result.away_ftg}}</td>
               <td>[{{result.away_htg}}]</td>
               <td>{{result.away_team.title()}}</td>
-              <td>TBI</td>
+              <td class="result_type"></td>
             </tr>
           {% endfor %}
         </table>
       </div>
+      <nav id="paginated_navigation">
+        {% for number in range(pagination.get_page_count()) %}
+          <a href="{{ url_for('drill_down', team=team.name,page=number+1) }}">{{number + 1}}</a>
+        {% endfor %}
+      </nav>
+      <!-- {% if page > 1 %}
+        <a href="{{ url_for('drill_down', team=team.name,page=page - 1) }}">Prev</a>
+      {% endif %}
+      {% if page < pagination.get_page_count() %}
+        <a href="{{ url_for('drill_down', team=team.name,page=page + 1) }}">Next</a>
+      {% endif %} -->
 
 {%endblock%}

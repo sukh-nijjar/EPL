@@ -1,5 +1,6 @@
 import csv, re
 from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
+from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
 from operator import methodcaller, attrgetter
 from playhouse.shortcuts import model_to_dict
@@ -205,12 +206,9 @@ def delete_all_teees():
 @app.route('/team_drill_down/<team>', methods=['GET'])
 def drill_down(team):
     team=Team.get(Team.name == team)
-    #print(str(team.name))
     results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
-    return render_template('teamDetails.html',team=team,results=results)
-    # return render_template(
-    # 'teamDetails.html', team=Team.get(Team.name == team),
-    # results=Result.select().where((Result.away_team == team) | (Result.home_team == team))
+    # object_list method creates a PaginatedQuery object calls get_object_list
+    return object_list('teamDetails.html',results,paginate_by=9,team=team)
 
 @app.route('/get_teams_autocompletion_data', methods=['GET'])
 def team_autocompletion_src():

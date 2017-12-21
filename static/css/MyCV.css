@@ -22,6 +22,11 @@ div[class='error']{
 	text-align: center;
 }
 
+img{
+  height: 30px;
+  width: 30px;
+}
+
 li{
   list-style: none;
 }
@@ -50,10 +55,18 @@ tr[class='table_rows']:hover{
 	/*border-bottom: 1px solid blue;*/
 }
 
+/* footer{
+	background: orange;
+	bottom: 50px;
+	height: 100px;
+	position: fixed;
+	width: 1200px;
+} */
+
 header{
 	font-family: 'Bungee Shade';
+	height: 120px;
   width: 1200px;
-  height: 120px;
 	text-align: center;
 	border-bottom: thick solid black;
 	margin-bottom: 5px; /*this specifies the gap downwards from header's bottom boundary*/
@@ -76,7 +89,8 @@ header h1 a{
 nav{
   width: 240px;
   float: left; /*otherwise it would be centered*/
-  font-family: 'Unica One', cursive;
+  /* font-family: 'Unica One', cursive; */
+	font-family: 'Baloo', cursive;
 	/*outline: 1px solid blue;*/
 }
 
@@ -89,15 +103,16 @@ nav ul{
 nav li{
 	margin-bottom: 10px;
 	margin-left: 0px;
-	font-size: 36px;
+	font-size: 25px;
 	float: left;
 	width: 240px;
 	/*outline: 1px dashed red;*/
 }
 
 nav li:hover{
-	background-color: orange;
+	/* background-color: orange; */
 	font-weight: bolder;
+	text-shadow: 2px 2px 30px orange ;
 }
 
 section{
@@ -105,7 +120,7 @@ section{
 	float: left;
 	/*margin-top: 15px;*/
 	padding-left: 15px;
-	font-family: 'News Cycle', sans-serif;
+	font-family: 'Baloo', cursive;
 	font-size: 18px;
 	/*outline: 2px solid purple;*/
 }
@@ -127,6 +142,22 @@ nav a{
 
 #invalid_results{
 	margin: 25px 0 0 50px;
+}
+
+#paginated_navigation{
+	/* border-top: thick solid black; */
+	margin-left: 189px;
+	margin-top: 15px;
+	text-align: center;
+	/* outline: 2px solid green; */
+}
+
+#paginated_navigation a{
+	padding: 0px 8px;
+}
+
+#paginated_navigation a:hover{
+	background: orange;
 }
 
 #submitSaveResult{
@@ -151,16 +182,22 @@ nav a{
 	width:555px;
 }
 
+#team_details_Headline{
+	text-align: center;
+	/* outline: 2px solid green; */
+}
+
 #team_details_name{
 	font-family: 'Bungee', cursive;
 	font-size: 40px;
 }
 
 #team_details_table{
-	/*border: 1px solid red;*/
-	left:45px;
-	position: relative;
+	/* border: 1px solid red; */
+	/* left:45px;
+	position: relative; */
 	padding: 0px 0px;
+	width: 70%;
 }
 
 
@@ -231,6 +268,7 @@ nav a{
 }
 
 .team_column{
+	font-weight: bold;
 	text-align: left;
 	/*border-right: 1px solid red;*/
 }
@@ -242,6 +280,7 @@ nav a{
 .table_rows{
 	border-bottom: 1px solid red;
 }
+
 /*next 3 classes used in team details view  */
 .win{
   background-color: green;

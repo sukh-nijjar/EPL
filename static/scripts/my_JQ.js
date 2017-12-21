@@ -58,20 +58,20 @@ $(document).ready(function() {
       var away = $this.find("td.away").text();
       if (row_team === team){
         if (home > away) {
-          $(this).addClass('win');
+          $(this).find('td.result_type').append('<img src="/static/images/win.png"/>');
         } else if (away > home) {
-          $(this).addClass('loss');
+          $(this).find('td.result_type').append('<img src="/static/images/loss.png"/>');
         } else {
-          $(this).addClass('drawn');
+          $(this).find('td.result_type').append('<img src="/static/images/draw.png"/>');
         }
       }
       if (row_team != team) {
         if (home > away) {
-          $(this).addClass('loss');
+          $(this).find('td.result_type').append('<img src="/static/images/loss.png"/>');
         } else if (away > home) {
-          $(this).addClass('win');
+          $(this).find('td.result_type').append('<img src="/static/images/win.png"/>');
         } else {
-          $(this).addClass('drawn');
+          $(this).find('td.result_type').append('<img src="/static/images/draw.png"/>');
         }
       }
     });
