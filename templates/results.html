@@ -1,7 +1,7 @@
 {%extends "master_layout.html"%}
 {%block content%}
     <div id="results_list">
-      
+
         <table>
           <tr>
             <th scope="col">Home</th>
@@ -11,7 +11,7 @@
             <th scope="col">FT</th>
             <th scope="col">Away</th>
           </tr>
-          {% for result in results %}
+          {% for result in object_list %}
             <tr>
               <td>{{result.home_team}}</td>
               <td>{{result.home_ftg}}</td>
@@ -22,6 +22,10 @@
             </tr>
           {% endfor %}
         </table>
-
       </div> <!--results_list-->
+      <nav id="paginated_navigation">
+        {% for number in range(pagination.get_page_count()) %}
+          <a href="{{ url_for('view_results',page=number+1) }}">{{number + 1}}</a>
+        {% endfor %}
+      </nav>
 {%endblock%}

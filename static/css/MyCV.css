@@ -7,7 +7,7 @@
 a, a:visited{
   text-decoration: none;
 	color: inherit;
-	/*outline: 1px solid pink;*/
+	/* outline: 1px solid blue; */
 }
 
 body{
@@ -55,13 +55,14 @@ tr[class='table_rows']:hover{
 	/*border-bottom: 1px solid blue;*/
 }
 
-/* footer{
-	background: orange;
-	bottom: 50px;
-	height: 100px;
-	position: fixed;
+footer{
+	border-top: thick solid black;
+	bottom:17px;
+	font-family: 'Baloo', cursive;
+	position:fixed;
 	width: 1200px;
-} */
+	/* outline: 1px solid red; */
+}
 
 header{
 	font-family: 'Bungee Shade';
@@ -106,13 +107,12 @@ nav li{
 	font-size: 25px;
 	float: left;
 	width: 240px;
-	/*outline: 1px dashed red;*/
+	/* outline: 1px dashed red; */
 }
 
 nav li:hover{
-	/* background-color: orange; */
 	font-weight: bolder;
-	text-shadow: 2px 2px 30px orange ;
+	text-decoration: underline;
 }
 
 section{
@@ -125,11 +125,6 @@ section{
 	/*outline: 2px solid purple;*/
 }
 
-/*
-nav a{
-	border: 1px solid black;
-}*/
-
 #create_team_form{
 	margin-left: 62px;
 	margin-top: 20px;
@@ -140,8 +135,20 @@ nav a{
 	margin-top: 20px;
 }
 
+/* #icon_team{
+	background-image: url('../images/team.png');
+}
+
+#icon_team:hover{
+	background-image: url('../images/team_hover.png');
+} */
+
 #invalid_results{
 	margin: 25px 0 0 50px;
+}
+
+#league_table{
+	font-size: 15px;
 }
 
 #paginated_navigation{
@@ -149,7 +156,8 @@ nav a{
 	margin-left: 189px;
 	margin-top: 15px;
 	text-align: center;
-	/* outline: 2px solid green; */
+	width:900px;
+	outline: 2px solid green;
 }
 
 #paginated_navigation a{
@@ -216,6 +224,26 @@ nav a{
   width:1200px;
 }
 
+.button_upload{
+	background: #ffffff;
+	border: 2px solid #D9D6D3;
+	border-radius: 12px;
+	color: #D9D6D3;
+	font-family: 'Baloo', cursive;
+	font-size: 40px;
+	left: 200px;
+	margin: 30px 0 30px 0;
+	padding: 20px 10px;
+	position: relative;
+	text-align: center;
+	width: 500px;
+}
+
+.button_upload:hover{
+	border: 2px solid red;
+	color: red;
+}
+
 .error{
 	/*font-family: 'Unica One', cursive;*/
 	border-radius: 15px;
@@ -240,6 +268,11 @@ nav a{
 
 .full_time{
 	font-weight: bold;
+}
+
+.icons{
+	vertical-align: middle; /*lines up icons with menu text*/
+	/* outline: 1px solid pink; */
 }
 
 .team_details_rows{

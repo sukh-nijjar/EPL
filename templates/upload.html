@@ -6,12 +6,12 @@
     {% if error %}
       <h3 class="error">{{error}}</h3>
     {% endif %}
-    <h1 class="feedback">UPLOAD FORM :D</h1>
+    <!-- <h1 class="feedback">UPLOAD FORM :D</h1> -->
     <form action="/upload_teams/" method="post">
-      <p><input type="submit" value="upload teams" class="ui-button ui-corner-all ui-widget"></p>
+      <p><input type="submit" value="upload teams" class="button_upload"></p>
     </form>
 
     <form action="/upload_results/" method="post">
-      <p><input type="submit" value="upload results" class="ui-button ui-corner-all ui-widget"></p>
+      <p><input type="submit" value="upload results" class="button_upload"></p>
     </form>
 {%endblock%}

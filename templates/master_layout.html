@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Premiership 2017/18</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/MyCV.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.css')}}">
   <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play|Baloo|Bungee" rel="stylesheet">
@@ -21,15 +22,15 @@
 
       <nav>
         <ul>
-            <li><a href="{{ url_for('new_team') }}">Add a new team</a></li>
-            <li><a href="{{ url_for('enter_result') }}">Enter result</a></li>
-            <li><a href="{{ url_for('view_results') }}">View results</a></li>
-            <li><a href="{{ url_for('delete_all_results') }}">Delete <strong>ALL</strong> results</a></li>
+            <li><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"> </span>New team</a></li>
+            <li><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
+            <li><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
+            <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
             <form id="deleteAllTeams" action="delete_all_teams/" method="post">
-              <li><a  id="submitDeleteAllTeams" href="#">Delete <strong>ALL</strong> teams</a></li>
+              <li><a  id="submitDeleteAllTeams" href="#"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete teams</a></li>
               <input type="hidden">
             </form>
-            <li><a href="{{url_for('display_upload_form')}}">Load data</a></li>
+            <li><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"> </span>Load data</a></li>
             <!-- <li><a href="#">Load Data</a>
               <ul>
                 <li>Upload Teams</li>
@@ -45,6 +46,15 @@
         {%endblock%}
       </section>
 
+      <footer>
+        <div>Icons made by
+          <a href="https://www.flaticon.com/authors/yannick" title="Yannick">Yannick</a>,
+          <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a>,
+          <a href="https://www.flaticon.com/authors/eucalyp" title="Eucalyp">Eucalyp</a>
+          from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
+          Licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+      </footer>
+
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
@@ -56,6 +66,5 @@
     <div id="dialog-confirm" class="ui-helper-hidden">
       <span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>CONFIRM ACTION
     </div>
-    <!-- <footer></footer> -->
 </body>
 </html>

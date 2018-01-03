@@ -141,6 +141,7 @@ def perform_results_upload():
 @app.route('/enter_result/')
 def enter_result():
     team_dd = Team.select().order_by(Team.name)
+    print('team dd = {}'.format(team_dd[0]))
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd)
     else:
@@ -148,12 +149,17 @@ def enter_result():
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
+    team_dd = Team.select().order_by(Team.name)
     error = None
     # check home and away teams are different
     if request.form.get('home_team') == request.form.get('away_team'):
         error = request.form.get('home_team').title() + " cannot play themselves!"
         team_dd = Team.select().order_by(Team.name)
         return render_template('enterResult.html', error = error, team_dd = team_dd)
+    # check valid team has be selected and not the default text
+    # if request.form.get('home_team') or request.form.get('away_team') not in team_dd:
+    #     error='Need to provide team(s)'
+    #     return render_template('enterResult.html', error = error, team_dd = team_dd)
     # check half-time goals are not greater than full-time goals
     # before saving result:
     if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
@@ -182,7 +188,8 @@ def view_results():
     feedback = None
     results = Result.select()
     if len(results) > 0:
-        return render_template('results.html', results = results)
+        # return render_template('results.html', results = results)
+        return object_list('results.html',results,paginate_by=10)
     else:
         feedback = "No results available"
         return render_template("feedback.html", feedback = feedback)

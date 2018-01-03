@@ -10,6 +10,7 @@
             <span>Home Team</span>
             <!-- <input id="autocomplete" class="ui-widget"> -->
             <select name="home_team" class="selectmenu">
+              <option selected="selected">Select home team...</option>
               {% for team in team_dd %}
                 <option value='{{team.name}}'>{{team.name.title()}}</option>
               {% endfor %}
@@ -24,6 +25,7 @@
           <p class="teamDropDowns">
             <span>Away Team</span>
             <select name="away_team" class="selectmenu">
+              <option selected="selected">Select away team...</option>
               {% for team in team_dd %}
                 <option value='{{team.name}}'>{{team.name.title()}}</option>
               {% endfor %}
