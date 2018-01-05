@@ -13,12 +13,12 @@
           </tr>
           {% for result in object_list %}
             <tr>
-              <td>{{result.home_team}}</td>
+              <td>{{result.home_team.title()}}</td>
               <td>{{result.home_ftg}}</td>
               <td>({{result.home_htg}})</td>
               <td>({{result.away_htg}})</td>
               <td>{{result.away_ftg}}</td>
-              <td>{{result.away_team}}</td>
+              <td>{{result.away_team.title()}}</td>
             </tr>
           {% endfor %}
         </table>

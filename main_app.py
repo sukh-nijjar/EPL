@@ -100,6 +100,13 @@ def perform_teams_upload():
 
 @app.route('/upload_results/', methods=['POST'])
 def perform_results_upload():
+    """
+    Team names changed to lower when creating db record.
+    A team's stats are only updated when a result exists,
+    otherwise null values are stored for full and half time goals (see method
+    mandatory_data_present(row)).
+    Where errors are found they are presented to the user.
+    """
     error = None
     feedback = None
     invalid_rows = []
@@ -107,12 +114,13 @@ def perform_results_upload():
         feedback = "Teams must be loaded before loading results"
         return render_template('feedback.html', feedback=feedback)
     try:
-        with open('2017Results.csv') as results_csv:
+        with open('2017ResultsShortVersion.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
 
             for row in csv_reader:
                 if row_is_valid(row):
+                    # print("inserting {}".format(row))
                     Result.create(
                     home_team = row[0].lower().strip(),
                     away_team = row[1].lower().strip(),
@@ -121,8 +129,9 @@ def perform_results_upload():
                     home_htg = row[4],
                     away_htg = row[5]
                     )
-                    print ("calling update_team_stats")
-                    update_team_stats(row[0].lower(),row[1].lower(),int(row[2]),int(row[3]))
+                    if None not in row:
+                        # print ("calling update_team_stats")
+                        update_team_stats(row[0].lower(),row[1].lower(),int(row[2]),int(row[3]))
                 else:
                     invalid_rows.append(row)
             #in the case of errors show the upload errors view
@@ -130,7 +139,7 @@ def perform_results_upload():
                 with open('result_upload_errors.csv', 'w') as results_errors_csv:
                     csv_writer = csv.writer(results_errors_csv)
                     csv_writer.writerows(invalid_rows)
-                    print('number of invalid rows = {} '.format(len(invalid_rows)))
+                    # print('number of invalid rows = {} '.format(len(invalid_rows)))
                 return render_template('uploadErrors.html',invalid_rows=invalid_rows)
             else:
                 return redirect(url_for('view_results'))
@@ -156,10 +165,13 @@ def create_result():
         error = request.form.get('home_team').title() + " cannot play themselves!"
         team_dd = Team.select().order_by(Team.name)
         return render_template('enterResult.html', error = error, team_dd = team_dd)
+
     # check valid team has be selected and not the default text
     # if request.form.get('home_team') or request.form.get('away_team') not in team_dd:
+    #     print("HOME team is {} ".format(request.form.get('home_team')))
     #     error='Need to provide team(s)'
     #     return render_template('enterResult.html', error = error, team_dd = team_dd)
+
     # check half-time goals are not greater than full-time goals
     # before saving result:
     if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
@@ -175,7 +187,7 @@ def create_result():
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
         return redirect(url_for('home'))
     else:
-        error = ("INVALID RESULT - half time goals " +
+        error = ("INVALID RESULT - half time goals total of " +
         str(int(request.form['ahtg']) + int(request.form['hhtg'])) +
         " cannot be higher than full time goals total of " +
         str(int(request.form['aftg']) + int(request.form['hftg']))
@@ -217,6 +229,15 @@ def drill_down(team):
     # object_list method creates a PaginatedQuery object calls get_object_list
     return object_list('teamDetails.html',results,paginate_by=9,team=team)
 
+@app.route('/upload_errors/', methods=['GET'])
+def display_upload_errors():
+    invalid_rows = []
+    with open('result_upload_errors.csv') as results_errors_csv:
+        csv_reader = csv.reader(results_errors_csv)
+        for row in csv_reader:
+            invalid_rows.append(row)
+        return render_template('uploadErrors.html',invalid_rows=invalid_rows)
+        
 @app.route('/get_teams_autocompletion_data', methods=['GET'])
 def team_autocompletion_src():
     team_source=["arsenal","rs","Man Utd","Man City"]
@@ -234,31 +255,37 @@ def create_dd_of_ints(required_range):
 
 def row_is_valid(row):
     """
-    check half times don't exceed full time goals
-    check all data presents
+    check half times don't exceed full time goals (if goal data available)
+    check all data is present
     check team actually exist
-    check if valid result already exists (i.e. not a duplicate) > TODO
+    check if valid result already exists (i.e. not a duplicate)
     """
     rules = [goals_valid(row),mandatory_data_present(row),teams_exists(row),is_result_new(row)]
     return all(rules)
 
 def goals_valid(row):
-    if row[2] >= row[4] and row[3] >= row[5]:
+    if row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '':
+        return True
+    elif row[2] >= row[4] and row[3] >= row[5]:
         return True
     else:
         return False
 
 def mandatory_data_present(row):
-    for item in row:
-        #print(item)
-        if item == '':
-            return False
+    # print("Calling mandatory_data_present()_2")
+    if row[0] == '' or row[1] == '':
+        return False
+    elif row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '':
+        row[2] = None
+        row[3] = None
+        row[4] = None
+        row[5] = None
+        # print ("row values are {}, {}, {}, {}".format(row[2],row[3],row[4],row[5]))
+        return True
     else:
         return True
 
 def teams_exists(row):
-        # home_team = Team.select().where(Team.name == row[0])
-        # away_team = Team.select().where(Team.name == row[1])
         home_team = Team.select().where(Team.name == row[0].lower()).get()
         away_team = Team.select().where(Team.name == row[1].lower()).get()
         if ((home_team) and (away_team)):
@@ -267,7 +294,8 @@ def teams_exists(row):
             return False
 
 def is_result_new(row):
-    result = Result.select().where((Result.home_team == row[0]) & (Result.away_team == row[1]))
+    # print('teams = {},{}'.format(row[0],row[1]))
+    result = Result.select().where((Result.home_team == row[0].lower()) & (Result.away_team == row[1].lower()))
     if result.exists():
         return False
     else:
@@ -281,7 +309,7 @@ def team_name_valid(team_name):
         return False
 
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
-    print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
+    # print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
         update_query = Team.update(
         won = Team.won + 1,
