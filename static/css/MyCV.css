@@ -266,6 +266,14 @@ section{
 	width: 675px;
 }
 
+.fixture{
+	background-color: #e8f7f3;
+}
+
+.fixture input{
+	width: 50px;
+}
+
 .full_time{
 	font-weight: bold;
 }

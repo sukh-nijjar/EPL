@@ -1,4 +1,4 @@
-import csv, re
+import csv, os, re
 from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
 from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
@@ -136,10 +136,10 @@ def perform_results_upload():
                     invalid_rows.append(row)
             #in the case of errors show the upload errors view
             if len(invalid_rows) > 0:
-                with open('result_upload_errors.csv', 'w') as results_errors_csv:
+                with open('result_upload_errors.csv', 'w', newline='') as results_errors_csv:
                     csv_writer = csv.writer(results_errors_csv)
                     csv_writer.writerows(invalid_rows)
-                    # print('number of invalid rows = {} '.format(len(invalid_rows)))
+                    print('number of invalid rows = {} '.format(len(invalid_rows)))
                 return render_template('uploadErrors.html',invalid_rows=invalid_rows)
             else:
                 return redirect(url_for('view_results'))
@@ -150,7 +150,8 @@ def perform_results_upload():
 @app.route('/enter_result/')
 def enter_result():
     team_dd = Team.select().order_by(Team.name)
-    print('team dd = {}'.format(team_dd[0]))
+    # print('team dd = {}'.format(team_dd[0])) -CAREFULL! > THIS LINE CAUSED APP TO CRASH
+    # WHEN NO TEAMS IN team_dd!!
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd)
     else:
@@ -213,13 +214,14 @@ def delete_all_results():
     return redirect(url_for('home'))
 
 @app.route('/delete_all_teams/', methods=['POST'])
-def delete_all_teees():
+def delete_all_teams():
     """deleting teams also causes all results to be deleted
     """
     delete_query = Team.delete()
     delete_query.execute()
     delete_query = Result.delete()
     delete_query.execute()
+    os.remove('result_upload_errors.csv')
     return redirect(url_for('home'))
 
 @app.route('/team_drill_down/<team>', methods=['GET'])
@@ -237,15 +239,6 @@ def display_upload_errors():
         for row in csv_reader:
             invalid_rows.append(row)
         return render_template('uploadErrors.html',invalid_rows=invalid_rows)
-        
-@app.route('/get_teams_autocompletion_data', methods=['GET'])
-def team_autocompletion_src():
-    team_source=["arsenal","rs","Man Utd","Man City"]
-    return jsonify(team_source)
-    # team_source = Team.select(Team.name).order_by(Team.name)
-    # print (team_source)
-    # print (json.dumps(model_to_dict(team_source.get())))
-    # return json.dumps(model_to_dict(team_source.get()))
 
 def create_dd_of_ints(required_range):
     dd = []

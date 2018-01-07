@@ -49,6 +49,29 @@ $(document).ready(function() {
            });
     });
 
+    $('.fixture').delegate('td.action_link', 'click', function() {
+      $this = $(this);
+      var action_type = $this.find('a').text();
+      if (action_type === 'Edit'){
+        // alert(action_type);
+        $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
+        $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
+        $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
+        // alert($(this).parent());
+        // console.log($(this).parent());
+        $(this).remove();} //end if action type is *EDIT*
+        if (action_type === 'Cancel'){
+          // alert(action_type);
+          $(this).closest('tr').css('background-color','#e8f7f3').find('input').prop('disabled', true).val('0');
+          $(this).after('<td class="action_link"><a class="AL_edit" href="#">Edit</a></td>');
+          $(this).closest('tr').find('td:nth-child(7)').remove();
+          $(this).closest('tr').find('td:nth-child(7)').remove();
+        } //end if action type is *CANCEL*
+        if (action_type === 'Save'){
+          alert(action_type);
+        } //end if action type is *SAVE*
+    }); //function end
+
     var team = $('#team_details_name').text();
     $("tr.result_row").each(function() {
       // alert(team + '\n' + row_team);
@@ -92,4 +115,4 @@ $(document).ready(function() {
 });//end top document.ready function
 
 //set focus on team name input on create team form
-document.getElementById("teamName").focus();
+// document.getElementById("teamName").focus();

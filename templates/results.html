@@ -12,14 +12,27 @@
             <th scope="col">Away</th>
           </tr>
           {% for result in object_list %}
-            <tr>
+          {% if result.home_ftg == None or result.home_htg == None or result.away_ftg == None or result.away_htg == None %}
+            <tr class="fixture">
               <td>{{result.home_team.title()}}</td>
-              <td>{{result.home_ftg}}</td>
-              <td>({{result.home_htg}})</td>
-              <td>({{result.away_htg}})</td>
-              <td>{{result.away_ftg}}</td>
+              <td><input type="number" min="0" value="0" disabled></td>
+              <td><input type="number" min="0" value="0" disabled></td>
+              <td><input type="number" min="0" value="0" disabled></td>
+              <td><input type="number" min="0" value="0" disabled></td>
               <td>{{result.away_team.title()}}</td>
+              <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
             </tr>
+          {% else %}
+          <tr class="result">
+            <td>{{result.home_team.title()}}</td>
+            <td>{{result.home_ftg}}</td>
+            <td>({{result.home_htg}})</td>
+            <td>({{result.away_htg}})</td>
+            <td>{{result.away_ftg}}</td>
+            <td>{{result.away_team.title()}}</td>
+            <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
+          </tr>
+          {% endif %}
           {% endfor %}
         </table>
       </div> <!--results_list-->
