@@ -150,7 +150,7 @@ def perform_results_upload():
 @app.route('/enter_result/')
 def enter_result():
     team_dd = Team.select().order_by(Team.name)
-    # print('team dd = {}'.format(team_dd[0])) -CAREFULL! > THIS LINE CAUSED APP TO CRASH
+    # print('team dd = {}'.format(team_dd[0])) CAREFULL! > THIS LINE CAUSED APP TO CRASH
     # WHEN NO TEAMS IN team_dd!!
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd)
@@ -206,6 +206,29 @@ def view_results():
     else:
         feedback = "No results available"
         return render_template("feedback.html", feedback = feedback)
+
+@app.route('/update_score/', methods=['POST'])
+def update_score():
+    home_team = request.form['home_team']
+    away_team = request.form['away_team']
+    home_htg = request.form['hhtg']
+    away_htg = request.form['ahtg']
+    home_ftg = request.form['hftg']
+    away_ftg = request.form['aftg']
+
+    if home_htg and away_htg and home_ftg and away_ftg:
+        print("updating score")
+        update_query = Result.update(
+        home_htg = home_htg,
+        away_htg = away_htg,
+        home_ftg = home_ftg,
+        away_ftg = away_ftg
+        ).where((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
+        update_query.execute()
+        update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
+        return redirect(url_for('home'))
+    else:
+        print("Missing values")
 
 @app.route('/delete_all_results/')
 def delete_all_results():
@@ -302,7 +325,8 @@ def team_name_valid(team_name):
         return False
 
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
-    # print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
+    print("Calling update team stats")
+    print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
         update_query = Team.update(
         won = Team.won + 1,

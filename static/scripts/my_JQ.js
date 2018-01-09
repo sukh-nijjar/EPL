@@ -49,7 +49,7 @@ $(document).ready(function() {
            });
     });
 
-    $('.fixture').delegate('td.action_link', 'click', function() {
+    $('.fixture').delegate('td.action_link', 'click', function(e) {
       $this = $(this);
       var action_type = $this.find('a').text();
       if (action_type === 'Edit'){
@@ -57,7 +57,6 @@ $(document).ready(function() {
         $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
         $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
         $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
-        // alert($(this).parent());
         // console.log($(this).parent());
         $(this).remove();} //end if action type is *EDIT*
         if (action_type === 'Cancel'){
@@ -68,7 +67,19 @@ $(document).ready(function() {
           $(this).closest('tr').find('td:nth-child(7)').remove();
         } //end if action type is *CANCEL*
         if (action_type === 'Save'){
-          alert(action_type);
+          $.ajax({
+            data :  {
+              home_team : $(this).closest('tr').find('[name=home_team]').text(),
+              hftg : $(this).closest('tr').find('td input[name=hftg]').val(),
+              hhtg : $(this).closest('tr').find('td input[name=hhtg]').val(),
+              ahtg : $(this).closest('tr').find('td input[name=ahtg]').val(),
+              aftg : $(this).closest('tr').find('td input[name=aftg]').val(),
+              away_team : $(this).closest('tr').find('[name=away_team]').text()
+            },
+            type : 'POST',
+            url : '/update_score/'
+          })
+          // e.preventDefault();
         } //end if action type is *SAVE*
     }); //function end
 
@@ -113,6 +124,12 @@ $(document).ready(function() {
       $('.warning').fadeIn("slow");
 
 });//end top document.ready function
+
+function submit_inline_result(){
+  // alert('Hello from inline');
+  // var hftg = $(this).closest('tr').find('td:nth-child(2)').val();
+  // alert(hftg);
+}
 
 //set focus on team name input on create team form
 // document.getElementById("teamName").focus();

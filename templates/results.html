@@ -1,9 +1,10 @@
 {%extends "master_layout.html"%}
 {%block content%}
     <div id="results_list">
-
+      <form>
         <table>
           <tr>
+            <th scope="col">PK</th>
             <th scope="col">Home</th>
             <th scope="col">FT</th>
             <th scope="col">HT</th>
@@ -14,16 +15,18 @@
           {% for result in object_list %}
           {% if result.home_ftg == None or result.home_htg == None or result.away_ftg == None or result.away_htg == None %}
             <tr class="fixture">
-              <td>{{result.home_team.title()}}</td>
-              <td><input type="number" min="0" value="0" disabled></td>
-              <td><input type="number" min="0" value="0" disabled></td>
-              <td><input type="number" min="0" value="0" disabled></td>
-              <td><input type="number" min="0" value="0" disabled></td>
-              <td>{{result.away_team.title()}}</td>
+              <td>{{result.result_id}}</td>
+              <td name="home_team">{{result.home_team.title()}}</td>
+              <td><input type="number" min="0" value="0" name="hftg" disabled/></td>
+              <td><input type="number" min="0" value="0" name="hhtg" disabled/></td>
+              <td><input type="number" min="0" value="0" name="ahtg" disabled/></td>
+              <td><input type="number" min="0" value="0" name="aftg" disabled/></td>
+              <td name="away_team">{{result.away_team.title()}}</td>
               <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
             </tr>
           {% else %}
           <tr class="result">
+            <td>{{result.result_id}}</td>
             <td>{{result.home_team.title()}}</td>
             <td>{{result.home_ftg}}</td>
             <td>({{result.home_htg}})</td>
@@ -35,7 +38,8 @@
           {% endif %}
           {% endfor %}
         </table>
-      </div> <!--results_list-->
+      </form>
+    </div> <!--results_list-->
       <nav id="paginated_navigation">
         {% for number in range(pagination.get_page_count()) %}
           <a href="{{ url_for('view_results',page=number+1) }}">{{number + 1}}</a>
