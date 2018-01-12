@@ -216,7 +216,7 @@ def update_score():
     home_ftg = request.form['hftg']
     away_ftg = request.form['aftg']
 
-    if home_htg and away_htg and home_ftg and away_ftg:
+    if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
         print("updating score")
         update_query = Result.update(
         home_htg = home_htg,
@@ -226,9 +226,10 @@ def update_score():
         ).where((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
         update_query.execute()
         update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
-        return redirect(url_for('home'))
+        return jsonify({'done' : 'Update successful'})
+        # return redirect(url_for('home'))
     else:
-        print("Missing values")
+        return jsonify({'error' : 'Validation errors'})
 
 @app.route('/delete_all_results/')
 def delete_all_results():

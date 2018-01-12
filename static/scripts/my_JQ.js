@@ -49,24 +49,34 @@ $(document).ready(function() {
            });
     });
 
-    $('.fixture').delegate('td.action_link', 'click', function(e) {
+    // update to accept any TR and render edit mode accordingly
+    // which includes updating scores with goals values already set
+    $('tr').delegate('td.action_link', 'click', function(e) {
       $this = $(this);
       var action_type = $this.find('a').text();
       if (action_type === 'Edit'){
-        // alert(action_type);
-        $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
-        $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
-        $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
-        // console.log($(this).parent());
-        $(this).remove();} //end if action type is *EDIT*
+          if ($(this).closest('tr').hasClass('fixture')){
+            alert("Fixture class row");
+            $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
+            $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
+            $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
+            // console.log($(this).parent());
+            $(this).remove();
+          } else {
+            alert("It's a result class row");
+          }
+        } //end if action type is *EDIT*
         if (action_type === 'Cancel'){
+          location.reload(true);
           // alert(action_type);
-          $(this).closest('tr').css('background-color','#e8f7f3').find('input').prop('disabled', true).val('0');
-          $(this).after('<td class="action_link"><a class="AL_edit" href="#">Edit</a></td>');
-          $(this).closest('tr').find('td:nth-child(7)').remove();
-          $(this).closest('tr').find('td:nth-child(7)').remove();
+          // $(this).closest('tr').css('background-color','#e8f7f3').find('input').prop('disabled', true).val('0');
+          // $(this).after('<td class="action_link"><a class="AL_edit" href="#">Edit</a></td>');
+          // $(this).closest('tr').find('td:nth-child(7)').remove();
+          // $(this).closest('tr').find('td:nth-child(7)').remove();
         } //end if action type is *CANCEL*
         if (action_type === 'Save'){
+          var r = $(this).closest('tr');
+          // console.log(r);
           $.ajax({
             data :  {
               home_team : $(this).closest('tr').find('[name=home_team]').text(),
@@ -79,7 +89,17 @@ $(document).ready(function() {
             type : 'POST',
             url : '/update_score/'
           })
-          // e.preventDefault();
+          .done(function(data) {
+            if (data.done) {
+              alert(data.done);
+              location.reload(true);
+              // $(this).closest(r).removeClass('fixture');
+              // $(r).removeClass('fixture').css('background-color','#ffffff');
+            }
+            else {
+              alert(data.error);
+            }
+          })
         } //end if action type is *SAVE*
     }); //function end
 
