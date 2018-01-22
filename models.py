@@ -51,10 +51,11 @@ class Result(BaseModel):
     result_id = PrimaryKeyField()
     home_team = CharField()
     away_team = CharField()
-    home_htg = IntegerField()
-    away_htg = IntegerField()
-    home_ftg = IntegerField()
-    away_ftg = IntegerField()
+    home_htg = IntegerField(null=True)
+    away_htg = IntegerField(null=True)
+    home_ftg = IntegerField(null=True)
+    away_ftg = IntegerField(null=True)
+    result_has_been_updated = BooleanField(default=False)
 
 def init_db():
     db.connect()

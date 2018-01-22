@@ -10,7 +10,6 @@ app = Flask(__name__)
 
 @app.before_request
 def before_request():
-    print("calling def before_request()")
     init_db()
 
 @app.teardown_request
@@ -101,12 +100,13 @@ def perform_teams_upload():
 @app.route('/upload_results/', methods=['POST'])
 def perform_results_upload():
     """
-    Team names changed to lower when creating db record.
+    Team names changed to lower case when creating db record.
     A team's stats are only updated when a result exists,
     otherwise null values are stored for full and half time goals (see method
     mandatory_data_present(row)).
     Where errors are found they are presented to the user.
     """
+	#NEED TO WRAP THIS IN ATOMIC FOR PERFORMANCE
     error = None
     feedback = None
     invalid_rows = []
@@ -119,6 +119,7 @@ def perform_results_upload():
             next(csv_reader)
 
             for row in csv_reader:
+                print(type(row))
                 if row_is_valid(row):
                     # print("inserting {}".format(row))
                     Result.create(
@@ -201,7 +202,6 @@ def view_results():
     feedback = None
     results = Result.select()
     if len(results) > 0:
-        # return render_template('results.html', results = results)
         return object_list('results.html',results,paginate_by=10)
     else:
         feedback = "No results available"
@@ -209,6 +209,9 @@ def view_results():
 
 @app.route('/update_score/', methods=['POST'])
 def update_score():
+	#staff_super = User.select(User.id).where(
+    #(User.is_staff == True) | (User.is_superuser == True))
+	#Tweet.select().where(Tweet.user << staff_super)
     home_team = request.form['home_team']
     away_team = request.form['away_team']
     home_htg = request.form['hhtg']
@@ -216,18 +219,35 @@ def update_score():
     home_ftg = request.form['hftg']
     away_ftg = request.form['aftg']
 
-    if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
-        print("updating score")
-        update_query = Result.update(
-        home_htg = home_htg,
-        away_htg = away_htg,
-        home_ftg = home_ftg,
-        away_ftg = away_ftg
-        ).where((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
-        update_query.execute()
-        update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
-        return jsonify({'done' : 'Update successful'})
-        # return redirect(url_for('home'))
+    result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
+
+    if int(home_ftg) >= int(home_htg) and int(away_ftg) >= int(away_htg):
+        if is_result_new([home_team,away_team]):
+            print("updating score for fixture")
+            update_query = Result.update(
+            home_htg = home_htg,
+            away_htg = away_htg,
+            home_ftg = home_ftg,
+            away_ftg = away_ftg
+            ).where(Result.result_id == result.result_id)
+            update_query.execute()
+            update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
+            return jsonify({'done' : 'Update successful'})
+        else:
+            print("Existing Result")
+            # result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
+            existing_result = dict(ID = result.result_id, home_FT = result.home_ftg, home_HT = result.home_htg,
+            away_HT = result.away_htg, away_FT = result.away_ftg)
+            update_query = Result.update(
+            home_htg = home_htg,
+            away_htg = away_htg,
+            home_ftg = home_ftg,
+            away_ftg = away_ftg,
+            result_has_been_updated = True
+            ).where(Result.result_id == existing_result['ID'])
+            update_query.execute()
+            amend_team_stats(existing_result)
+            return jsonify({'done' : 'To be decided'})
     else:
         return jsonify({'error' : 'Validation errors'})
 
@@ -251,6 +271,7 @@ def delete_all_teams():
 @app.route('/team_drill_down/<team>', methods=['GET'])
 def drill_down(team):
     team=Team.get(Team.name == team)
+    print("team id is {}".format(team.team_id))
     results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
     # object_list method creates a PaginatedQuery object calls get_object_list
     return object_list('teamDetails.html',results,paginate_by=9,team=team)
@@ -311,8 +332,10 @@ def teams_exists(row):
             return False
 
 def is_result_new(row):
-    # print('teams = {},{}'.format(row[0],row[1]))
-    result = Result.select().where((Result.home_team == row[0].lower()) & (Result.away_team == row[1].lower()))
+    # for a result to exist (and therefor not be 'new')
+    # each of the 4 goal values must be populated with a positive int
+    result = Result.select().where((Result.home_team == row[0].lower()) & (Result.away_team == row[1].lower())
+    & (Result.home_htg != None or Result.away_htg != None or Result.home_ftg != None or Result.away_ftg != None))
     if result.exists():
         return False
     else:
@@ -329,6 +352,7 @@ def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_sco
     print("Calling update team stats")
     print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
+        # home win
         update_query = Team.update(
         won = Team.won + 1,
         goals_scored = Team.goals_scored + goals_scored_by_home_team,
@@ -342,6 +366,7 @@ def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_sco
         ).where(Team.name == away_team)
         update_query.execute()
     elif goals_scored_by_home_team < goals_scored_by_away_team:
+        # away win
         update_query = Team.update(won = Team.won + 1,
         goals_scored = Team.goals_scored + goals_scored_by_away_team,
         goals_conceded = Team.goals_conceded + goals_scored_by_home_team
@@ -353,11 +378,54 @@ def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_sco
         ).where(Team.name == home_team)
         update_query.execute()
     else:
+        # draw
         update_query = Team.update(drawn = Team.drawn + 1,
         goals_scored = Team.goals_scored + goals_scored_by_home_team,
         goals_conceded = Team.goals_conceded + goals_scored_by_away_team
         ).where(Team.name << [home_team, away_team])
         update_query.execute()
+
+def amend_team_stats(previous_result):
+    print ("previous {} ".format(previous_result))
+    current_result = Result.get(Result.result_id == previous_result['ID'])
+    print("current = {},{},{},{},{},{},{}".format(
+      current_result.result_id,
+      current_result.home_team, current_result.away_team,
+      current_result.home_ftg, current_result.home_htg,
+      current_result.away_htg, current_result.away_ftg)
+      )
+
+    # teams_to_update = Team.select().where((Team.name == current_result.home_team) | (Team.name == current_result.away_team))
+    # for team in teams_to_update:
+    #     print("Team from database = {}, ID={}, scored={}".format(team.name,team.team_id,team.goals_scored))
+    home_team = Team.get(Team.name == current_result.home_team)
+    away_team = Team.get(Team.name == current_result.away_team)
+    # print("home team = {}, ID={}, scored={}".format(home_team.name,home_team.team_id,home_team.goals_scored))
+    # print("away team = {}, ID={}, scored={}".format(away_team.name,away_team.team_id,away_team.goals_scored))
+
+    if current_result.home_ftg > current_result.away_ftg:#define Result model class method so can say if home_win/away_win/draw
+        print("It's now a home win")
+        if current_result.result_has_been_updated:
+            scored_change = current_result.home_ftg - previous_result['home_FT']
+            conceded_change = current_result.away_ftg - previous_result['away_FT']
+            update_query = Team.update(goals_scored = Team.goals_scored + scored_change,
+            goals_conceded = Team.goals_conceded + conceded_change
+            ).where(Team.name == home_team.name)
+            update_query.execute()
+            #repeat for away team
+            scored_change = current_result.away_ftg - previous_result['away_FT']
+            conceded_change = current_result.home_ftg - previous_result['home_FT']
+            update_query = Team.update(goals_scored = Team.goals_scored + scored_change,
+            goals_conceded = Team.goals_conceded + conceded_change
+            ).where(Team.name == away_team.name)
+            update_query.execute()
+        update_query = Result.update(result_has_been_updated=False).where(Result.result_id == current_result.result_id)
+        update_query.execute()
+
+    # elif current_result.home_ftg < current_result.away_ftg:
+    #     print("It's now an away win")
+    # else:
+    #     print("It's now a draw")
 
 if __name__ == '__main__':
     app.secret_key ='sum fink' #THIS SHOULD BE IN CONFIG - SECRET_KEY = 'string'
