@@ -1,5 +1,8 @@
 {%extends "master_layout.html"%}
 {%block content%}
+    {% if feedback %}
+      <h3 class="feedback">{{feedback}}</h3>
+    {% endif %}
     {% if invalid_rows %}
       <div class="warning">
         All valid results have been uploaded, however there are invalid results that need correcting
@@ -9,20 +12,20 @@
         <table>
           <tr>
             <th scope="col">Home</th>
-            <th scope="col">Home FT</th>
-            <th scope="col">Home HT</th>
+            <th scope="col">FT</th>
+            <th scope="col">HT</th>
+            <th scope="col">HT</th>
+            <th scope="col">FT</th>
             <th scope="col">Away</th>
-            <th scope="col">Away FT</th>
-            <th scope="col">Away HT</th>
           </tr>
           {% for row in invalid_rows %}
             <tr class="table_rows">
               <td>{{row[0]}}</td>
               <td>{{row[2]}}</td>
               <td>{{row[4]}}</td>
-              <td>{{row[1]}}</td>
-              <td>{{row[3]}}</td>
               <td>{{row[5]}}</td>
+              <td>{{row[3]}}</td>
+              <td>{{row[1]}}</td>
             </tr>
           {% endfor %}
         </table>

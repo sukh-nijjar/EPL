@@ -1,10 +1,13 @@
 {%extends "master_layout.html"%}
 {%block content%}
     <div id="results_list">
+      <div class="banner">
+        <h2>Week {{page}} Results</h2>
+      </div>
       <form>
-        <table>
+        <table id="results_grid">
           <tr>
-            <th scope="col">PK</th>
+            <!-- <th scope="col">PK</th> -->
             <th scope="col">Home</th>
             <th scope="col">FT</th>
             <th scope="col">HT</th>
@@ -15,7 +18,7 @@
           {% for result in object_list %}
           {% if result.home_ftg == None or result.home_htg == None or result.away_ftg == None or result.away_htg == None %}
             <tr class="fixture">
-              <td>{{result.result_id}}</td>
+              <!-- <td>{{result.result_has_been_updated}}</td> -->
               <td name="home_team">{{result.home_team.title()}}</td>
               <td><input type="number" min="0" value="0" name="hftg" disabled/></td>
               <td><input type="number" min="0" value="0" name="hhtg" disabled/></td>
@@ -26,14 +29,13 @@
             </tr>
           {% else %}
           <tr class="result">
-            <td>{{result.result_id}}</td>
-            <td>{{result.home_team.title()}}</td>
-            <td>{{result.home_ftg}}</td>
-            <!-- <td><input type="number" value={{result.home_ftg}} name="hftg" disabled/></td> -->
-            <td>({{result.home_htg}})</td>
-            <td>({{result.away_htg}})</td>
-            <td>{{result.away_ftg}}</td>
-            <td>{{result.away_team.title()}}</td>
+            <!-- <td>{{result.result_has_been_updated}}</td> -->
+            <td name="home_team" class="team">{{result.home_team.title()}}</td>
+            <td name="hftg">{{result.home_ftg}}</td>
+            <td name="hhtg">{{result.home_htg}}</td>
+            <td name="ahtg">{{result.away_htg}}</td>
+            <td name="aftg">{{result.away_ftg}}</td>
+            <td name=away_team class="team">{{result.away_team.title()}}</td>
             <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
           </tr>
           {% endif %}
@@ -42,8 +44,24 @@
       </form>
     </div> <!--results_list-->
       <nav id="paginated_navigation">
-        {% for number in range(pagination.get_page_count()) %}
+        <!-- {{pagination.get_page_count(),page}} -->
+        <!-- {% for number in range(pagination.get_page_count()) %}
           <a href="{{ url_for('view_results',page=number+1) }}">{{number + 1}}</a>
+        {% endfor %} -->
+        <!-- {% for number in range(5) %}
+          <a href="{{ url_for('view_results',page=number+1) }}">{{number + 1}}</a>
+        {% endfor %} -->
+
+        {% if page > 0 %}
+          <a href="{{ url_for('view_results', page=page - 5) }}"><<</a>
+        {% endif %}
+        {% for number in range(page,page+5) %}
+          <a href="{{ url_for('view_results',page=number) }}">{{number}}</a>
         {% endfor %}
+        {% if page < pagination.get_page_count() %}
+          <a href="{{ url_for('view_results', page=page + 5) }}">>></a>
+        {% endif %}
       </nav>
+      <!-- <div id="saved" class="success_msg"></div> -->
+
 {%endblock%}

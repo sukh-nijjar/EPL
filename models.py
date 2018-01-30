@@ -57,6 +57,16 @@ class Result(BaseModel):
     away_ftg = IntegerField(null=True)
     result_has_been_updated = BooleanField(default=False)
 
+    def result_type(self):
+        """returns the result type which is either home win,
+            away win_rate, draw or no result"""
+        if self.home_ftg > self.away_ftg:
+            return 'home win'
+        elif self.home_ftg < self.away_ftg:
+            return 'away win'
+        else:
+            return 'draw'
+
 def init_db():
     db.connect()
     db.create_tables([Team, Result], safe = True)

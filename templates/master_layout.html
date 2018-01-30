@@ -26,7 +26,7 @@
             <li><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
             <li><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
             <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
-            <form id="deleteAllTeams" action="delete_all_teams/" method="post">
+            <form id="deleteAllTeams" action="delete_all_teams/" method="delete">
               <li><a  id="submitDeleteAllTeams" href="#"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete teams</a></li>
               <input type="hidden">
             </form>

@@ -106,7 +106,6 @@ def perform_results_upload():
     mandatory_data_present(row)).
     Where errors are found they are presented to the user.
     """
-	#NEED TO WRAP THIS IN ATOMIC FOR PERFORMANCE
     error = None
     feedback = None
     invalid_rows = []
@@ -114,27 +113,29 @@ def perform_results_upload():
         feedback = "Teams must be loaded before loading results"
         return render_template('feedback.html', feedback=feedback)
     try:
-        with open('2017ResultsShortVersion.csv') as results_csv:
+        with open('2017Results.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
 
-            for row in csv_reader:
-                print(type(row))
-                if row_is_valid(row):
-                    # print("inserting {}".format(row))
-                    Result.create(
-                    home_team = row[0].lower().strip(),
-                    away_team = row[1].lower().strip(),
-                    home_ftg = row[2],
-                    away_ftg = row[3],
-                    home_htg = row[4],
-                    away_htg = row[5]
-                    )
-                    if None not in row:
-                        # print ("calling update_team_stats")
-                        update_team_stats(row[0].lower(),row[1].lower(),int(row[2]),int(row[3]))
-                else:
-                    invalid_rows.append(row)
+            #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
+            with db.atomic():
+                for row in csv_reader:
+                    print(type(row))
+                    if row_is_valid(row):
+                        # print("inserting {}".format(row))
+                        Result.create(
+                        home_team = row[0].lower().strip(),
+                        away_team = row[1].lower().strip(),
+                        home_ftg = row[2],
+                        away_ftg = row[3],
+                        home_htg = row[4],
+                        away_htg = row[5]
+                        )
+                        if None not in row:
+                            # print ("calling update_team_stats")
+                            update_team_stats(row[0].lower(),row[1].lower(),int(row[2]),int(row[3]))
+                    else:
+                        invalid_rows.append(row)
             #in the case of errors show the upload errors view
             if len(invalid_rows) > 0:
                 with open('result_upload_errors.csv', 'w', newline='') as results_errors_csv:
@@ -207,7 +208,51 @@ def view_results():
         feedback = "No results available"
         return render_template("feedback.html", feedback = feedback)
 
-@app.route('/update_score/', methods=['POST'])
+@app.route('/delete_result/', methods=['DELETE'])
+def delete_result():
+    home_team = request.form['home_team'].lower()
+    away_team = request.form['away_team'].lower()
+    #get the teams whose stats will need amending due to result deletion
+    home = Team.get(Team.name == home_team)
+    away = Team.get(Team.name == away_team)
+
+    result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
+    home_goals_adjustment = result.home_ftg
+    away_goals_adjustment = result.away_ftg
+
+    if result.result_type() == 'draw':
+        home.drawn = Team.drawn - 1
+        home.save()
+        away.drawn = Team.drawn - 1
+        away.save()
+    elif result.result_type() == 'home win':
+        home.won = Team.won - 1
+        home.save()
+        away.lost = Team.lost - 1
+        away.save()
+    else: #must be away win
+        away.won = Team.won - 1
+        away.save()
+        home.lost = Team.lost - 1
+        home.save()
+
+    #adjust goals scored/conceded for deleted result
+    update_home_for_against = Team.update(goals_scored = Team.goals_scored - home_goals_adjustment,
+    goals_conceded = Team.goals_conceded - away_goals_adjustment).where(Team.team_id == home.team_id)
+    update_home_for_against.execute()
+    #repeat for away team
+    update_away_for_against = Team.update(goals_scored = Team.goals_scored - away_goals_adjustment,
+    goals_conceded = Team.goals_conceded - home_goals_adjustment).where(Team.team_id == away.team_id)
+    update_away_for_against.execute()
+
+    result.delete_instance()
+    return jsonify({'done' : 'Result deleted'})
+    #update stats !!!
+    # print ("home - {} , away - {}".format(home.name, away.name))
+    # print("Outcome is {}, home goals = {}, away goals = {}".format(result.result_type(), result.home_ftg, result.away_ftg))
+
+
+@app.route('/update_score/', methods=['PUT'])
 def update_score():
 	#staff_super = User.select(User.id).where(
     #(User.is_staff == True) | (User.is_superuser == True))
@@ -232,12 +277,14 @@ def update_score():
             ).where(Result.result_id == result.result_id)
             update_query.execute()
             update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
-            return jsonify({'done' : 'Update successful'})
+            return jsonify({'done' : 'New result created'})
         else:
-            print("Existing Result")
+            # print("Existing Result")
             # result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
+            #existing_result is the result BEFORE getting updated
             existing_result = dict(ID = result.result_id, home_FT = result.home_ftg, home_HT = result.home_htg,
-            away_HT = result.away_htg, away_FT = result.away_ftg)
+            away_HT = result.away_htg, away_FT = result.away_ftg, outcome=result.result_type())
+
             update_query = Result.update(
             home_htg = home_htg,
             away_htg = away_htg,
@@ -247,14 +294,20 @@ def update_score():
             ).where(Result.result_id == existing_result['ID'])
             update_query.execute()
             amend_team_stats(existing_result)
-            return jsonify({'done' : 'To be decided'})
+            return jsonify({'done' : 'Result updated'})
     else:
         return jsonify({'error' : 'Validation errors'})
 
 @app.route('/delete_all_results/')
 def delete_all_results():
+    """deletes all results and resets teams stats to no games played"""
     delete_query = Result.delete()
     delete_query.execute()
+    reset_teams_query = Team.update(won = 0,drawn = 0,lost = 0,
+    goals_scored = 0,goals_conceded = 0)
+    reset_teams_query.execute()
+    if os.path.exists('result_upload_errors.csv'):
+        os.remove('result_upload_errors.csv')
     return redirect(url_for('home'))
 
 @app.route('/delete_all_teams/', methods=['POST'])
@@ -265,7 +318,8 @@ def delete_all_teams():
     delete_query.execute()
     delete_query = Result.delete()
     delete_query.execute()
-    os.remove('result_upload_errors.csv')
+    if os.path.exists('result_upload_errors.csv'):
+        os.remove('result_upload_errors.csv')
     return redirect(url_for('home'))
 
 @app.route('/team_drill_down/<team>', methods=['GET'])
@@ -279,11 +333,14 @@ def drill_down(team):
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
     invalid_rows = []
-    with open('result_upload_errors.csv') as results_errors_csv:
-        csv_reader = csv.reader(results_errors_csv)
-        for row in csv_reader:
-            invalid_rows.append(row)
-        return render_template('uploadErrors.html',invalid_rows=invalid_rows)
+    if os.path.exists('result_upload_errors.csv'):
+        with open('result_upload_errors.csv') as results_errors_csv:
+            csv_reader = csv.reader(results_errors_csv)
+            for row in csv_reader:
+                invalid_rows.append(row)
+            return render_template('uploadErrors.html',invalid_rows=invalid_rows)
+    else:
+        return render_template('uploadErrors.html',feedback = "No errors to report")
 
 def create_dd_of_ints(required_range):
     dd = []
@@ -339,6 +396,7 @@ def is_result_new(row):
     if result.exists():
         return False
     else:
+        #it's a new result
         return True
 
 def team_name_valid(team_name):
@@ -348,8 +406,10 @@ def team_name_valid(team_name):
     else:
         return False
 
+#TO-D0 - PASS IN RESULT OBJECT AND result_type() METHOD
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
-    print("Calling update team stats")
+    """After a new result has been created this method updates the matches
+    won, drawn, lost, goals scored and conceded for each team in the match."""
     print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
         # home win
@@ -386,46 +446,77 @@ def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_sco
         update_query.execute()
 
 def amend_team_stats(previous_result):
-    print ("previous {} ".format(previous_result))
+    print ("previous result = {} ".format(previous_result))
     current_result = Result.get(Result.result_id == previous_result['ID'])
-    print("current = {},{},{},{},{},{},{}".format(
-      current_result.result_id,
-      current_result.home_team, current_result.away_team,
-      current_result.home_ftg, current_result.home_htg,
-      current_result.away_htg, current_result.away_ftg)
-      )
-
-    # teams_to_update = Team.select().where((Team.name == current_result.home_team) | (Team.name == current_result.away_team))
-    # for team in teams_to_update:
-    #     print("Team from database = {}, ID={}, scored={}".format(team.name,team.team_id,team.goals_scored))
     home_team = Team.get(Team.name == current_result.home_team)
     away_team = Team.get(Team.name == current_result.away_team)
-    # print("home team = {}, ID={}, scored={}".format(home_team.name,home_team.team_id,home_team.goals_scored))
-    # print("away team = {}, ID={}, scored={}".format(away_team.name,away_team.team_id,away_team.goals_scored))
+    print("DB result type = {}".format(current_result.result_type()))
 
-    if current_result.home_ftg > current_result.away_ftg:#define Result model class method so can say if home_win/away_win/draw
-        print("It's now a home win")
-        if current_result.result_has_been_updated:
-            scored_change = current_result.home_ftg - previous_result['home_FT']
-            conceded_change = current_result.away_ftg - previous_result['away_FT']
-            update_query = Team.update(goals_scored = Team.goals_scored + scored_change,
-            goals_conceded = Team.goals_conceded + conceded_change
-            ).where(Team.name == home_team.name)
-            update_query.execute()
-            #repeat for away team
-            scored_change = current_result.away_ftg - previous_result['away_FT']
-            conceded_change = current_result.home_ftg - previous_result['home_FT']
-            update_query = Team.update(goals_scored = Team.goals_scored + scored_change,
-            goals_conceded = Team.goals_conceded + conceded_change
-            ).where(Team.name == away_team.name)
-            update_query.execute()
+    if current_result.result_has_been_updated:
+        scored_change = current_result.home_ftg - previous_result['home_FT']
+        conceded_change = current_result.away_ftg - previous_result['away_FT']
+        update_query = Team.update(goals_scored = Team.goals_scored + scored_change,
+        goals_conceded = Team.goals_conceded + conceded_change
+        ).where(Team.name == home_team.name)
+        update_query.execute()
+        #repeat for away team
+        scored_change = current_result.away_ftg - previous_result['away_FT']
+        conceded_change = current_result.home_ftg - previous_result['home_FT']
+        update_query = Team.update(goals_scored = Team.goals_scored + scored_change,
+        goals_conceded = Team.goals_conceded + conceded_change
+        ).where(Team.name == away_team.name)
+        update_query.execute()
         update_query = Result.update(result_has_been_updated=False).where(Result.result_id == current_result.result_id)
         update_query.execute()
 
-    # elif current_result.home_ftg < current_result.away_ftg:
-    #     print("It's now an away win")
-    # else:
-    #     print("It's now a draw")
+    if previous_result['outcome'] == 'draw':
+        if current_result.result_type() == 'home win':
+            update_query = Team.update(won = Team.won + 1,
+            drawn = Team.drawn - 1).where(Team.name == home_team.name)
+            update_query.execute()
+            update_query = Team.update(lost = Team.lost + 1,
+            drawn = Team.drawn - 1).where(Team.name == away_team.name)
+            update_query.execute()
+        if current_result.result_type() == 'away win':
+            update_query = Team.update(won = Team.won + 1,
+            drawn = Team.drawn - 1).where(Team.name == away_team.name)
+            update_query.execute()
+            update_query = Team.update(lost = Team.lost + 1,
+            drawn = Team.drawn - 1).where(Team.name == home_team.name)
+            update_query.execute()
+
+    if previous_result['outcome'] == 'home win':
+        if current_result.result_type() == 'draw':
+            update_query = Team.update(won = Team.won - 1,
+            drawn = Team.drawn + 1).where(Team.name == home_team.name)
+            update_query.execute()
+            update_query = Team.update(lost = Team.lost - 1,
+            drawn = Team.drawn + 1).where(Team.name == away_team.name)
+            update_query.execute()
+        if current_result.result_type() == 'away win':
+            update_query = Team.update(won = Team.won - 1,
+            lost = Team.lost + 1).where(Team.name == home_team.name)
+            update_query.execute()
+            update_query = Team.update(lost = Team.lost - 1,
+            won = Team.won + 1).where(Team.name == away_team.name)
+            update_query.execute()
+
+    if previous_result['outcome'] == 'away win':
+        if current_result.result_type() == 'draw':
+            update_query = Team.update(won = Team.won - 1,
+            drawn = Team.drawn + 1).where(Team.name == away_team.name)
+            update_query.execute()
+            update_query = Team.update(lost = Team.lost - 1,
+            drawn = Team.drawn + 1).where(Team.name == home_team.name)
+            update_query.execute()
+        if current_result.result_type() == 'home win':
+            update_query = Team.update(won = Team.won + 1,
+            lost = Team.lost - 1).where(Team.name == home_team.name)
+            update_query.execute()
+            update_query = Team.update(lost = Team.lost + 1,
+            won = Team.won - 1).where(Team.name == away_team.name)
+            update_query.execute()
+
 
 if __name__ == '__main__':
     app.secret_key ='sum fink' #THIS SHOULD BE IN CONFIG - SECRET_KEY = 'string'

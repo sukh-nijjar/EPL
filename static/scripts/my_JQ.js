@@ -1,18 +1,4 @@
 $(document).ready(function() {
-  $('#create_team').validate({
-      messages: {
-        team: 'Team name is mandatory'
-      }
-      /*showErrors() presents a message pane informing of the
-      number of errors in the form*/
-      //,
-      // showErrors: function(errorMap, errorList) {
-      //   $('#usr_messages').html('<p>The form contains '
-      //   + this.numberOfInvalids()
-      //   + ' errors:</p>').addClass('error');
-      //   this.defaultShowErrors();
-      // }
-    });
 
     $('#submitSaveTeam').on('click', function(e) {
         e.preventDefault();
@@ -24,8 +10,8 @@ $(document).ready(function() {
           $('#create_team').submit();
         }
         else {
-          $('section').prepend('<h3 class="error">Team name is mandatory</h3>');
-          // $('.error').css('display','block');
+          $('section').prepend('<h3 id="UI_Msg" class="error">Team name is mandatory</h3>');
+          toggle_UI_Msg();
         }
      });
 
@@ -49,34 +35,40 @@ $(document).ready(function() {
            });
     });
 
-    // update to accept any TR and render edit mode accordingly
-    // which includes updating scores with goals values already set
     $('tr').delegate('td.action_link', 'click', function(e) {
       $this = $(this);
       var action_type = $this.find('a').text();
       if (action_type === 'Edit'){
           if ($(this).closest('tr').hasClass('fixture')){
-            alert("Fixture class row");
+            // alert("Fixture class row");
             $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
             $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
             $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
-            // console.log($(this).parent());
             $(this).remove();
-          } else {
-            alert("It's a result class row");
+          } else /*result*/ {
+            var hftg = $(this).closest('tr').find('[name=hftg]').text();
+            var hhtg = $(this).closest('tr').find('[name=hhtg]').text();
+            var ahtg = $(this).closest('tr').find('[name=ahtg]').text();
+            var aftg = $(this).closest('tr').find('[name=aftg]').text();
+            // alert("It's a result class row");
+            $(this).closest('tr').css('background-color','#44c154');
+            $(this).closest('tr').each(function(){
+              $(this).find('td').not('.action_link, .team').remove();
+            });
+            $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
+            $(this).after('<td class="action_link"><a class="AL_delete" href="#">Delete</a></td>');
+            $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
+            $(this).closest('tr').find('td:nth-child(1)').after('<td name="hftg"><input min="0" name="hftg" type="number" value="' + hftg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(2)').after('<td name="hhtg"><input min="0" name="hhtg" type="number" value="' + hhtg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(3)').after('<td name="ahtg"><input min="0" name="ahtg" type="number" value="' + ahtg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(4)').after('<td name="aftg"><input min="0" name="aftg" type="number" value="' + aftg + '"/></td>');
+            $(this).remove();
           }
         } //end if action type is *EDIT*
         if (action_type === 'Cancel'){
           location.reload(true);
-          // alert(action_type);
-          // $(this).closest('tr').css('background-color','#e8f7f3').find('input').prop('disabled', true).val('0');
-          // $(this).after('<td class="action_link"><a class="AL_edit" href="#">Edit</a></td>');
-          // $(this).closest('tr').find('td:nth-child(7)').remove();
-          // $(this).closest('tr').find('td:nth-child(7)').remove();
         } //end if action type is *CANCEL*
         if (action_type === 'Save'){
-          var r = $(this).closest('tr');
-          // console.log(r);
           $.ajax({
             data :  {
               home_team : $(this).closest('tr').find('[name=home_team]').text(),
@@ -86,26 +78,42 @@ $(document).ready(function() {
               aftg : $(this).closest('tr').find('td input[name=aftg]').val(),
               away_team : $(this).closest('tr').find('[name=away_team]').text()
             },
-            type : 'POST',
+            type : 'PUT',
             url : '/update_score/'
           })
           .done(function(data) {
             if (data.done) {
-              alert(data.done);
-              location.reload(true);
-              // $(this).closest(r).removeClass('fixture');
-              // $(r).removeClass('fixture').css('background-color','#ffffff');
+              $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+              toggle_UI_Msg();
             }
             else {
-              alert(data.error);
+              // alert(data.error);
+              $('section').prepend('<h3 id="UI_Msg" class="error">' + data.error + '</h3>');
+              toggle_UI_Msg();
             }
           })
         } //end if action type is *SAVE*
+        if (action_type === 'Delete'){
+          alert("DELETE CALLED")
+          $.ajax({
+            data : {
+              home_team : $(this).closest('tr').find('[name=home_team]').text(),
+              away_team : $(this).closest('tr').find('[name=away_team]').text()
+            },
+            type : 'DELETE',
+            url : '/delete_result/'
+          })
+          .done(function(data) {
+            if (data.done) {
+              $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+              toggle_UI_Msg();
+            }
+          })
+        } //end if action type is *DELETE*
     }); //function end
 
     var team = $('#team_details_name').text();
     $("tr.result_row").each(function() {
-      // alert(team + '\n' + row_team);
       $this = $(this);
       var row_team = $this.find("td.home_team").text();
       var home = $this.find("td.home").text();
@@ -141,14 +149,18 @@ $(document).ready(function() {
 
       $('.error').fadeIn("slow");
       $('.feedback').fadeIn("slow");
+      $('.success_msg').fadeIn("slow");
       $('.warning').fadeIn("slow");
 
 });//end top document.ready function
 
-function submit_inline_result(){
-  // alert('Hello from inline');
-  // var hftg = $(this).closest('tr').find('td:nth-child(2)').val();
-  // alert(hftg);
+function toggle_UI_Msg(){
+  // $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+  $('#UI_Msg').slideDown();
+  window.setTimeout(function(){
+       $('#UI_Msg').slideUp(400,function(){
+         location.reload(true);
+       })},3000);
 }
 
 //set focus on team name input on create team form

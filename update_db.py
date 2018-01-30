@@ -15,9 +15,15 @@ migrator = SqliteMigrator(db)
 # )
 
 #04/01/2018 - make goal fields accept null values
-migrate(
-    migrator.drop_not_null('Result','home_htg'),
-    migrator.drop_not_null('Result','away_htg'),
-    migrator.drop_not_null('Result','home_ftg'),
-    migrator.drop_not_null('Result','away_ftg'),
-)
+# migrate(
+#     migrator.drop_not_null('Result','home_htg'),
+#     migrator.drop_not_null('Result','away_htg'),
+#     migrator.drop_not_null('Result','home_ftg'),
+#     migrator.drop_not_null('Result','away_ftg'),
+# )
+
+#21/01/2018 - add boolean field to Result to indicated result has be updated
+# result_updated_field = BooleanField(default=False)
+# migrate(
+#     migrator.add_column('Result','result_has_been_updated',result_updated_field),
+# )

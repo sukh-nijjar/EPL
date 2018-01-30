@@ -87,6 +87,10 @@ header h1 a{
 	/*outline: 2px solid yellow;*/
 }
 
+/* h2{
+	margin-left: 242px;
+} */
+
 nav{
   width: 240px;
   float: left; /*otherwise it would be centered*/
@@ -151,13 +155,17 @@ section{
 	font-size: 15px;
 }
 
+#msg_span{
+	float: right;
+}
+
 #paginated_navigation{
 	/* border-top: thick solid black; */
-	margin-left: 189px;
+	margin-left: 10px;
 	margin-top: 15px;
 	text-align: center;
-	width:900px;
-	outline: 2px solid green;
+	width:659px;
+	/* outline: 2px solid green; */
 }
 
 #paginated_navigation a{
@@ -224,6 +232,10 @@ section{
   width:1200px;
 }
 
+.banner{
+	margin-left: 242px;
+}
+
 .button_upload{
 	background: #ffffff;
 	border: 2px solid #D9D6D3;
@@ -244,19 +256,22 @@ section{
 	color: red;
 }
 
+.closeMsg{
+	margin:12px 12px 20px 0;
+}
+
+/* message panels that get displayed to user */
 .error{
-	/*font-family: 'Unica One', cursive;*/
 	border-radius: 15px;
 	background: #ff0000;
 	color: white;
-	/*display: none;*/
+	display: none;
 	font-weight: bold;
 	text-align: center;
 	width: 675px;
 }
 
 .feedback{
-	/*font-family: 'Unica One', cursive;*/
 	border-radius: 15px;
 	background: Blue;
 	color: white;
@@ -266,11 +281,34 @@ section{
 	width: 675px;
 }
 
+.success_msg{
+	border-radius: 15px;
+	background: green;
+	color: white;
+	display:none;
+	font-weight: bold;
+	text-align: center;
+	width: 675px;
+	/* outline: 5px solid black; */
+}
+
+.warning{
+	border-radius: 15px;
+	background: #fcc438;
+	border: 2px solid #ef8d22;
+	color: black;
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	width: 675px;
+}
+/* END message panels */
+
 .fixture{
 	background-color: #e8f7f3;
 }
 
-.fixture input{
+#results_grid input{
 	width: 50px;
 }
 
@@ -287,17 +325,6 @@ section{
 	font-family: 'Baloo', cursive;
 	font-size: 30px;
 	font-weight:lighter;
-}
-
-.warning{
-	border-radius: 15px;
-	background: #fcc438;
-	border: 2px solid #ef8d22;
-	color: black;
-	display: none;
-	font-weight: bold;
-	text-align: center;
-	width: 675px;
 }
 
 .goals_spinner {
