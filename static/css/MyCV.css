@@ -12,7 +12,9 @@ a, a:visited{
 
 body{
 	margin-top: 5px;
+	overflow-y:scroll;
 }
+
 
 div[class='error']{
 	font-family: 'News Cycle', sans-serif;
@@ -139,14 +141,6 @@ section{
 	margin-top: 20px;
 }
 
-/* #icon_team{
-	background-image: url('../images/team.png');
-}
-
-#icon_team:hover{
-	background-image: url('../images/team_hover.png');
-} */
-
 #invalid_results{
 	margin: 25px 0 0 50px;
 }
@@ -271,6 +265,11 @@ section{
 	width: 675px;
 }
 
+.error_desc{
+	color: red;
+	font-size: 15px;
+}
+
 .feedback{
 	border-radius: 15px;
 	background: Blue;
@@ -312,6 +311,10 @@ section{
 	width: 50px;
 }
 
+#results_grid .team_name input{
+	width: 145px;
+}
+
 .full_time{
 	font-weight: bold;
 }
@@ -319,6 +322,26 @@ section{
 .icons{
 	vertical-align: middle; /*lines up icons with menu text*/
 	/* outline: 1px solid pink; */
+}
+
+.resolve_error_buttons{
+	background: #ffffff;
+	border: 2px solid #D9D6D3;
+	border-radius: 12px;
+	color: #D9D6D3;
+	font-family: 'Baloo', cursive;
+	font-size: 19px;
+	left: 70px;
+	margin: 30px 0 30px 7px;
+	padding: 20px 10px;
+	position: relative;
+	text-align: center;
+	width: 157px;
+}
+
+.resolve_error_buttons:hover{
+	border: 2px solid red;
+	color: red;
 }
 
 .team_details_rows{

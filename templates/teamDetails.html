@@ -1,11 +1,12 @@
 {%extends "master_layout.html"%}
 {%block content%}
+  <div id="teamDetails">
       <div id="team_details_Headline">
         <!-- <h1 id="team_details_name">{{team.name.title()}} - {{team.points()}} pts</h1> -->
         <table id="team_details_table">
           <tr>
             <!-- <td id="team_details_name" colspan="3">{{team.name.title()}} - {{team.points()}} pts</td> -->
-            <td id="team_details_name" colspan="3">{{team.name.title()}}</td>
+            <td id="team_details_name" colspan="3"><a href="#">{{team.name.title()}}</a></td>
           </tr>
           <!-- <tr class="team_details_rows">
             <td id="td_wins">Wins = {{team.win_rate()}}%</td>
@@ -14,8 +15,8 @@
           </tr> -->
         </table>
       </div> <!--team_details_Headline-->
-<!-- just loop thru table elements and add required class..TRY IT! -->
-      <div>
+      <div id="chart_div"></div>
+      <div id="qwerty">
         <table id="team_results">
           <tr>
             <th scope="col">Home</th>
@@ -50,5 +51,6 @@
       {% if page < pagination.get_page_count() %}
         <a href="{{ url_for('drill_down', team=team.name,page=page + 1) }}">Next</a>
       {% endif %} -->
+  </div>
 
 {%endblock%}

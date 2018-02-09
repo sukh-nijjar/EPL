@@ -1,4 +1,49 @@
 $(document).ready(function() {
+    console.log('Calling my_JQ.js')
+    google.charts.load('current', {'packages':['corechart']});
+
+    // if ($('#teamDetails').length) {
+    //   alert("on team details page")
+    //   alert(data);
+    //   // alert($('#team_details_name').text());
+    //   google.charts.load('current', {'packages':['corechart']});
+    //   // google.charts.setOnLoadCallback(drawChart);
+    // }
+
+    $("#err_resolve").click(function(){
+      console.log("resolve button clicked")
+      $("td").each(function() {
+        // console.log($(this).text());
+        var input_value = $(this).text();
+        if (!isNaN(input_value) && !$(this).hasClass("team_name")){
+          $(this).after('<td><input min="0" type="number" value="' + input_value + '"/></td>');
+          $(this).remove(); //removes the read-only values
+        }
+        else if ($(this).hasClass("team_name")){
+          $(this).after('<td class="team_name"><input type="text" value="' + input_value + '"/></td>');
+          $(this).remove(); //removes the read-only values
+        }
+      });
+      // console.log(this); Note - the context of 'this' is dependent on element selected
+      $(this).after('<input class="resolve_error_buttons" id="err_cancel" type="button" value="Cancel"/>');
+      $(this).after('<input class="resolve_error_buttons" id="err_save" type="button" value="Save"/>');
+      $(this).remove();
+    });
+
+    $("#invalid_results").on("click", "#err_cancel", function () {
+      location.reload(true);
+    });
+
+    $("#team_details_name").click(function(){
+        var team = $(this).text();
+        $(function() {
+          $.getJSON("/get_chart_data", {
+            team : team},
+              function(data) {
+                drawChart(data);
+        });
+      });
+    });
 
     $('#submitSaveTeam').on('click', function(e) {
         e.preventDefault();
@@ -152,6 +197,12 @@ $(document).ready(function() {
       $('.success_msg').fadeIn("slow");
       $('.warning').fadeIn("slow");
 
+      // // set focus on team name input on create team form
+      // $('#teamName').bind('focus,' function(){
+      //   $(this).css('border', '1px solid blue');
+      // });
+
+
 });//end top document.ready function
 
 function toggle_UI_Msg(){
@@ -163,5 +214,29 @@ function toggle_UI_Msg(){
        })},3000);
 }
 
-//set focus on team name input on create team form
+function drawChart(t) {
+  // Create the data table.
+  $('#chart_div').slideToggle(1000);
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Result_Outcome');
+  data.addColumn('number', 'Result_Count');
+  data.addRows([
+    ['Wins', t.won],
+    ['Draws', t.drawn],
+    ['Losses', t.lost]
+  ]);
+  //
+  // // Set chart options
+  var options = {'title':'Performance',
+                 'width':600,
+                 'height':400,
+                 'pieHole': 0.3,
+                 'colors': ['green', 'orange', 'red']};
+  //
+  // // Instantiate and draw our chart, passing in some options.
+  var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
+
+// set focus on team name input on create team form
 // document.getElementById("teamName").focus();

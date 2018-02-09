@@ -113,14 +113,13 @@ def perform_results_upload():
         feedback = "Teams must be loaded before loading results"
         return render_template('feedback.html', feedback=feedback)
     try:
-        with open('2017Results.csv') as results_csv:
+        with open('2017ResultsShortVersion.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
 
             #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
             with db.atomic():
                 for row in csv_reader:
-                    print(type(row))
                     if row_is_valid(row):
                         # print("inserting {}".format(row))
                         Result.create(
@@ -142,7 +141,7 @@ def perform_results_upload():
                     csv_writer = csv.writer(results_errors_csv)
                     csv_writer.writerows(invalid_rows)
                     print('number of invalid rows = {} '.format(len(invalid_rows)))
-                return render_template('uploadErrors.html',invalid_rows=invalid_rows)
+                return render_template('uploadErrors.html',invalid_rows=invalid_rows,error_count = len(invalid_rows))
             else:
                 return redirect(url_for('view_results'))
     except IOError:
@@ -247,10 +246,6 @@ def delete_result():
 
     result.delete_instance()
     return jsonify({'done' : 'Result deleted'})
-    #update stats !!!
-    # print ("home - {} , away - {}".format(home.name, away.name))
-    # print("Outcome is {}, home goals = {}, away goals = {}".format(result.result_type(), result.home_ftg, result.away_ftg))
-
 
 @app.route('/update_score/', methods=['PUT'])
 def update_score():
@@ -325,10 +320,19 @@ def delete_all_teams():
 @app.route('/team_drill_down/<team>', methods=['GET'])
 def drill_down(team):
     team=Team.get(Team.name == team)
-    print("team id is {}".format(team.team_id))
+    print("{} team id is {}, wins = {}".format(team.name, team.team_id, team.won))
     results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
     # object_list method creates a PaginatedQuery object calls get_object_list
     return object_list('teamDetails.html',results,paginate_by=9,team=team)
+
+@app.route('/get_chart_data', methods=['GET'])
+def ReturnChartData():
+    team_arg = request.args.get('team')
+    # print("Called 'ReturnChartData', team = {}".format(team))
+    print("Called 'ReturnChartData'")
+    team=Team.get(Team.name == team_arg.lower())
+    print("{} team id is {}".format(team.name, team.team_id))
+    return jsonify({'won' : team.won,'drawn' : team.drawn, 'lost'  : team.lost})
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
@@ -361,31 +365,37 @@ def row_is_valid(row):
 def goals_valid(row):
     if row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '':
         return True
-    elif row[2] >= row[4] and row[3] >= row[5]:
+    elif int(row[2]) < 0 or int(row[3]) < 0 or int(row[4]) < 0 or int(row[5]) < 0:
+        row.append("Negative goal value")
+        return False
+    elif int(row[2]) >= int(row[4]) and int(row[3]) >= int(row[5]):
         return True
     else:
+        row.append("Half time goals exceed full time goals")
         return False
 
 def mandatory_data_present(row):
-    # print("Calling mandatory_data_present()_2")
     if row[0] == '' or row[1] == '':
+        row.append("Missing team name")
         return False
     elif row[2] == '' or row[3] == '' or row[4] == '' or row[5] == '':
         row[2] = None
         row[3] = None
         row[4] = None
         row[5] = None
-        # print ("row values are {}, {}, {}, {}".format(row[2],row[3],row[4],row[5]))
         return True
     else:
         return True
 
 def teams_exists(row):
-        home_team = Team.select().where(Team.name == row[0].lower()).get()
-        away_team = Team.select().where(Team.name == row[1].lower()).get()
+        if row[0] == '' or row[1] == '':
+            return False
+        home_team = Team.select().where(Team.name == row[0].lower())
+        away_team = Team.select().where(Team.name == row[1].lower())
         if ((home_team) and (away_team)):
             return True
         else:
+            row.append("Unknown team")
             return False
 
 def is_result_new(row):
@@ -394,6 +404,7 @@ def is_result_new(row):
     result = Result.select().where((Result.home_team == row[0].lower()) & (Result.away_team == row[1].lower())
     & (Result.home_htg != None or Result.away_htg != None or Result.home_ftg != None or Result.away_ftg != None))
     if result.exists():
+        row.append("Duplicate match")
         return False
     else:
         #it's a new result

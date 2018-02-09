@@ -26,12 +26,13 @@
             <li><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
             <li><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
             <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
-            <form id="deleteAllTeams" action="delete_all_teams/" method="delete">
+            <form id="deleteAllTeams" action="delete_all_teams/" method="post">
               <li><a  id="submitDeleteAllTeams" href="#"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete teams</a></li>
               <input type="hidden">
             </form>
             <li><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"> </span>Load data</a></li>
             <li><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/errors.png')}}"> </span>Upload errors</a></li>
+            <li><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/data_visualization.png')}}"> </span>Data</a></li>
         </ul>
       </nav>
 
@@ -45,8 +46,8 @@
         <div>Icons made by
           <a href="https://www.flaticon.com/authors/yannick" title="Yannick">Yannick</a>,
           <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a>,
-          <a href="https://www.flaticon.com/authors/eucalyp" title="Eucalyp">Eucalyp</a>,
-          <a href="https://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a>
+          <a href="https://www.flaticon.com/authors/eucalyp" title="Eucalyp">Eucalyp</a>
+          <a href="https://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">& Gregor Cresnar</a>
           from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
           Licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
       </footer>
@@ -55,6 +56,7 @@
       <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}"></script>
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script type=text/javascript>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
       </script>

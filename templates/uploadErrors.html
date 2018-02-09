@@ -5,11 +5,11 @@
     {% endif %}
     {% if invalid_rows %}
       <div class="warning">
-        All valid results have been uploaded, however there are invalid results that need correcting
+        All valid results have been uploaded, however there are {{error_count}} invalid results that need correcting:
       </div>
 
       <div id="invalid_results">
-        <table>
+        <table id="results_grid">
           <tr>
             <th scope="col">Home</th>
             <th scope="col">FT</th>
@@ -17,18 +17,21 @@
             <th scope="col">HT</th>
             <th scope="col">FT</th>
             <th scope="col">Away</th>
+            <th scope="col">Error</th>
           </tr>
           {% for row in invalid_rows %}
             <tr class="table_rows">
-              <td>{{row[0]}}</td>
+              <td class="team_name">{{row[0]}}</td>
               <td>{{row[2]}}</td>
               <td>{{row[4]}}</td>
               <td>{{row[5]}}</td>
               <td>{{row[3]}}</td>
-              <td>{{row[1]}}</td>
+              <td class="team_name">{{row[1]}}</td>
+              <td class="error_desc">{{row[6]}}</td>
             </tr>
           {% endfor %}
         </table>
+        <input class="resolve_error_buttons" id="err_resolve" type="button" value="Resolve Errors"/>
       </div>
 
     {% endif %}
