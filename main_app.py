@@ -4,6 +4,7 @@ from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
 from operator import methodcaller, attrgetter
 from playhouse.shortcuts import model_to_dict
+from results_manager import ResultsValidator
 
 #create application instance
 app = Flask(__name__)
@@ -38,6 +39,8 @@ def new_team():
 def create_team():
     error = None
     team_name_to_validate = request.form['team'].lower().strip()
+    rm = ResultsValidator()
+    print(rm.validate_team(""))
     if team_name_valid(team_name_to_validate):
         try:
             Team.create(
@@ -160,23 +163,31 @@ def enter_result():
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
-    team_dd = Team.select().order_by(Team.name)
-    error = None
-    # check home and away teams are different
-    if request.form.get('home_team') == request.form.get('away_team'):
-        error = request.form.get('home_team').title() + " cannot play themselves!"
-        team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = error, team_dd = team_dd)
+    results_validator = ResultsValidator()
+    teams = dict(Home=request.form.get('home_team'), Away=request.form.get('away_team'))
+    goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
+                 FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
 
-    # check valid team has be selected and not the default text
-    # if request.form.get('home_team') or request.form.get('away_team') not in team_dd:
-    #     print("HOME team is {} ".format(request.form.get('home_team')))
-    #     error='Need to provide team(s)'
-    #     return render_template('enterResult.html', error = error, team_dd = team_dd)
+    results_validator.validate_goal_types(goals)
+
+    UI_msg,different_teams = results_validator.validate_home_and_away_teams_different(teams)
+    if not different_teams:
+        team_dd = Team.select().order_by(Team.name)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+
+    # check valid team(s)selected and not the default text
+    UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
+    if not teams_exist:
+        team_dd = Team.select().order_by(Team.name)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
 
     # check half-time goals are not greater than full-time goals
-    # before saving result:
-    if int(request.form['hftg']) >= int(request.form['hhtg']) and int(request.form['aftg']) >= int(request.form['ahtg']):
+    UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
+    if not goal_totals_valid:
+        team_dd = Team.select().order_by(Team.name)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+
+    if different_teams and teams_exist and goal_totals_valid:
         Result.create(
         home_team = request.form.get('home_team'),
         away_team = request.form.get('away_team'),
@@ -185,17 +196,8 @@ def create_result():
         home_ftg = request.form['hftg'],
         away_ftg = request.form['aftg']
         )
-        print("home team is {} ".format(request.form.get('home_team')))
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
         return redirect(url_for('home'))
-    else:
-        error = ("INVALID RESULT - half time goals total of " +
-        str(int(request.form['ahtg']) + int(request.form['hhtg'])) +
-        " cannot be higher than full time goals total of " +
-        str(int(request.form['aftg']) + int(request.form['hftg']))
-        )
-        team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = error, team_dd = team_dd)
 
 @app.route('/view_results/')
 def view_results():
@@ -249,21 +251,23 @@ def delete_result():
 
 @app.route('/update_score/', methods=['PUT'])
 def update_score():
-	#staff_super = User.select(User.id).where(
-    #(User.is_staff == True) | (User.is_superuser == True))
-	#Tweet.select().where(Tweet.user << staff_super)
+    results_validator = ResultsValidator()
+    goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
+                 FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+    #i need to refactor out the below var = request form []...stick with the dicts now!
     home_team = request.form['home_team']
     away_team = request.form['away_team']
     home_htg = request.form['hhtg']
     away_htg = request.form['ahtg']
     home_ftg = request.form['hftg']
     away_ftg = request.form['aftg']
-
     result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
 
-    if int(home_ftg) >= int(home_htg) and int(away_ftg) >= int(away_htg):
+    # if int(home_ftg) >= int(home_htg) and int(away_ftg) >= int(away_htg):
+    UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
+    if goal_totals_valid:
         if is_result_new([home_team,away_team]):
-            print("updating score for fixture")
+            print("updating score for fixture aka NEW result")
             update_query = Result.update(
             home_htg = home_htg,
             away_htg = away_htg,
@@ -274,9 +278,7 @@ def update_score():
             update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
             return jsonify({'done' : 'New result created'})
         else:
-            # print("Existing Result")
-            # result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
-            #existing_result is the result BEFORE getting updated
+            #existing_result (the result BEFORE getting updated via the 'Edit')
             existing_result = dict(ID = result.result_id, home_FT = result.home_ftg, home_HT = result.home_htg,
             away_HT = result.away_htg, away_FT = result.away_ftg, outcome=result.result_type())
 
@@ -291,7 +293,7 @@ def update_score():
             amend_team_stats(existing_result)
             return jsonify({'done' : 'Result updated'})
     else:
-        return jsonify({'error' : 'Validation errors'})
+        return jsonify({'error' : UI_msg})
 
 @app.route('/delete_all_results/')
 def delete_all_results():
@@ -527,7 +529,6 @@ def amend_team_stats(previous_result):
             update_query = Team.update(lost = Team.lost + 1,
             won = Team.won - 1).where(Team.name == away_team.name)
             update_query.execute()
-
 
 if __name__ == '__main__':
     app.secret_key ='sum fink' #THIS SHOULD BE IN CONFIG - SECRET_KEY = 'string'

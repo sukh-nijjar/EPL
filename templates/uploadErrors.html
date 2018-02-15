@@ -21,12 +21,12 @@
           </tr>
           {% for row in invalid_rows %}
             <tr class="table_rows">
-              <td class="team_name">{{row[0]}}</td>
-              <td>{{row[2]}}</td>
-              <td>{{row[4]}}</td>
-              <td>{{row[5]}}</td>
-              <td>{{row[3]}}</td>
-              <td class="team_name">{{row[1]}}</td>
+              <td name="home_team" class="team_name">{{row[0]}}</td>
+              <td name="hftg">{{row[2]}}</td>
+              <td name="hhtg">{{row[4]}}</td>
+              <td name="ahtg">{{row[5]}}</td>
+              <td name="aftg">{{row[3]}}</td>
+              <td name="away_team" class="team_name">{{row[1]}}</td>
               <td class="error_desc">{{row[6]}}</td>
             </tr>
           {% endfor %}
