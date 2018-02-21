@@ -13,14 +13,19 @@ $(document).ready(function() {
     $("#err_resolve").click(function(){
       console.log("resolve button clicked")
       $("td").each(function() {
-        // console.log($(this).text());
+        // get the values to populate editable boxes plus pull through name attribute
+        // to include on elements dynamically created
         var input_value = $(this).text();
+        var name = $(this).attr("name");
+
+        //if value is a number (NOT isNAN!!) and also is not a team name
         if (!isNaN(input_value) && !$(this).hasClass("team_name")){
-          $(this).after('<td><input min="0" type="number" value="' + input_value + '"/></td>');
+          $(this).after('<td><input min="0" type="number" value="' + input_value + '" name="' + name + '"/></td>');
           $(this).remove(); //removes the read-only values
         }
+        //else it is a team name
         else if ($(this).hasClass("team_name")){
-          $(this).after('<td class="team_name"><input type="text" value="' + input_value + '"/></td>');
+          $(this).after('<td class="team_name"><input type="text" value="' + input_value + '" name="' + name + '"/></td>');
           $(this).remove(); //removes the read-only values
         }
       });
@@ -32,6 +37,25 @@ $(document).ready(function() {
 
     $("#invalid_results").on("click", "#err_cancel", function () {
       location.reload(true);
+    });
+
+    $("#invalid_results").on("click", "#err_save", function () {
+      $("tr.table_rows").each(function(){
+        console.log($(this));
+        $.ajax({
+          data :  {
+            home_team : $(this).find('[name=home_team]').val(),
+            hftg : $(this).find('td input[name=hftg]').val(),
+            hhtg : $(this).find('td input[name=hhtg]').val(),
+            ahtg : $(this).find('td input[name=ahtg]').val(),
+            aftg : $(this).find('td input[name=aftg]').val(),
+            away_team : $(this).find('[name=away_team]').val()
+          },
+          type : 'PUT',
+          url : '/update_score/'
+        })
+        // .done(
+      })
     });
 
     $("#team_details_name").click(function(){

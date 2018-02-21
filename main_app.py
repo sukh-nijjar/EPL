@@ -19,6 +19,7 @@ def teardown_request(exception):
 
 @app.route('/')
 def home():
+    ResultsValidator.display_all_results_in_DB()
     feedback = None
     teams = Team.select()
     if len(teams) > 0:
@@ -115,6 +116,7 @@ def perform_results_upload():
     if Team.select().count() < 1:
         feedback = "Teams must be loaded before loading results"
         return render_template('feedback.html', feedback=feedback)
+
     try:
         with open('2017ResultsShortVersion.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
@@ -123,6 +125,9 @@ def perform_results_upload():
             #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
             with db.atomic():
                 for row in csv_reader:
+                    teams = dict(Home=row[0], Away=row[1])
+                    goals = dict(FT_Home=int(row[2]),HT_Home=int(row[4]),FT_Away=int(row[3]),HT_Away=int(row[5]))
+                    result_is_valid(teams,goals)
                     if row_is_valid(row):
                         # print("inserting {}".format(row))
                         Result.create(
@@ -143,7 +148,7 @@ def perform_results_upload():
                 with open('result_upload_errors.csv', 'w', newline='') as results_errors_csv:
                     csv_writer = csv.writer(results_errors_csv)
                     csv_writer.writerows(invalid_rows)
-                    print('number of invalid rows = {} '.format(len(invalid_rows)))
+                    # print('number of invalid rows = {} '.format(len(invalid_rows)))
                 return render_template('uploadErrors.html',invalid_rows=invalid_rows,error_count = len(invalid_rows))
             else:
                 return redirect(url_for('view_results'))
@@ -163,12 +168,11 @@ def enter_result():
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
-    results_validator = ResultsValidator()
     teams = dict(Home=request.form.get('home_team'), Away=request.form.get('away_team'))
     goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
                  FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
 
-    results_validator.validate_goal_types(goals)
+    results_validator = ResultsValidator()
 
     UI_msg,different_teams = results_validator.validate_home_and_away_teams_different(teams)
     if not different_teams:
@@ -187,7 +191,13 @@ def create_result():
         team_dd = Team.select().order_by(Team.name)
         return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
 
-    if different_teams and teams_exist and goal_totals_valid:
+    # check a team is not both the home and away team - can't play themselves(!)
+    UI_msg, two_different_teams = results_validator.validate_home_and_away_teams_different(teams)
+    if not two_different_teams:
+        team_dd = Team.select().order_by(Team.name)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+
+    if different_teams and teams_exist and goal_totals_valid and two_different_teams:
         Result.create(
         home_team = request.form.get('home_team'),
         away_team = request.form.get('away_team'),
@@ -197,6 +207,7 @@ def create_result():
         away_ftg = request.form['aftg']
         )
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
+        # print(ResultsValidator.display_all_results_in_DB())
         return redirect(url_for('home'))
 
 @app.route('/view_results/')
@@ -252,6 +263,7 @@ def delete_result():
 @app.route('/update_score/', methods=['PUT'])
 def update_score():
     results_validator = ResultsValidator()
+    teams = dict(Home=request.form['home_team'],Away=request.form['away_team'])
     goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
                  FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
     #i need to refactor out the below var = request form []...stick with the dicts now!
@@ -263,11 +275,11 @@ def update_score():
     away_ftg = request.form['aftg']
     result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
 
-    # if int(home_ftg) >= int(home_htg) and int(away_ftg) >= int(away_htg):
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
+    UI_msg, new_result = results_validator.result_is_new(teams)
     if goal_totals_valid:
-        if is_result_new([home_team,away_team]):
-            print("updating score for fixture aka NEW result")
+        if new_result:
+            print("This is a NEW result")
             update_query = Result.update(
             home_htg = home_htg,
             away_htg = away_htg,
@@ -354,6 +366,27 @@ def create_dd_of_ints(required_range):
         dd.append(i)
     return dd
 
+#IF ROW IS VALID REFACTORED START--------------------------------------------
+
+def result_is_valid(teams,goals):
+    res = {**teams, **goals}
+    results_validator = ResultsValidator()
+    UI_msg, goal_types_valid = results_validator.validate_goal_types(goals)
+    print("{} : message = {}. Outcome = {}".format(res, UI_msg, goal_types_valid))
+    UI_msg, goal_values_valid = results_validator.validate_goal_values(goals)
+    print("{} : message = {}. Outcome = {}".format(res, UI_msg,goal_values_valid))
+    UI_msg, team_names_provided = results_validator.validate_team_names_present(teams)
+    print("{} : message = {}. Outcome = {}".format(res, UI_msg,team_names_provided))
+    UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
+    print("{} : message = {}. Outcome = {}".format(res, UI_msg,teams_exist))
+    UI_msg, different_teams = results_validator.validate_home_and_away_teams_different(teams)
+    print("{} : message = {}. Outcome = {}".format(res, UI_msg,different_teams))
+    if goal_types_valid and goal_values_valid and team_names_provided and teams_exist and different_teams:
+        print("Valid result - {}".format(res))
+    else:
+        print("ERROR in {}".format(res))
+#IF ROW IS VALID REFACTORED END--------------------------------------------------
+
 def row_is_valid(row):
     """
     check half times don't exceed full time goals (if goal data available)
@@ -401,10 +434,10 @@ def teams_exists(row):
             return False
 
 def is_result_new(row):
+    # print("ROW = {}".format(row))
     # for a result to exist (and therefor not be 'new')
     # each of the 4 goal values must be populated with a positive int
-    result = Result.select().where((Result.home_team == row[0].lower()) & (Result.away_team == row[1].lower())
-    & (Result.home_htg != None or Result.away_htg != None or Result.home_ftg != None or Result.away_ftg != None))
+    result = Result.select().where((Result.home_team == row[0].lower()) & (Result.away_team == row[1].lower()))
     if result.exists():
         row.append("Duplicate match")
         return False
@@ -423,7 +456,7 @@ def team_name_valid(team_name):
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
     """After a new result has been created this method updates the matches
     won, drawn, lost, goals scored and conceded for each team in the match."""
-    print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
+    # print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
         # home win
         update_query = Team.update(

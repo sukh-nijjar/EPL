@@ -69,7 +69,7 @@ footer{
 header{
 	font-family: 'Bungee Shade';
 	height: 120px;
-  width: 1200px;
+	width: 1200px;
 	text-align: center;
 	border-bottom: thick solid black;
 	margin-bottom: 5px; /*this specifies the gap downwards from header's bottom boundary*/
