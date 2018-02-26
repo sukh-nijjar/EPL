@@ -2,14 +2,6 @@ $(document).ready(function() {
     console.log('Calling my_JQ.js')
     google.charts.load('current', {'packages':['corechart']});
 
-    // if ($('#teamDetails').length) {
-    //   alert("on team details page")
-    //   alert(data);
-    //   // alert($('#team_details_name').text());
-    //   google.charts.load('current', {'packages':['corechart']});
-    //   // google.charts.setOnLoadCallback(drawChart);
-    // }
-
     $("#err_resolve").click(function(){
       console.log("resolve button clicked")
       $("td").each(function() {

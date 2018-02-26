@@ -3,8 +3,11 @@ from models import *
 
 class ResultsValidator:
     def validate_goal_types(self, goals):
-        # print("VALIDATE GOAL TYPES()")
+        """validates goals are integer values"""
+        print("VALIDATE GOAL TYPES()")
         #needs to handle empty strings don't forget!!!
+        if all(g == None for g in goals.values()):
+            return None,True
         for key,val in goals.items():
             # print("{} = {}".format(key, val))
             if isinstance(val, int):
@@ -17,8 +20,10 @@ class ResultsValidator:
     def validate_goal_values(self, goals):
         """validates goals are not negative values and
             FT goals are more than or equal to HT goals"""
-        # print("{}".format(goals))
-        # print("VALIDATE GOAL VALUES()")
+        print("Befor - {}".format(goals))
+        print("VALIDATE GOAL VALUES()")
+        if all(g == None for g in goals.values()):
+            return None,True
         if any(g < 0 for g in goals.values()):
             msg = "Negative values not allowed"
             return msg,False
@@ -27,10 +32,11 @@ class ResultsValidator:
         else:
             msg = "FT goals cannot be less than HT goals"
             return msg,False
+        print("After - {}".format(goals))
 
     def validate_team_names_present(self,teams):
         # the IF checks if team names have a value
-        # print("VALIDATE TEAM NAMES PRESENT()")
+        print("VALIDATE TEAM NAMES PRESENT()")
         if teams['Home'] and teams['Away']:
             return None,True
         else:
@@ -39,17 +45,19 @@ class ResultsValidator:
             return msg,False
 
     def validate_teams_exist(self,result):
-        # print("VALIDATE TEAM EXISTS()")
+        print("VALIDATE TEAM EXISTS()")
         home_team = Team.select().where(Team.name == result["Home"].lower())
         away_team = Team.select().where(Team.name == result["Away"].lower())
         if home_team.exists() and away_team.exists():
             return None,True
         else:
-            msg = "Please provide 2 teams"
+            msg = "Please provide 2 valid teams"
             return msg,False
 
     def result_is_new(self,result):
-        # print("IS RESULT IS NEW()?")
+        """determines if a result already exists for the
+        combination of the home and away teams"""
+        print("IS RESULT IS NEW()")
         # print("ROW (new method) = {}".format(result))
         res = Result.select().where((Result.home_team == result["Home"].lower()) & (Result.away_team == result["Away"].lower()))
         if res.exists():
@@ -62,7 +70,7 @@ class ResultsValidator:
     def validate_home_and_away_teams_different(self,result):
         """validates the home and away teams are different, for example
         a match cannot be Arsenal vs Arsenal"""
-        # print("VALIDATE HOME & AWAY DIFF()")
+        print("VALIDATE HOME & AWAY DIFF()")
         if result['Home'].lower() == result['Away'].lower():
             msg = result['Home'].title() + " cannot play themselves"
             return msg,False

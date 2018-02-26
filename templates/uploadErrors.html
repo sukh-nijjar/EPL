@@ -3,7 +3,7 @@
     {% if feedback %}
       <h3 class="feedback">{{feedback}}</h3>
     {% endif %}
-    {% if invalid_rows %}
+    {% if invalid_results %}
       <div class="warning">
         All valid results have been uploaded, however there are {{error_count}} invalid results that need correcting:
       </div>
@@ -19,15 +19,15 @@
             <th scope="col">Away</th>
             <th scope="col">Error</th>
           </tr>
-          {% for row in invalid_rows %}
+          {% for result in invalid_results %}
             <tr class="table_rows">
-              <td name="home_team" class="team_name">{{row[0]}}</td>
-              <td name="hftg">{{row[2]}}</td>
-              <td name="hhtg">{{row[4]}}</td>
-              <td name="ahtg">{{row[5]}}</td>
-              <td name="aftg">{{row[3]}}</td>
-              <td name="away_team" class="team_name">{{row[1]}}</td>
-              <td class="error_desc">{{row[6]}}</td>
+              <td name="home_team" class="team_name">{{result['Home'].title()}}</td>
+              <td name="hftg">{{result['FT_Home']}}</td>
+              <td name="hhtg">{{result['HT_Home']}}</td>
+              <td name="ahtg">{{result['HT_Away']}}</td>
+              <td name="aftg">{{result['FT_Away']}}</td>
+              <td name="away_team" class="team_name">{{result['Away'].title()}}</td>
+              <td class="error_desc">TBI</td>
             </tr>
           {% endfor %}
         </table>
