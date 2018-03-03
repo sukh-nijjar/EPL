@@ -43,10 +43,15 @@ $(document).ready(function() {
             aftg : $(this).find('td input[name=aftg]').val(),
             away_team : $(this).find('[name=away_team]').val()
           },
-          type : 'PUT',
-          url : '/update_score/'
+          type : 'POST',
+          url : '/verify_resolved_results/'
         })
-        // .done(
+        .done(function(data) {
+          if (data.done) {
+            console.log("RESPONSE FROM CLICKING SAVE");
+            window.location.href = "/upload_errors/";
+          }
+        })
       })
     });
 

@@ -20,6 +20,7 @@ class ResultsValidator:
     def validate_goal_values(self, goals):
         """validates goals are not negative values and
             FT goals are more than or equal to HT goals"""
+        #TO DO : Negative goal values MASKS ELSE CLAUSE ERROR
         print("Befor - {}".format(goals))
         print("VALIDATE GOAL VALUES()")
         if all(g == None for g in goals.values()):

@@ -156,7 +156,8 @@ def perform_teams_upload():
 @app.route('/upload_results/', methods=['POST'])
 def perform_results_upload():
     """
-    FILL IN
+    Reads in result data from csv file. Validates each result and creates a dB
+    record for valid results or writes invalid result to text file as errors.
     """
     error = None
     feedback = None
@@ -178,10 +179,8 @@ def perform_results_upload():
                         goals = dict(FT_Home=int(row[2]),HT_Home=int(row[4]),FT_Away=int(row[3]),HT_Away=int(row[5]))
                     except ValueError:
                         goals = dict(FT_Home=None,HT_Home=None,FT_Away=None,HT_Away=None)
-                    # goals = dict(FT_Home=row[2],HT_Home=row[4],FT_Away=row[3],HT_Away=row[5])
 
                     result = result_is_valid(teams,goals)
-                    print(result)
                     if result == True:
                         Result.create(
                             home_team = teams['Home'],
@@ -191,7 +190,7 @@ def perform_results_upload():
                             home_htg = goals['HT_Home'],
                             away_htg = goals['HT_Away']
                             )
-                        print(goals)
+
                         if None not in goals.values():
                             # the result has a score therefore stats for each team need updating
                             update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
@@ -211,8 +210,6 @@ def perform_results_upload():
 @app.route('/enter_result/')
 def enter_result():
     team_dd = Team.select().order_by(Team.name)
-    # print('team dd = {}'.format(team_dd[0])) CAREFULL! > THIS LINE CAUSED APP TO CRASH
-    # WHEN NO TEAMS IN team_dd!!
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd)
     else:
@@ -259,7 +256,6 @@ def create_result():
         away_ftg = request.form['aftg']
         )
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
-        # print(ResultsValidator.display_all_results_in_DB())
         return redirect(url_for('home'))
 
 @app.route('/view_results/')
@@ -359,6 +355,38 @@ def update_score():
     else:
         return jsonify({'error' : UI_msg})
 
+@app.route('/verify_resolved_results/', methods=['POST'])
+def verify():
+    invalid_results = []
+    teams = dict(Home=request.form['home_team'].lower().strip(),Away=request.form['away_team'].lower().strip())
+    goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
+                 FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+
+    result = result_is_valid(teams,goals)
+    if result == True:
+        Result.create(
+            home_team = teams['Home'],
+            away_team = teams['Away'],
+            home_ftg = goals['FT_Home'],
+            away_ftg = goals['FT_Away'],
+            home_htg = goals['HT_Home'],
+            away_htg = goals['HT_Away']
+            )
+        update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
+    else:
+        invalid_results.append(result)
+        print("INVALID RESULT [] = {}".format(invalid_results))
+
+    if len(invalid_results) > 0:
+         with open('result_upload_errors.txt', 'w+') as errors:
+             errors.write(json.dumps(invalid_results))
+    else:
+        if os.path.exists('result_upload_errors.txt'):
+            os.remove('result_upload_errors.txt')
+
+    return jsonify({'done' : 'True'})
+    # return redirect(url_for('display_upload_errors'))
+
 @app.route('/delete_all_results/')
 def delete_all_results():
     """deletes all results and resets teams stats to no games played"""
@@ -419,7 +447,6 @@ def create_dd_of_ints(required_range):
 #IF ROW IS VALID REFACTORED START--------------------------------------------
 def result_is_valid(teams,goals):
     res = defaultdict(list,{**teams, **goals})
-    print("REZ - {}".format(res))
     results_validator = ResultsValidator()
     UI_msg, goal_types_valid = results_validator.validate_goal_types(goals)
     if not goal_types_valid:
@@ -528,7 +555,6 @@ def team_name_valid(team_name):
 def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team):
     """After a result has been created this method updates the matches
     won, drawn, lost, goals scored and conceded stats for each team in the match."""
-    # print ("home - {}, away - {} hgoals - {} agoals - {} ".format(home_team, away_team, goals_scored_by_home_team, goals_scored_by_away_team))
     if goals_scored_by_home_team > goals_scored_by_away_team:
         # home win
         update_query = Team.update(

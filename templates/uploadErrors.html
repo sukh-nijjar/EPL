@@ -27,7 +27,13 @@
               <td name="ahtg">{{result['HT_Away']}}</td>
               <td name="aftg">{{result['FT_Away']}}</td>
               <td name="away_team" class="team_name">{{result['Away'].title()}}</td>
-              <td class="error_desc">TBI</td>
+              <td class="error_desc">
+                <ol>
+                  {% for err in result['Errors'] %}
+                    <li>{{err}}</li>
+                  {% endfor %}
+                </ol>
+              </td>
             </tr>
           {% endfor %}
         </table>
