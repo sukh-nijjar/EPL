@@ -32,27 +32,28 @@ $(document).ready(function() {
     });
 
     $("#invalid_results").on("click", "#err_save", function () {
+      // Construct empty array
+      var deferreds = [];
       $("tr.table_rows").each(function(){
-        console.log($(this));
-        $.ajax({
-          data :  {
-            home_team : $(this).find('[name=home_team]').val(),
-            hftg : $(this).find('td input[name=hftg]').val(),
-            hhtg : $(this).find('td input[name=hhtg]').val(),
-            ahtg : $(this).find('td input[name=ahtg]').val(),
-            aftg : $(this).find('td input[name=aftg]').val(),
-            away_team : $(this).find('[name=away_team]').val()
+        var ajax = $.ajax({
+            data :  {
+              home_team : $(this).find('[name=home_team]').val(),
+              hftg : $(this).find('td input[name=hftg]').val(),
+              hhtg : $(this).find('td input[name=hhtg]').val(),
+              ahtg : $(this).find('td input[name=ahtg]').val(),
+              aftg : $(this).find('td input[name=aftg]').val(),
+              away_team : $(this).find('[name=away_team]').val(),
+              resid : $(this).find('[name=ID]').val()
           },
-          type : 'POST',
+          type : 'PUT',
           url : '/verify_resolved_results/'
         })
-        .done(function(data) {
-          if (data.done) {
-            console.log("RESPONSE FROM CLICKING SAVE");
-            window.location.href = "/upload_errors/";
-          }
-        })
-      })
+        // Push promise to 'deferreds' array
+        deferreds.push(ajax);
+      }); //end 'each'
+      $.when.apply($, deferreds).then(function() {
+          window.location.href = "/upload_errors/";
+      });
     });
 
     $("#team_details_name").click(function(){

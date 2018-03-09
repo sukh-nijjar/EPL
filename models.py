@@ -1,6 +1,7 @@
 from peewee import *
 
-db = SqliteDatabase("EPL.db") #in real app this would come from config, not hard coded
+db = SqliteDatabase("EPL.db", pragmas=(('foreign_keys', 'on'),))
+# db = SqliteDatabase("EPL.db")
 
 # model definitions -- the standard "pattern" is to define a base model class
 # that specifies which database to use.  then, any subclasses will automatically
@@ -49,6 +50,7 @@ class Team(BaseModel):
 
 class Result(BaseModel):
     result_id = PrimaryKeyField()
+    week = IntegerField(null=False, default=0)
     home_team = CharField()
     away_team = CharField()
     home_htg = IntegerField(null=True)
@@ -56,6 +58,7 @@ class Result(BaseModel):
     home_ftg = IntegerField(null=True)
     away_ftg = IntegerField(null=True)
     result_has_been_updated = BooleanField(default=False)
+    is_error = BooleanField(default=False)
 
     def result_type(self):
         """returns the result type which is either home win,
@@ -67,6 +70,11 @@ class Result(BaseModel):
         else:
             return 'draw'
 
+class Error(BaseModel):
+    error_id = PrimaryKeyField()
+    result = ForeignKeyField(Result) #(Result,backref='errors') accessed by Result.errors
+    description = TextField()
+
 def init_db():
     db.connect()
-    db.create_tables([Team, Result], safe = True)
+    db.create_tables([Team, Result, Error], safe = True)

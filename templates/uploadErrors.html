@@ -11,6 +11,7 @@
       <div id="invalid_results">
         <table id="results_grid">
           <tr>
+            <th hidden scope="col">ID</th>
             <th scope="col">Home</th>
             <th scope="col">FT</th>
             <th scope="col">HT</th>
@@ -20,17 +21,20 @@
             <th scope="col">Error</th>
           </tr>
           {% for result in invalid_results %}
+            <!-- <p>We are in item number: {{ loop.index0 }}</p> -->
+            {% set outer_loop = loop.index0 %}
             <tr class="table_rows">
-              <td name="home_team" class="team_name">{{result['Home'].title()}}</td>
-              <td name="hftg">{{result['FT_Home']}}</td>
-              <td name="hhtg">{{result['HT_Home']}}</td>
-              <td name="ahtg">{{result['HT_Away']}}</td>
-              <td name="aftg">{{result['FT_Away']}}</td>
-              <td name="away_team" class="team_name">{{result['Away'].title()}}</td>
+              <td hidden name="ID">{{result.result_id}}</td>
+              <td name="home_team" class="team_name">{{result.home_team.title()}}</td>
+              <td name="hftg">{{result.home_ftg}}</td>
+              <td name="hhtg">{{result.home_htg}}</td>
+              <td name="ahtg">{{result.away_htg}}</td>
+              <td name="aftg">{{result.away_ftg}}</td>
+              <td name="away_team" class="team_name">{{result.away_team.title()}}</td>
               <td class="error_desc">
                 <ol>
-                  {% for err in result['Errors'] %}
-                    <li>{{err}}</li>
+                  {% for error in result.error_set: %}
+                      <li>{{error.description}}</li>
                   {% endfor %}
                 </ol>
               </td>

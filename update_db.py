@@ -27,3 +27,15 @@ migrator = SqliteMigrator(db)
 # migrate(
 #     migrator.add_column('Result','result_has_been_updated',result_updated_field),
 # )
+
+#07/03/2018 add integter field representing the week the match has been played in (1 to 38)
+# week_field = IntegerField(null = False, default=0)
+# migrate(
+#     migrator.add_column('Result','week',week_field),
+# )
+
+#07/03/2018 add boolean field to Result to indicated result has validation errors
+# is_error_field = BooleanField(default=False)
+# migrate(
+#     migrator.add_column('Result','is_error',is_error_field),
+# )
