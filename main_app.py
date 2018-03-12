@@ -153,8 +153,6 @@ def perform_results_upload():
                             each_error.append(err)
                         # get result record just inserted
                         result = Result.select().order_by(Result.result_id.desc()).get()
-                        #at the moment 'e' is the whole list
-                        # for e in errors_list:
                         for err in each_error:
                             error = Error.create(result_id=result, description=err)
                         #get all errors for a given result
@@ -324,7 +322,7 @@ def verify():
     teams = dict(Home=request.form['home_team'].lower().strip(),Away=request.form['away_team'].lower().strip())
     goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
                  FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
-
+    display_all_error_in_DB()
     result_to_verify = Result.get(Result.result_id == int(request.form['resid']))
 
     update_query = Result.update(
@@ -339,17 +337,23 @@ def verify():
 
     result = result_is_valid(teams,goals,ignore_result_is_new=True)
     if result == True:
-        update_query = Result.update(is_error = False)
+        update_query = Result.update(is_error = False).where(Result.result_id == result_to_verify.result_id)
         update_query.execute()
         update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
-    else:
-        print("Need to delete errors that are no longer relevant")
-        dq = Error.delete()
-        #delete the error description that matches the resolved error ... hmmm OR
-        #have a error column boolean that can be deleted when resolved = true ... hmmm
+        #delete errors for result as no longer relevant
+        delete_query = Error.delete().where(Result.result_id == result_to_verify.result_id)
+        delete_query.execute()
+
+    if result != True:
+        #delete errors that have been resolved
+        delete_resolved_errors = Error.delete().where((Result.result_id==result_to_verify.result_id) &
+                                (str(Error.description) not in result['Errors']))
+        delete_resolved_errors.execute()
+        #create new errors
+        for err in result['Errors']:
+            error = Error.create(result_id=result_to_verify.result_id, description=err)
 
     return jsonify({'done' : 'Re-validation complete'})
-    # return redirect(url_for('display_upload_errors'))
 
 @app.route('/delete_all_results/')
 def delete_all_results():
@@ -361,14 +365,13 @@ def delete_all_results():
     reset_teams_query = Team.update(won = 0,drawn = 0,lost = 0,
     goals_scored = 0,goals_conceded = 0)
     reset_teams_query.execute()
-    # if os.path.exists('result_upload_errors.txt'):
-    #     os.remove('result_upload_errors.txt')
     return redirect(url_for('home'))
 
 @app.route('/delete_all_teams/', methods=['POST'])
 def delete_all_teams():
     """deleting teams also causes all results to be deleted
     """
+    #DON'T FORGET TO INCLUDE RESULT Error DELETIONS
     delete_query = Team.delete()
     delete_query.execute()
     delete_query = Result.delete()
@@ -580,8 +583,8 @@ def amend_team_stats(previous_result):
 #debug helpers
 def display_all_error_in_DB():
     errors = Error.select()
+    print("-----------Error Count = {}".format(errors.count()) + "-------------------------")
     for e in errors:
-      print("---------------------------------------------------------------")
       print("Errors_ID : {}, Result_ID : {}, Desc : {}".format(e.error_id,e.result_id,e.description))
       print("---------------------------------------------------------------")
 
