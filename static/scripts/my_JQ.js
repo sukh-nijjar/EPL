@@ -10,7 +10,7 @@ $(document).ready(function() {
         var input_value = $(this).text();
         var name = $(this).attr("name");
 
-        //if value is a number (NOT isNAN!!) and also is not a team name
+        //if value is a number (NOT isNAN!!) and also is not a team name (therefore a goal field)
         if (!isNaN(input_value) && !$(this).hasClass("team_name")){
           $(this).after('<td><input min="0" type="number" value="' + input_value + '" name="' + name + '"/></td>');
           $(this).remove(); //removes the read-only values
@@ -19,6 +19,10 @@ $(document).ready(function() {
         else if ($(this).hasClass("team_name")){
           $(this).after('<td class="team_name"><input type="text" value="' + input_value + '" name="' + name + '"/></td>');
           $(this).remove(); //removes the read-only values
+        }
+        else if (input_value === 'None'){
+          $(this).after('<td><input min="0" type="number" value="0" name="' + name + '"/></td>');
+          $(this).remove(); //removes the read-only 'None' values
         }
       });
       // console.log(this); Note - the context of 'this' is dependent on element selected
@@ -32,7 +36,13 @@ $(document).ready(function() {
     });
 
     $("#invalid_results").on("click", "#err_save", function () {
-      // Construct empty array
+      // $('td [type=number]').css('background','blue');
+      // $('td [type=number]').each(function (i,value) {
+      //   console.log(this)
+      //   if (this.value.length === 0) {
+      //     this.css('background','red')};
+      //   alert("i = " + i + " " + this.value);
+      // });
       var deferreds = [];
       $("tr.table_rows").each(function(){
         var ajax = $.ajax({
@@ -113,6 +123,7 @@ $(document).ready(function() {
             $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
             $(this).remove();
           } else /*result*/ {
+            var r_id = $(this).closest('tr').find('[name=ID]').text(); //gets the hidden record ID from results.html
             var hftg = $(this).closest('tr').find('[name=hftg]').text();
             var hhtg = $(this).closest('tr').find('[name=hhtg]').text();
             var ahtg = $(this).closest('tr').find('[name=ahtg]').text();
@@ -125,10 +136,11 @@ $(document).ready(function() {
             $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
             $(this).after('<td class="action_link"><a class="AL_delete" href="#">Delete</a></td>');
             $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
-            $(this).closest('tr').find('td:nth-child(1)').after('<td name="hftg"><input min="0" name="hftg" type="number" value="' + hftg + '"/></td>');
-            $(this).closest('tr').find('td:nth-child(2)').after('<td name="hhtg"><input min="0" name="hhtg" type="number" value="' + hhtg + '"/></td>');
-            $(this).closest('tr').find('td:nth-child(3)').after('<td name="ahtg"><input min="0" name="ahtg" type="number" value="' + ahtg + '"/></td>');
-            $(this).closest('tr').find('td:nth-child(4)').after('<td name="aftg"><input min="0" name="aftg" type="number" value="' + aftg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(1)').before('<td hidden name="ID"><input min="0" name="ID" type="number" value="' + r_id + '"/></td>');//makes ID available in DOM
+            $(this).closest('tr').find('td:nth-child(2)').after('<td name="hftg"><input min="0" name="hftg" type="number" value="' + hftg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(3)').after('<td name="hhtg"><input min="0" name="hhtg" type="number" value="' + hhtg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(4)').after('<td name="ahtg"><input min="0" name="ahtg" type="number" value="' + ahtg + '"/></td>');
+            $(this).closest('tr').find('td:nth-child(5)').after('<td name="aftg"><input min="0" name="aftg" type="number" value="' + aftg + '"/></td>');
             $(this).remove();
           }
         } //end if action type is *EDIT*
@@ -162,10 +174,11 @@ $(document).ready(function() {
         } //end if action type is *SAVE*
         if (action_type === 'Delete'){
           alert("DELETE CALLED")
+          var r_id = $(this).closest('tr').find('td input[name=ID]').val();
+          console.log("r-id is " + r_id)
           $.ajax({
             data : {
-              home_team : $(this).closest('tr').find('[name=home_team]').text(),
-              away_team : $(this).closest('tr').find('[name=away_team]').text()
+              resid : r_id
             },
             type : 'DELETE',
             url : '/delete_result/'

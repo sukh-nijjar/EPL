@@ -59,7 +59,9 @@ class ResultsValidator:
         combination of the home and away teams"""
         print("IS RESULT IS NEW()")
         # print("ROW (new method) = {}".format(result))
-        res = Result.select().where((Result.home_team == result["Home"].lower()) & (Result.away_team == result["Away"].lower()))
+        res = Result.select().where((Result.home_team == result["Home"].lower()) &
+                                    (Result.away_team == result["Away"].lower()) &
+                                    (Result.is_error == False))
         if res.exists():
             msg = "Duplicate result"
             return msg,False
@@ -80,7 +82,10 @@ class ResultsValidator:
     @staticmethod
     def display_all_results_in_DB():
         results = Result.select()
-        for r in results:
-          print("---------------------------------------------------------------")
-          print("Result_ID : {}, Errors exist? : {}, Updated? : {}, Week : {}, home = {}, away={}, {},{},{},{}".format(r.result_id,r.is_error,r.result_has_been_updated, r.week,r.home_team,r.away_team,r.home_ftg,r.home_htg,r.away_ftg,r.away_htg))
-          print("---------------------------------------------------------------")
+        if results.count() > 0:
+            for r in results:
+              print("---------------------------------------------------------------")
+              print("Result_ID : {}, Errors exist? : {}, Updated? : {}, Week : {}, home = {}, away={}, {},{},{},{}".format(r.result_id,r.is_error,r.result_has_been_updated, r.week,r.home_team,r.away_team,r.home_ftg,r.home_htg,r.away_ftg,r.away_htg))
+              print("---------------------------------------------------------------")
+        else:
+            print("-----------No results in database------------")

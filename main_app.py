@@ -21,6 +21,7 @@ def teardown_request(exception):
 @app.route('/')
 def home():
     ResultsValidator.display_all_results_in_DB()
+    display_all_error_in_DB()
     feedback = None
     teams = Team.select()
     if len(teams) > 0:
@@ -231,22 +232,21 @@ def view_results():
 
 @app.route('/delete_result/', methods=['DELETE'])
 def delete_result():
-    home_team = request.form['home_team'].lower()
-    away_team = request.form['away_team'].lower()
+    result_to_delete = Result.get(Result.result_id == int(request.form['resid']))
+    print("result_to_delete ID = {}".format(result_to_delete.result_id))
     #get the teams from database whose stats will need amending due to result deletion
-    home = Team.get(Team.name == home_team)
-    away = Team.get(Team.name == away_team)
+    home = Team.get(Team.name == result_to_delete.home_team)
+    away = Team.get(Team.name == result_to_delete.away_team)
 
-    result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
-    home_goals_adjustment = result.home_ftg
-    away_goals_adjustment = result.away_ftg
+    home_goals_adjustment = result_to_delete.home_ftg
+    away_goals_adjustment = result_to_delete.away_ftg
 
-    if result.result_type() == 'draw':
+    if result_to_delete.result_type() == 'draw':
         home.drawn = Team.drawn - 1
         home.save()
         away.drawn = Team.drawn - 1
         away.save()
-    elif result.result_type() == 'home win':
+    elif result_to_delete.result_type() == 'home win':
         home.won = Team.won - 1
         home.save()
         away.lost = Team.lost - 1
@@ -266,7 +266,7 @@ def delete_result():
     goals_conceded = Team.goals_conceded - home_goals_adjustment).where(Team.team_id == away.team_id)
     update_away_for_against.execute()
 
-    result.delete_instance()
+    result_to_delete.delete_instance(recursive=True)
     return jsonify({'done' : 'Result deleted'})
 
 @app.route('/update_score/', methods=['PUT'])
@@ -318,11 +318,13 @@ def update_score():
 
 @app.route('/verify_resolved_results/', methods=['PUT'])
 def verify():
-    print("ROUTE '/verify_resolved_results/' called")
+    UI_msg = None
     teams = dict(Home=request.form['home_team'].lower().strip(),Away=request.form['away_team'].lower().strip())
+    # try:
     goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
                  FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
-    display_all_error_in_DB()
+    # except ValueError:
+    #     goals = dict(FT_Home='',HT_Home='',FT_Away='',HT_Away='')
     result_to_verify = Result.get(Result.result_id == int(request.form['resid']))
 
     update_query = Result.update(
@@ -335,14 +337,20 @@ def verify():
     ).where(Result.result_id == result_to_verify.result_id)
     update_query.execute()
 
+    result_count = Result.select().where((Result.home_team == teams["Home"]) & (Result.away_team == teams["Away"])).count()
     result = result_is_valid(teams,goals,ignore_result_is_new=True)
-    if result == True:
+
+    if result == True and result_count == 1:
         update_query = Result.update(is_error = False).where(Result.result_id == result_to_verify.result_id)
         update_query.execute()
         update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
         #delete errors for result as no longer relevant
         delete_query = Error.delete().where(Result.result_id == result_to_verify.result_id)
         delete_query.execute()
+    elif result_count > 1:
+        #a result record for the same home and away team combination already exists
+        #so the duplicate result check is valid
+        result = result_is_valid(teams,goals)
 
     if result != True:
         #delete errors that have been resolved
@@ -369,10 +377,11 @@ def delete_all_results():
 
 @app.route('/delete_all_teams/', methods=['POST'])
 def delete_all_teams():
-    """deleting teams also causes all results to be deleted
+    """deleting teams also causes all results and errors to be deleted
     """
-    #DON'T FORGET TO INCLUDE RESULT Error DELETIONS
     delete_query = Team.delete()
+    delete_query.execute()
+    delete_query = Error.delete()
     delete_query.execute()
     delete_query = Result.delete()
     delete_query.execute()
@@ -402,7 +411,8 @@ def ReturnChartData():
 def display_upload_errors():
     result_errors = Result.select().where(Result.is_error == True)
     if len(result_errors) > 0:
-        return render_template('uploadErrors.html',invalid_results=result_errors)
+        return render_template('uploadErrors.html',invalid_results=result_errors,
+                               error_count=Error.select().count())
     else:
         return render_template('uploadErrors.html',feedback = "No errors to report")
 
