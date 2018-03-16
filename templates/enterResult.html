@@ -7,7 +7,7 @@
       <div id="enter_result_form">
         <form action="/create_result/" id="create_result" method="post">
           <p class="teamDropDowns">
-            <span>Home Team</span>
+            <!-- <span>Home Team</span> -->
             <select name="home_team" class="selectmenu">
               <option selected="selected">Select home team...</option>
               {% for team in team_dd %}
@@ -16,13 +16,14 @@
             </select>
 
             <!-- Home HT -->
+            <!-- <span>Half Time Goals</span> -->
             <input class="spinner" name="hhtg" value="0">
 
             <!-- Home FT -->
             <input class="spinner" name="hftg" value="0">
           </p>
           <p class="teamDropDowns">
-            <span>Away Team</span>
+            <!-- <span>Away Team</span> -->
             <select name="away_team" class="selectmenu">
               <option selected="selected">Select away team...</option>
               {% for team in team_dd %}

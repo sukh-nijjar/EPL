@@ -3,7 +3,6 @@ $(document).ready(function() {
     google.charts.load('current', {'packages':['corechart']});
 
     $("#err_resolve").click(function(){
-      console.log("resolve button clicked")
       $("td").each(function() {
         // get the values to populate editable boxes plus pull through name attribute
         // to include on elements dynamically created
@@ -24,6 +23,11 @@ $(document).ready(function() {
           $(this).after('<td><input min="0" type="number" value="0" name="' + name + '"/></td>');
           $(this).remove(); //removes the read-only 'None' values
         }
+        // remove the delete option when in edit mode
+        $(this).find('.erroneous_result_delete').remove();
+        $(this).closest('tr').find('td:nth-child(1)').prop('hidden',true);
+        // $('td [name=ID]').prop('hidden',true);
+        // $('td [name=ID]').remove();
       });
       // console.log(this); Note - the context of 'this' is dependent on element selected
       $(this).after('<input class="resolve_error_buttons" id="err_cancel" type="button" value="Cancel"/>');
@@ -32,7 +36,7 @@ $(document).ready(function() {
     });
 
     $("#invalid_results").on("click", "#err_cancel", function () {
-      location.reload(true);
+      window.location.href = "/upload_errors/";
     });
 
     $("#invalid_results").on("click", "#err_save", function () {
@@ -64,6 +68,23 @@ $(document).ready(function() {
       $.when.apply($, deferreds).then(function() {
           window.location.href = "/upload_errors/";
       });
+    });
+
+    $(".erroneous_result_delete").on("click",function () {
+      var r_id = $(this).closest('tr').find('td[name=ID]').text();
+      $.ajax({
+        data : {
+          resid : r_id
+        },
+        type : 'DELETE',
+        url : '/delete_erroneous_result/'
+      })
+      .done(function(data) {
+        if (data.done) {
+          $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+          toggle_UI_Msg();
+        }
+      })
     });
 
     $("#team_details_name").click(function(){
@@ -174,8 +195,9 @@ $(document).ready(function() {
         } //end if action type is *SAVE*
         if (action_type === 'Delete'){
           alert("DELETE CALLED")
-          var r_id = $(this).closest('tr').find('td input[name=ID]').val();
-          console.log("r-id is " + r_id)
+          // var r_id = $(this).closest('tr').find('td input[name=ID]').val();
+          var r_id = $(this).closest('tr').find('td [name=ID]').val();
+          console.log("r-id is " + r_id);
           $.ajax({
             data : {
               resid : r_id

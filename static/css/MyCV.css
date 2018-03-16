@@ -315,6 +315,10 @@ section{
 	width: 145px;
 }
 
+.erroneous_result_delete{
+	border: 2px solid #D9D6D3;
+}
+
 .full_time{
 	font-weight: bold;
 }

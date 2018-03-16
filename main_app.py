@@ -269,6 +269,12 @@ def delete_result():
     result_to_delete.delete_instance(recursive=True)
     return jsonify({'done' : 'Result deleted'})
 
+@app.route('/delete_erroneous_result/', methods=['DELETE'])
+def delete_erroneous_result():
+    erroneous_result_to_delete = Result.get(Result.result_id == int(request.form['resid']))
+    erroneous_result_to_delete.delete_instance(recursive=True)
+    return jsonify({'done' : 'Erroneous Result deleted'})
+
 @app.route('/update_score/', methods=['PUT'])
 def update_score():
     results_validator = ResultsValidator()
