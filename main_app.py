@@ -1,5 +1,6 @@
 import csv, os, shutil, re
 from collections import defaultdict
+from domain import TeamPosition
 from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
 from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
@@ -20,8 +21,9 @@ def teardown_request(exception):
 
 @app.route('/')
 def home():
-    ResultsValidator.display_all_results_in_DB()
-    display_all_error_in_DB()
+    # ResultsValidator.display_all_results_in_DB()
+    # display_all_error_in_DB()
+    get_results_by_week(1,1)
     feedback = None
     teams = Team.select()
     if len(teams) > 0:
@@ -113,7 +115,7 @@ def perform_results_upload():
         return render_template('feedback.html', feedback=feedback)
 
     try:
-        with open('2017ResultsShortVersion.csv') as results_csv:
+        with open('2017Results.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
             #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
@@ -595,6 +597,44 @@ def amend_team_stats(previous_result):
             update_query = Team.update(lost = Team.lost + 1,
             won = Team.won - 1).where(Team.name == away_team.name)
             update_query.execute()
+
+def get_results_by_week(from_week,to_week):
+    results = Result.select().where(Result.week.between(from_week,to_week))
+    create_weekly_position_table(results)
+
+def create_weekly_position_table(results):
+    teams = Team.select(Team.name)
+    teams_list = []
+    for t in teams:
+        team_position = TeamPosition(t.name)
+        teams_list.append((team_position))
+    for tp in teams_list:
+        print(tp)
+
+    week_range = results.select(Result.week).distinct()
+    for w in week_range:
+        match_week = [w.week]
+        positions = [*match_week,*teams_list]
+        for p in positions:
+            print(p)
+        for r in results:
+            if r.week == positions[0]:
+                if r.result_type() == 'home win':
+                    winner = r.home_team
+                    #skip the first element as it is an integer and
+                    #not a TeamPosition object
+                    # q = [x for x in positions[1:] if x.team == winner]
+                    for item in positions[1:]:
+                        if item.team == winner:
+                            item.points += 3
+                print("same {},{}".format(r.week,positions[0]))
+            else:
+                print("diff {},{}".format(r.week,positions[0]))
+        for p in positions:
+            print(p)
+    for r in results:
+        print("Week : {}, Home : {},{}, Away : {},{} is a {}".format(r.week,r.home_team,r.home_ftg,r.away_team,r.away_ftg,r.result_type()))
+        print("******************************************")
 
 #debug helpers
 def display_all_error_in_DB():
