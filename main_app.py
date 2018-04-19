@@ -23,7 +23,7 @@ def teardown_request(exception):
 def home():
     # ResultsValidator.display_all_results_in_DB()
     # display_all_error_in_DB()
-    get_results_by_week(1,1)
+    # get_results_by_week(1,1)
     feedback = None
     teams = Team.select()
     if len(teams) > 0:
@@ -202,13 +202,13 @@ def create_result():
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
     if not goal_totals_valid:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams)
 
     # check a team is not both the home and away team - can't play themselves(!)
     UI_msg, two_different_teams = results_validator.validate_home_and_away_teams_different(teams)
     if not two_different_teams:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams)
 
     if new_result and teams_exist and goal_totals_valid and two_different_teams:
         Result.create(
@@ -415,6 +415,53 @@ def ReturnChartData():
     print("{} team id is {}".format(team.name, team.team_id))
     return jsonify({'won' : team.won,'drawn' : team.drawn, 'lost'  : team.lost})
 
+@app.route('/charts/', methods=['GET'])
+def GetCharts():
+    print("CALLING ___ GetCharts()")
+    #grab any teams that have been submitted via checkboxes
+    teams_filter = request.args.getlist('team_checked')
+
+    #team_list is passed to the view to produce the checkboxes
+    team_list = Team.select().order_by(Team.name)
+    chartToLoad = request.args.get('chart_select')
+
+    team_positions_dict = {}
+
+    #when page is requested from home page no chart will be displayed so
+    #chartToLoad set to lineChart as default
+    if chartToLoad is None:
+        chartToLoad = 'lineChart'
+
+    if chartToLoad == 'lineChart':
+        #get_results_by_week params can be driven from UI
+        team_positions = get_results_by_week(1,31)
+        if len(teams_filter):
+            for team in team_positions:
+                if team.team in teams_filter:
+                    t = dict(TeamName=team.team,Positions=team.position)
+                    team_positions_dict[team.team] = t
+            print("team_positions_filtered dict = {}".format(team_positions_dict))
+            return render_template('charts_home.html',team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad)
+        else:
+            for team in team_positions:
+                t = dict(TeamName=team.team,Positions=team.position)
+                team_positions_dict[team.team] = t
+            return render_template('charts_home.html', team_data=team_positions_dict, team_list = team_list,chartToLoad=chartToLoad)
+    else:
+        if len(teams_filter):
+            teams = Team.select().where(Team.name.in_(teams_filter))
+        else:
+            teams = Team.select()
+        teams_in_points_order = sorted(teams, key=methodcaller('points'), reverse=True)
+        for team in teams_in_points_order:
+            team_positions_dict[team.name] = team.lost, team.drawn, team.won, team.points(), team.max_possible()
+
+        if len(teams) > 0:
+            return render_template('charts_home.html', team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad)
+        else:
+            feedback = "There are no teams in the system. Please add some."
+            return render_template('feedback.html', feedback = feedback)
+
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
     result_errors = Result.select().where(Result.is_error == True)
@@ -424,13 +471,76 @@ def display_upload_errors():
     else:
         return render_template('uploadErrors.html',feedback = "No errors to report")
 
+def get_results_by_week(from_week,to_week):
+    results = Result.select().where(Result.week.between(from_week,to_week) &
+                                       (Result.is_error == False))
+    return create_weekly_position_table(results)
+
+def create_weekly_position_table(results):
+    print("CALLED create_weekly_position_table()")
+    teams = Team.select(Team.name)
+    teams_list = []
+    for team in teams:
+        team_position = TeamPosition(team.name)
+        teams_list.append((team_position))
+
+    week_range = results.select(Result.week).distinct()
+    for w in week_range:
+        match_week = [w.week]
+        positions = [*match_week,*teams_list]
+        for result in results:
+            if result.week == positions[0]:
+                if result.result_type() == 'home win':
+                    winner = result.home_team
+                    loser = result.away_team
+                    #skip the first element as it is an integer and
+                    #not a TeamPosition object
+                    for item in positions[1:]:
+                        if item.team == winner:
+                            item.points += 3
+                            item.scored += result.home_ftg
+                            item.conceded += result.away_ftg
+                        if item.team == loser:
+                            item.scored += result.away_ftg
+                            item.conceded += result.home_ftg
+                elif result.result_type() == 'away win':
+                    winner = result.away_team
+                    loser = result.home_team
+                    for item in positions[1:]:
+                        if item.team == winner:
+                            item.points += 3
+                            item.scored += result.away_ftg
+                            item.conceded += result.home_ftg
+                        if item.team == loser:
+                            item.scored += result.home_ftg
+                            item.conceded += result.away_ftg
+                elif result.result_type() == 'draw':
+                    home_team = result.home_team
+                    away_team = result.away_team
+                    for item in positions[1:]:
+                        if item.team == home_team:
+                            item.points += 1
+                            item.scored += result.home_ftg
+                            item.conceded += result.away_ftg
+                        if item.team == away_team:
+                            item.points += 1
+                            item.scored += result.away_ftg
+                            item.conceded += result.home_ftg
+        #sort positions[] into points order
+        in_goals_scored_order = sorted(positions[1:], key=attrgetter('scored'))
+        in_GD_order = sorted(in_goals_scored_order, key=methodcaller('goal_difference'), reverse=True)
+        in_points_order = sorted(in_GD_order, key=attrgetter('points'),reverse=True)
+        for pos in in_points_order:
+            i = in_points_order.index(pos)
+            pos.position.append(i+1)
+    return in_points_order
+
 def create_dd_of_ints(required_range):
     dd = []
     for i in range(required_range):
         dd.append(i)
     return dd
 
-#IF ROW IS VALID REFACTORED START--------------------------------------------
 def result_is_valid(teams,goals,**kwargs):
     res = defaultdict(list,{**teams, **goals})
     results_validator = ResultsValidator()
@@ -477,7 +587,6 @@ def result_is_valid(teams,goals,**kwargs):
     else:
         print("ERROR in {}".format(res))
         return res
-#IF ROW IS VALID REFACTORED END--------------------------------------------------
 
 def team_name_valid(team_name):
     match = re.search(r'^[a-z A-Z 0-9 &]+\Z', team_name)
@@ -597,44 +706,6 @@ def amend_team_stats(previous_result):
             update_query = Team.update(lost = Team.lost + 1,
             won = Team.won - 1).where(Team.name == away_team.name)
             update_query.execute()
-
-def get_results_by_week(from_week,to_week):
-    results = Result.select().where(Result.week.between(from_week,to_week))
-    create_weekly_position_table(results)
-
-def create_weekly_position_table(results):
-    teams = Team.select(Team.name)
-    teams_list = []
-    for t in teams:
-        team_position = TeamPosition(t.name)
-        teams_list.append((team_position))
-    for tp in teams_list:
-        print(tp)
-
-    week_range = results.select(Result.week).distinct()
-    for w in week_range:
-        match_week = [w.week]
-        positions = [*match_week,*teams_list]
-        for p in positions:
-            print(p)
-        for r in results:
-            if r.week == positions[0]:
-                if r.result_type() == 'home win':
-                    winner = r.home_team
-                    #skip the first element as it is an integer and
-                    #not a TeamPosition object
-                    # q = [x for x in positions[1:] if x.team == winner]
-                    for item in positions[1:]:
-                        if item.team == winner:
-                            item.points += 3
-                print("same {},{}".format(r.week,positions[0]))
-            else:
-                print("diff {},{}".format(r.week,positions[0]))
-        for p in positions:
-            print(p)
-    for r in results:
-        print("Week : {}, Home : {},{}, Away : {},{} is a {}".format(r.week,r.home_team,r.home_ftg,r.away_team,r.away_ftg,r.result_type()))
-        print("******************************************")
 
 #debug helpers
 def display_all_error_in_DB():

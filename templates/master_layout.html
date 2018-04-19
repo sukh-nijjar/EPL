@@ -2,6 +2,8 @@
 <html>
 <head>
   <title>Premiership 2017/18</title>
+  {% block script %}
+  {% endblock %}
   <meta charset="UTF-8">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/MyCV.css')}}">
@@ -32,13 +34,17 @@
             </form>
             <li><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"> </span>Load data</a></li>
             <li><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/errors.png')}}"> </span>Upload errors</a></li>
-            <li><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/data_visualization.png')}}"> </span>Data</a></li>
+            <li><a href="{{url_for('GetCharts')}}"><span><img class="icons" src="{{url_for('static', filename='images/data_visualization.png')}}"> </span>Visualization</a></li>
         </ul>
       </nav>
 
       <section>
         <!-- <div id="usr_messages"></div> -->
         {%block content%}
+          <div>
+            {% block chart_options %}
+            {% endblock %}
+          </div>
         {%endblock%}
       </section>
 
@@ -51,12 +57,13 @@
           from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
           Licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
       </footer>
-
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}"></script>
-      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+      {% block bottomscript %}
+      {% endblock %}
       <script type=text/javascript>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
       </script>

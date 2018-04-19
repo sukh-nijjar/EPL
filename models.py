@@ -33,6 +33,10 @@ class Team(BaseModel):
         """returns the goals difference for the team"""
         return self.goals_scored - self.goals_conceded
 
+    def max_possible(self):
+        max = self.points() + ((38 - (self.won + self.drawn + self.lost)) * 3)
+        return max - self.points()
+
     def win_rate(self):
         """returns the percentage of games won by a team"""
         return round((100/self.games_played())*self.won)

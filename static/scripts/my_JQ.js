@@ -1,6 +1,14 @@
 $(document).ready(function() {
     console.log('Calling my_JQ.js')
-    google.charts.load('current', {'packages':['corechart']});
+    // google.charts.load('current', {'packages':['corechart']});
+    // google.charts.load('current', {'packages':['bar']});
+
+    // var chart = chart_to_load;
+    //
+    // $("#chart_types").change(function(){
+    //   alert("Chart to load is " + chart)
+    //   $('#chart_selector').submit();
+    // });
 
     $("#err_resolve").click(function(){
       $("td").each(function() {
@@ -87,16 +95,16 @@ $(document).ready(function() {
       })
     });
 
-    $("#team_details_name").click(function(){
-        var team = $(this).text();
-        $(function() {
-          $.getJSON("/get_chart_data", {
-            team : team},
-              function(data) {
-                drawChart(data);
-        });
-      });
-    });
+    // $("#team_details_name").click(function(){
+    //     var team = $(this).text();
+    //     $(function() {
+    //       $.getJSON("/get_chart_data", {
+    //         team : team},
+    //           function(data) {
+    //             drawChart(data);
+    //     });
+    //   });
+    // });
 
     $('#submitSaveTeam').on('click', function(e) {
         e.preventDefault();
@@ -271,29 +279,29 @@ function toggle_UI_Msg(){
        })},3000);
 }
 
-function drawChart(t) {
-  // Create the data table.
-  $('#chart_div').slideToggle(1000);
-  var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Result_Outcome');
-  data.addColumn('number', 'Result_Count');
-  data.addRows([
-    ['Wins', t.won],
-    ['Draws', t.drawn],
-    ['Losses', t.lost]
-  ]);
-  //
-  // // Set chart options
-  var options = {'title':'Performance',
-                 'width':600,
-                 'height':400,
-                 'pieHole': 0.3,
-                 'colors': ['green', 'orange', 'red']};
-  //
-  // // Instantiate and draw our chart, passing in some options.
-  var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-  chart.draw(data, options);
-}
+// function drawChart(t) {
+//   // Create the data table.
+//   $('#chart_div').slideToggle(1000);
+//   var data = new google.visualization.DataTable();
+//   data.addColumn('string', 'Result_Outcome');
+//   data.addColumn('number', 'Result_Count');
+//   data.addRows([
+//     ['Wins', t.won],
+//     ['Draws', t.drawn],
+//     ['Losses', t.lost]
+//   ]);
+//   //
+//   // // Set chart options
+//   var options = {'title':'Performance',
+//                  'width':600,
+//                  'height':400,
+//                  'pieHole': 0.3,
+//                  'colors': ['green', 'orange', 'red']};
+//   //
+//   // // Instantiate and draw our chart, passing in some options.
+//   var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+//   chart.draw(data, options);
+// }
 
 // set focus on team name input on create team form
 // document.getElementById("teamName").focus();

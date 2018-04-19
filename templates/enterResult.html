@@ -9,7 +9,11 @@
           <p class="teamDropDowns">
             <!-- <span>Home Team</span> -->
             <select name="home_team" class="selectmenu">
-              <option selected="selected">Select home team...</option>
+              {% if error %}
+                <option selected="selected" value='{{teams["Home"]}}'>{{teams['Home'].title()}}</option>
+              {% else %}
+                <option selected="selected">Select home team...</option>
+              {% endif %}
               {% for team in team_dd %}
                 <option value='{{team.name}}'>{{team.name.title()}}</option>
               {% endfor %}
@@ -25,7 +29,11 @@
           <p class="teamDropDowns">
             <!-- <span>Away Team</span> -->
             <select name="away_team" class="selectmenu">
+              {% if error %}
+                <option selected="selected" value='{{teams["Away"]}}'>{{teams['Away'].title()}}</option>
+              {% else %}
               <option selected="selected">Select away team...</option>
+              {% endif %}
               {% for team in team_dd %}
                 <option value='{{team.name}}'>{{team.name.title()}}</option>
               {% endfor %}
