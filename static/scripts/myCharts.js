@@ -17,7 +17,11 @@ $(document).ready(function() {
       google.charts.setOnLoadCallback(drawChartPts);
       break;
     case 'lineChart':
+      console.log(team_data);
       google.charts.setOnLoadCallback(drawChartTrend);
+      break;
+    case 'pieChart':
+      google.charts.setOnLoadCallback(drawChartPie);
   }//end switch
 
   //submit form when chart selected in drop-down list
@@ -55,11 +59,11 @@ $(document).ready(function() {
         chartArea:{
           left:180,top:50,width:'100%',
         },
-        title: 'By Wins, draws and defeats',
         bar: { groupWidth: '61.8%' },
         isStacked: false,
         orientation: 'vertical',
         colors:['red', 'orange', 'green'],
+        legend: { position: 'top', alignment:'center' },
       };
       var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
       chart.draw(data, google.charts.Bar.convertOptions(histogram_options));
@@ -95,11 +99,11 @@ $(document).ready(function() {
       chartArea:{
         left:75,top:50,width:'100%',
       },
-      title: 'By points',
       bar: { groupWidth: '61.8%' },
       isStacked: true,
       orientation: 'horizontal',
       colors:['green','blue'],
+      legend: { position: 'top', alignment:'center' },
     };
     var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
     chart.draw(data, google.charts.Bar.convertOptions(histogram_options));
@@ -168,5 +172,42 @@ $(document).ready(function() {
 
     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
     chart.draw(data, options);
-  }
+  }//end function drawChartTrend
+
+  function drawChartPie(){
+    // Create the data table.
+        var data_1 = new google.visualization.DataTable();
+        data_1.addColumn('string', 'Result_Outcome');
+        data_1.addColumn('number', 'Result_Count');
+        data_1.addRow(['Wins', team_data['Won']]);
+        data_1.addRow(['Draws', team_data['Drawn']]);
+        data_1.addRow(['Losses', team_data['Lost']]);
+
+        var data_2 = new google.visualization.DataTable();
+        data_2.addColumn('string', 'Amount');
+        data_2.addColumn('number', 'Amount');
+        data_2.addRow(['Goals scored', team_data['GS']]);
+        data_2.addRow(['Goals conceded', team_data['GC']]);
+
+        var options_1 = { width:400,
+                          height:300,
+                          'pieHole': 0.5,
+                          'colors': ['green', 'orange', 'red'],
+                          chartArea: {left:5},
+                          legend: { position: 'top', alignment:'center' },
+                        };
+        var options_2 = { width:400,
+                          height:300,
+                          'pieHole': 0.5,
+                          'colors': ['green', 'red'],
+                          chartArea: {left:5,},
+                          legend: { position: 'top', alignment:'center' },
+                        };
+       var chart_1 = new google.visualization.PieChart(document.getElementById('WDL_chart'));
+       var chart_2 = new google.visualization.PieChart(document.getElementById('goals_chart'));
+       chart_1.draw(data_1, options_1);
+       chart_2.draw(data_2, options_2);
+
+  }//end function drawChartPie
+
 });//end document ready function

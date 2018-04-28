@@ -1,0 +1,63 @@
+{%extends "master_layout.html"%}
+  {% block script %}
+  <script type="text/javascript">
+    var chart_to_load = '{{chartToLoad}}';
+    var teams = '{{team_data|tojson}}';
+  </script>
+  {% endblock %}
+  {% block content %}
+  <section class="stats_headline">
+    <p>{{team_data['TeamName'].title()}}</p>
+    <p>Rating : {{team_data['Rating']}}</p>
+    <p>* : {{history}}</p>
+  </section>
+    {% block chart_options %}
+    <form action="/charts/" id="chart_form" method="get">
+      <p>
+        <select name="week_select_start" id="week_selection_start">
+            <option selected="selected">Select start week...</option>
+            {% for week in weeks %}
+              <option value="{{week}}">{{week}}</option>
+            {% endfor %}
+        </select>
+        <select name="week_select_end" id="week_selection_end">
+          <option selected="selected">Select end week...</option>
+          {% for week in weeks %}
+            <option value="{{week}}">{{week}}</option>
+          {% endfor %}
+        </select>
+      </p>
+    </form>
+    {% endblock %}
+    <section class='stats'>
+      <h2 id="stats_overall">overall stats</h2>
+      <div id="overall">
+      <table class="overall">
+      <tr>
+        <td><div id="WDL_chart">WDL Chart</div></div></td>
+        <td><div id="goals_chart">Goals Chart</div></td>
+      </tr>
+    </table>
+    </div>
+    </section>
+    <section>
+      <p>Current Position : {{history[-1]}}</p>
+      <p>Average Position : {{team_data['Average']}}</p>
+      <p>Highest Position : {{ history|sort|first }}</p>
+      <p>Lowest Position : {{ history|sort|last }}</p>
+      <p>Scored per match : {{ (team_data['GS'] / team_data['Played']) | round(2) }}</p>
+      <p>Conceded per match : {{ (team_data['GC'] / team_data['Played']) | round(2) }}</p>
+    </section>
+    <section class='stats'>
+      <h2 id="stats_home">home stats</h2>
+      <p id="home">hs to follow</p>
+    </section>
+    <section class='stats'>
+      <h2 id="stats_away">away stats</h2>
+      <p id="away">as to follow</p>
+    </section>
+    <div id="chart_div" style="border: 1px solid #ccc"></div>
+    {% endblock %}
+    {% block bottomscript %}
+      <script src="{{url_for('static', filename='scripts/myCharts.js')}}"></script>
+    {% endblock %}

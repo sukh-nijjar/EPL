@@ -57,6 +57,19 @@ tr[class='table_rows']:hover{
 	/*border-bottom: 1px solid blue;*/
 }
 
+td[class='team_filter']{
+	text-align:left;
+	width:20%;
+}
+
+fieldset{
+	font-size: 12px;
+}
+
+legend{
+	font-size: 18px;
+}
+
 footer{
 	border-top: thick solid black;
 	bottom:17px;
@@ -89,9 +102,9 @@ header h1 a{
 	/*outline: 2px solid yellow;*/
 }
 
-/* h2{
-	margin-left: 242px;
-} */
+section h2{
+	background-color: pink;
+}
 
 nav{
   width: 240px;
@@ -128,7 +141,11 @@ section{
 	padding-left: 15px;
 	font-family: 'Baloo', cursive;
 	font-size: 18px;
-	/*outline: 2px solid purple;*/
+	/* outline: 2px solid purple; */
+}
+
+td[class='stats']{
+	display:inline-block;
 }
 
 #create_team_form{
@@ -174,6 +191,11 @@ section{
 	margin-left: 143px;
 }
 
+#table_team_filter{
+	margin-left: 67px;
+	width:90%;
+}
+
 #td_draws{
 	background: #DDFF11;
 }
@@ -210,7 +232,6 @@ section{
 	width: 70%;
 }
 
-
 /*#usr_messages{
 	  width: 300px;
 		border: 1px solid green;
@@ -238,7 +259,7 @@ section{
 	font-family: 'Baloo', cursive;
 	font-size: 40px;
 	left: 200px;
-	margin: 30px 0 30px 0;
+	margin: 30px 0 30px 0;
 	padding: 20px 10px;
 	position: relative;
 	text-align: center;
@@ -328,6 +349,12 @@ section{
 	/* outline: 1px solid pink; */
 }
 
+/* table holding the overall stats for a team */
+.overall{
+	/* border: 1px solid blue; */
+	margin-left: 0;
+}
+
 .resolve_error_buttons{
 	background: #ffffff;
 	border: 2px solid #D9D6D3;
@@ -370,6 +397,11 @@ section{
 
 .teamDropDowns{
 	padding: 0px 0px 25px 60px;
+}
+
+.team_filter a:hover{
+	font-weight: bolder;
+	text-decoration: underline;
 }
 
 .table_rows{

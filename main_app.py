@@ -7,6 +7,7 @@ from models import *
 from operator import methodcaller, attrgetter
 from playhouse.shortcuts import model_to_dict
 from results_manager import ResultsValidator
+from statistics import mean
 
 #create application instance
 app = Flask(__name__)
@@ -21,15 +22,17 @@ def teardown_request(exception):
 
 @app.route('/')
 def home():
-    # ResultsValidator.display_all_results_in_DB()
-    # display_all_error_in_DB()
-    # get_results_by_week(1,1)
     feedback = None
     teams = Team.select()
     if len(teams) > 0:
         teams_in_goals_scored_order = sorted(teams, key=attrgetter('goals_scored'))
         teams_in_GD_order = sorted(teams, key=methodcaller('goal_difference'), reverse=True)
         teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
+        print("{}".format(type(teams_in_points_order)))
+        i = 1
+        for tipo in teams_in_points_order:
+            print("{} {} {}".format(i, tipo.name, tipo.trend()))
+            i += 1
         return render_template('home.html', teams=teams_in_points_order)
     else:
         feedback = "There are no teams in the system. Please add some."
@@ -417,14 +420,17 @@ def ReturnChartData():
 
 @app.route('/charts/', methods=['GET'])
 def GetCharts():
-    print("CALLING ___ GetCharts()")
-    #grab any teams that have been submitted via checkboxes
+    results = Result.select().where(Result.is_error == False)
+    if len(results) == 0:
+        feedback = "No results available"
+        return render_template("feedback.html", feedback = feedback)
+
+    #...otherwise grab any teams that have been submitted via checkboxes
     teams_filter = request.args.getlist('team_checked')
 
     #team_list is passed to the view to produce the checkboxes
     team_list = Team.select().order_by(Team.name)
     chartToLoad = request.args.get('chart_select')
-
     team_positions_dict = {}
 
     #when page is requested from home page no chart will be displayed so
@@ -433,8 +439,12 @@ def GetCharts():
         chartToLoad = 'lineChart'
 
     if chartToLoad == 'lineChart':
-        #get_results_by_week params can be driven from UI
-        team_positions = get_results_by_week(1,31)
+        #get the minimum and maximum week range stored in the
+        #database to generate data for line chart
+        min_week = Result.select(fn.MIN(Result.week))
+        max_week = Result.select(fn.MAX(Result.week))
+        team_positions = get_results_by_week(min_week,max_week)
+
         if len(teams_filter):
             for team in team_positions:
                 if team.team in teams_filter:
@@ -461,6 +471,26 @@ def GetCharts():
         else:
             feedback = "There are no teams in the system. Please add some."
             return render_template('feedback.html', feedback = feedback)
+
+@app.route('/statiscal_analysis/<team>', methods=['GET'])
+def stats_drill_down(team):
+    team_stats=Team.get(Team.name == team)
+    min_week = Result.select(fn.MIN(Result.week))
+    max_week = Result.select(fn.MAX(Result.week))
+    team_positions = get_results_by_week(min_week,max_week)
+    position_history = [x for x in team_positions if x.team == team]
+    positions = position_history[0].position
+    average_pos = mean(positions)
+
+    weeks = range(1,39)
+    chartToLoad = 'pieChart'
+    team_dict = dict(TeamName=team_stats.name,Lost=team_stats.lost,Drawn=team_stats.drawn,Won=team_stats.won,
+                     GS=team_stats.goals_scored,GC=team_stats.goals_conceded,Rating=team_stats.trend(),
+                     Played=team_stats.games_played(),Average=average_pos)
+    # week_start = request.args.get('week_select_start')
+    # week_end = request.args.get('week_select_end')
+    # print("{},{}".format(week_start,week_end))
+    return render_template('stats_breakdown.html',team_data=team_dict,weeks=weeks,chartToLoad=chartToLoad,history=positions)
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
@@ -535,11 +565,11 @@ def create_weekly_position_table(results):
             pos.position.append(i+1)
     return in_points_order
 
-def create_dd_of_ints(required_range):
-    dd = []
-    for i in range(required_range):
-        dd.append(i)
-    return dd
+# def create_dd_of_ints(required_range):
+#     dd = []
+#     for i in range(required_range):
+#         dd.append(i)
+#     return dd
 
 def result_is_valid(teams,goals,**kwargs):
     res = defaultdict(list,{**teams, **goals})

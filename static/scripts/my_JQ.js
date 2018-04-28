@@ -262,11 +262,17 @@ $(document).ready(function() {
       $('.success_msg').fadeIn("slow");
       $('.warning').fadeIn("slow");
 
-      // // set focus on team name input on create team form
-      // $('#teamName').bind('focus,' function(){
-      //   $(this).css('border', '1px solid blue');
-      // });
+      $('#stats_home').bind('click',function(){
+        $('#home').slideToggle();
+      });
 
+      $('#stats_away').bind('click',function(){
+        $('#away').slideToggle();
+      });
+
+      $('#stats_overall').bind('click',function(){
+        $('#overall').slideToggle();
+      });
 
 });//end top document.ready function
 
@@ -278,30 +284,6 @@ function toggle_UI_Msg(){
          location.reload(true);
        })},3000);
 }
-
-// function drawChart(t) {
-//   // Create the data table.
-//   $('#chart_div').slideToggle(1000);
-//   var data = new google.visualization.DataTable();
-//   data.addColumn('string', 'Result_Outcome');
-//   data.addColumn('number', 'Result_Count');
-//   data.addRows([
-//     ['Wins', t.won],
-//     ['Draws', t.drawn],
-//     ['Losses', t.lost]
-//   ]);
-//   //
-//   // // Set chart options
-//   var options = {'title':'Performance',
-//                  'width':600,
-//                  'height':400,
-//                  'pieHole': 0.3,
-//                  'colors': ['green', 'orange', 'red']};
-//   //
-//   // // Instantiate and draw our chart, passing in some options.
-//   var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-//   chart.draw(data, options);
-// }
 
 // set focus on team name input on create team form
 // document.getElementById("teamName").focus();

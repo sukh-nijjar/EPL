@@ -17,11 +17,50 @@
       <p>
         <fieldset>
           <legend>Teams</legend>
-          {% for team in team_list %}
-          <!-- <p><input name="team_checked" type="checkbox" value='{{team.name}}'>{{team.name.title()}}</p> -->
-          <input name="team_checked" type="checkbox" value='{{team.name}}'>
-          <label for="{{team.name}}">{{team.name.title()}}</label>
-          {% endfor %}
+          <table id="table_team_filter">
+            {% for row in range (1) %}
+              <tr>
+                {% for team in team_list[0:5] %}
+                  <td class="team_filter">
+                    <input name="team_checked" type="checkbox" value='{{team.name}}'>
+                    <a href="{{ url_for('stats_drill_down', team=team.name) }}">
+                      <label for="{{team.name}}">{{team.name.title()}}</label>
+                    </a>
+                  </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                {% for team in team_list[5:10] %}
+                  <td class="team_filter">
+                    <input name="team_checked" type="checkbox" value='{{team.name}}'>
+                    <a href="{{ url_for('stats_drill_down', team=team.name) }}">
+                      <label for="{{team.name}}">{{team.name.title()}}</label>
+                    </a>
+                  </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                {% for team in team_list[10:15] %}
+                  <td class="team_filter">
+                    <input name="team_checked" type="checkbox" value='{{team.name}}'>
+                    <a href="{{ url_for('stats_drill_down', team=team.name) }}">
+                      <label for="{{team.name}}">{{team.name.title()}}</label>
+                    </a>
+                  </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                {% for team in team_list[15:] %}
+                  <td class="team_filter">
+                    <input name="team_checked" type="checkbox" value='{{team.name}}'>
+                    <a href="{{ url_for('stats_drill_down', team=team.name) }}">
+                      <label for="{{team.name}}">{{team.name.title()}}</label>
+                    </a>
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
         </fieldset>
       </p>
     </form>

@@ -37,6 +37,27 @@ class Team(BaseModel):
         max = self.points() + ((38 - (self.won + self.drawn + self.lost)) * 3)
         return max - self.points()
 
+    def trend(self):
+        # points_per_game = round(self.points() / self.games_played(),2)
+        points_per_game = self.points() / self.games_played()
+        if points_per_game < 1:
+            return 'Terrible'
+            # print("Terrible {}".format(points_per_game))
+        elif 1 <= points_per_game < 1.2:
+            return 'Bad'
+            # print("Bad {}".format(points_per_game))
+        elif 1.2 <= points_per_game < 1.6:
+            return 'Okay'
+            # print("Okay {}".format(points_per_game))
+        elif 1.6 <= points_per_game < 1.9:
+            return 'Good'
+            # print("Good {}".format(points_per_game))
+        elif 1.9 <= points_per_game < 2.3:
+            return 'Very Good'
+            # print("Very Good {}".format(points_per_game))
+        elif points_per_game >= 2.3:
+            return 'Excellent'
+
     def win_rate(self):
         """returns the percentage of games won by a team"""
         return round((100/self.games_played())*self.won)
