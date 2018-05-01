@@ -29,10 +29,10 @@ def home():
         teams_in_GD_order = sorted(teams, key=methodcaller('goal_difference'), reverse=True)
         teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
         print("{}".format(type(teams_in_points_order)))
-        i = 1
-        for tipo in teams_in_points_order:
-            print("{} {} {}".format(i, tipo.name, tipo.trend()))
-            i += 1
+        # i = 1
+        # for tipo in teams_in_points_order:
+        #     print("{} {} {}".format(i, tipo.name, tipo.trend()))
+        #     i += 1
         return render_template('home.html', teams=teams_in_points_order)
     else:
         feedback = "There are no teams in the system. Please add some."
@@ -436,7 +436,7 @@ def GetCharts():
     #when page is requested from home page no chart will be displayed so
     #chartToLoad set to lineChart as default
     if chartToLoad is None:
-        chartToLoad = 'lineChart'
+        chartToLoad = 'barChartPoints'
 
     if chartToLoad == 'lineChart':
         #get the minimum and maximum week range stored in the
@@ -475,6 +475,8 @@ def GetCharts():
 @app.route('/statiscal_analysis/<team>', methods=['GET'])
 def stats_drill_down(team):
     team_stats=Team.get(Team.name == team)
+    home_form_dict = get_stats_home_form(team_stats)
+    away_form_dict = get_stats_away_form(team_stats)
     min_week = Result.select(fn.MIN(Result.week))
     max_week = Result.select(fn.MAX(Result.week))
     team_positions = get_results_by_week(min_week,max_week)
@@ -485,12 +487,13 @@ def stats_drill_down(team):
     weeks = range(1,39)
     chartToLoad = 'pieChart'
     team_dict = dict(TeamName=team_stats.name,Lost=team_stats.lost,Drawn=team_stats.drawn,Won=team_stats.won,
-                     GS=team_stats.goals_scored,GC=team_stats.goals_conceded,Rating=team_stats.trend(),
+                     GS=team_stats.goals_scored,GC=team_stats.goals_conceded,Rating=team_stats.rating(),
                      Played=team_stats.games_played(),Average=average_pos)
     # week_start = request.args.get('week_select_start')
     # week_end = request.args.get('week_select_end')
     # print("{},{}".format(week_start,week_end))
-    return render_template('stats_breakdown.html',team_data=team_dict,weeks=weeks,chartToLoad=chartToLoad,history=positions)
+    return render_template('stats_breakdown.html',team_data=team_dict,weeks=weeks,chartToLoad=chartToLoad,
+                            history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict)
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
@@ -736,6 +739,46 @@ def amend_team_stats(previous_result):
             update_query = Team.update(lost = Team.lost + 1,
             won = Team.won - 1).where(Team.name == away_team.name)
             update_query.execute()
+
+def get_stats_home_form(team):
+    print("Team object passed in is {}".format(type(team)))
+    wins = draws = losses = gs = gc = 0
+    results=Result.select().where(Result.home_team == team.name)
+    for r in results:
+        print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
+        if r.result_type() == 'home win':
+            wins += 1
+        elif r.result_type() == 'away win':
+            losses += 1
+        else:
+            draws +=1
+        gs += r.home_ftg
+        gc += r.away_ftg
+    points = (wins*3) + draws
+    played = wins + losses + draws
+    rating = team.rating(points,played)
+    print("home rating from method call {}".format(rating))
+    return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
+
+
+def get_stats_away_form(team):
+    wins = draws = losses = gs = gc = 0
+    results=Result.select().where(Result.away_team == team.name)
+    for r in results:
+        print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
+        if r.result_type() == 'home win':
+            losses += 1
+        elif r.result_type() == 'away win':
+            wins += 1
+        else:
+            draws +=1
+        gs += r.away_ftg
+        gc += r.home_ftg
+    points = (wins*3) + draws
+    played = wins + losses + draws
+    rating = team.rating(points,played)
+    print("home rating from method call {}".format(rating))
+    return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 #debug helpers
 def display_all_error_in_DB():

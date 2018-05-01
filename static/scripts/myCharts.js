@@ -6,7 +6,24 @@ $(document).ready(function() {
   google.charts.load('current', {'packages':['line']});
 
   var chart = chart_to_load;
-  team_data = JSON.parse(teams); //note this kills the order of the dict!!
+  var team_data = JSON.parse(teams); //note this kills the order of the dict!!
+
+  //when stats_breakdown.html loads home_stats
+  //and away_stats will not necessarily be defined
+  //hence the checks:
+  if (typeof home_stats === 'undefined'){
+    home_stats = null;
+  }
+  else{
+    home_form = JSON.parse(home_stats);
+  }
+
+  if (typeof away_stats === 'undefined'){
+    away_stats = null;
+  }
+  else{
+    away_form = JSON.parse(away_stats);
+  }
 
   //decide which chart to invoke
   switch(chart){
@@ -207,6 +224,44 @@ $(document).ready(function() {
        var chart_2 = new google.visualization.PieChart(document.getElementById('goals_chart'));
        chart_1.draw(data_1, options_1);
        chart_2.draw(data_2, options_2);
+
+    // Create home form data table
+        var home_data = new google.visualization.DataTable();
+        home_data.addColumn('string', 'Result_Outcome');
+        home_data.addColumn('number', 'Result_Count');
+        home_data.addRow(['Wins', home_form['Won']]);
+        home_data.addRow(['Draws', home_form['Drawn']]);
+        home_data.addRow(['Losses', home_form['Lost']]);
+
+        var home_goals_data = new google.visualization.DataTable();
+        home_goals_data.addColumn('string', 'Amount');
+        home_goals_data.addColumn('number', 'Amount');
+        home_goals_data.addRow(['Goals scored', home_form['GS']]);
+        home_goals_data.addRow(['Goals conceded', home_form['GC']]);
+
+        var chart_home_form = new google.visualization.PieChart(document.getElementById('WDL_chart_home'));
+        var chart_home_goals = new google.visualization.PieChart(document.getElementById('goals_chart_home'));
+        chart_home_form.draw(home_data, options_1);
+        chart_home_goals.draw(home_goals_data,options_2);
+
+    // Create away form data table
+        var away_data = new google.visualization.DataTable();
+        away_data.addColumn('string', 'Result_Outcome');
+        away_data.addColumn('number', 'Result_Count');
+        away_data.addRow(['Wins', away_form['Won']]);
+        away_data.addRow(['Draws', away_form['Drawn']]);
+        away_data.addRow(['Losses', away_form['Lost']]);
+
+        var away_goals_data = new google.visualization.DataTable();
+        away_goals_data.addColumn('string', 'Amount');
+        away_goals_data.addColumn('number', 'Amount');
+        away_goals_data.addRow(['Goals scored', away_form['GS']]);
+        away_goals_data.addRow(['Goals conceded', away_form['GC']]);
+
+        var chart_away_form = new google.visualization.PieChart(document.getElementById('WDL_chart_away'));
+        var chart_away_goals = new google.visualization.PieChart(document.getElementById('goals_chart_away'));
+        chart_away_form.draw(away_data, options_1);
+        chart_away_goals.draw(away_goals_data,options_2);
 
   }//end function drawChartPie
 

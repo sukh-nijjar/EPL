@@ -37,9 +37,14 @@ class Team(BaseModel):
         max = self.points() + ((38 - (self.won + self.drawn + self.lost)) * 3)
         return max - self.points()
 
-    def trend(self):
-        # points_per_game = round(self.points() / self.games_played(),2)
-        points_per_game = self.points() / self.games_played()
+    def rating(self,*args):
+        # pass in optional params for points and games played
+        # from get_stats_home_form/away_form function
+        if args:
+            points_per_game = args[0] / args[1]
+        else:
+            points_per_game = self.points() / self.games_played()
+
         if points_per_game < 1:
             return 'Terrible'
             # print("Terrible {}".format(points_per_game))

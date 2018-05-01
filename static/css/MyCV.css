@@ -350,9 +350,9 @@ td[class='stats']{
 }
 
 /* table holding the overall stats for a team */
-.overall{
+.stats_table{
 	/* border: 1px solid blue; */
-	margin-left: 0;
+	/* margin-left: 0; */
 }
 
 .resolve_error_buttons{

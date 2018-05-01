@@ -3,13 +3,14 @@
   <script type="text/javascript">
     var chart_to_load = '{{chartToLoad}}';
     var teams = '{{team_data|tojson}}';
+    var home_stats = '{{Home_Form|tojson}}'
+    var away_stats = '{{Away_Form|tojson}}'
   </script>
   {% endblock %}
   {% block content %}
   <section class="stats_headline">
     <p>{{team_data['TeamName'].title()}}</p>
     <p>Rating : {{team_data['Rating']}}</p>
-    <p>* : {{history}}</p>
   </section>
     {% block chart_options %}
     <form action="/charts/" id="chart_form" method="get">
@@ -29,20 +30,21 @@
       </p>
     </form>
     {% endblock %}
+    <a href="{{url_for('GetCharts')}}">Visualization</a>
     <section class='stats'>
       <h2 id="stats_overall">overall stats</h2>
       <div id="overall">
-      <table class="overall">
-      <tr>
-        <td><div id="WDL_chart">WDL Chart</div></div></td>
-        <td><div id="goals_chart">Goals Chart</div></td>
-      </tr>
-    </table>
+        <table class="stats_table">
+        <tr>
+          <td><div id="WDL_chart"></div></td>
+          <td><div id="goals_chart"></div></td>
+        </tr>
+      </table>
     </div>
     </section>
     <section>
       <p>Current Position : {{history[-1]}}</p>
-      <p>Average Position : {{team_data['Average']}}</p>
+      <p>Average Position : {{team_data['Average'] | round | int }}</p>
       <p>Highest Position : {{ history|sort|first }}</p>
       <p>Lowest Position : {{ history|sort|last }}</p>
       <p>Scored per match : {{ (team_data['GS'] / team_data['Played']) | round(2) }}</p>
@@ -50,13 +52,36 @@
     </section>
     <section class='stats'>
       <h2 id="stats_home">home stats</h2>
-      <p id="home">hs to follow</p>
+      <div id="home">
+        <table class="stats_table">
+        <tr>
+          <td><div id="WDL_chart_home"></div></td>
+          <td><div id="goals_chart_home"></div></td>
+        </tr>
+      </table>
+    </div>
+    </section>
+    <section>
+      <p>Home rating : {{Home_Form['Rating']}}</p>
+      <p>Scored per match : {{ (Home_Form['GS'] / Home_Form['Played']) | round(2) }}</p>
+      <p>Conceded per match : {{ (Home_Form['GC'] / Home_Form['Played']) | round(2) }}</p>
     </section>
     <section class='stats'>
       <h2 id="stats_away">away stats</h2>
-      <p id="away">as to follow</p>
+      <div id="away">
+        <table class="stats_table">
+        <tr>
+          <td><div id="WDL_chart_away"></div></td>
+          <td><div id="goals_chart_away"></div></td>
+        </tr>
+      </table>
+    </div>
     </section>
-    <div id="chart_div" style="border: 1px solid #ccc"></div>
+    <section>
+      <p>Away rating : {{Away_Form['Rating']}}</p>
+      <p>Scored per match : {{ (Away_Form['GS'] / Away_Form['Played']) | round(2) }}</p>
+      <p>Conceded per match : {{ (Away_Form['GC'] / Away_Form['Played']) | round(2) }}</p>
+    </section>
     {% endblock %}
     {% block bottomscript %}
       <script src="{{url_for('static', filename='scripts/myCharts.js')}}"></script>
