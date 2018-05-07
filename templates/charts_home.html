@@ -64,6 +64,11 @@
         </fieldset>
       </p>
     </form>
+    <!-- the issue of double ajax call is resolved
+    by getting rid of the action attribute : action="/compare_teams/" -->
+    <form>
+        <button type="submit" id="compare_button">Compare Performance</button>
+    </form>
     {% endblock %}
     <div id="chart_div" style="border: 1px solid #ccc"></div>
     {% endblock %}

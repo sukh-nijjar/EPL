@@ -408,15 +408,15 @@ def drill_down(team):
     # object_list method creates a PaginatedQuery object calls get_object_list
     return object_list('teamDetails.html',results,paginate_by=9,team=team)
 
-@app.route('/get_chart_data', methods=['GET'])
-def ReturnChartData():
-    team_arg = request.args.get('team')
-    print("{}".format(request.args.get('team')))
-    # print("Called 'ReturnChartData', team = {}".format(team))
-    print("Called 'ReturnChartData'")
-    team=Team.get(Team.name == team_arg.lower())
-    print("{} team id is {}".format(team.name, team.team_id))
-    return jsonify({'won' : team.won,'drawn' : team.drawn, 'lost'  : team.lost})
+# @app.route('/get_chart_data', methods=['GET'])
+# def ReturnChartData():
+#     team_arg = request.args.get('team')
+#     print("{}".format(request.args.get('team')))
+#     # print("Called 'ReturnChartData', team = {}".format(team))
+#     print("Called 'ReturnChartData'")
+#     team=Team.get(Team.name == team_arg.lower())
+#     print("{} team id is {}".format(team.name, team.team_id))
+#     return jsonify({'won' : team.won,'drawn' : team.drawn, 'lost'  : team.lost})
 
 @app.route('/charts/', methods=['GET'])
 def GetCharts():
@@ -494,6 +494,23 @@ def stats_drill_down(team):
     # print("{},{}".format(week_start,week_end))
     return render_template('stats_breakdown.html',team_data=team_dict,weeks=weeks,chartToLoad=chartToLoad,
                             history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict)
+
+@app.route('/get_comparison_data', methods=['GET'])
+def get_comparison_data():
+    teams_filter = request.args.getlist('teams_for_comparison[]');
+    teams = Team.select().where(Team.name.in_(teams_filter))
+    comparison_data = []
+    for team in teams:
+        performance_data = {}
+        performance_data['Team'] = team.name
+        performance_data['Rating'] = team.rating()
+        comparison_data.append(performance_data)
+    return jsonify({'teams' : comparison_data})
+    # t1 = teams[0]
+    # print("lenght = {}".format(len(teams)))
+    # for t in teams:
+    #     print("Team = {}, pts = {}".format(t.name,t.points()))
+    # return render_template("comparison.html",teams_for_comparison=teams)
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():

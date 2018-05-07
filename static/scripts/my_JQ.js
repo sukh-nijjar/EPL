@@ -1,14 +1,5 @@
 $(document).ready(function() {
-    console.log('Calling my_JQ.js')
-    // google.charts.load('current', {'packages':['corechart']});
-    // google.charts.load('current', {'packages':['bar']});
-
-    // var chart = chart_to_load;
-    //
-    // $("#chart_types").change(function(){
-    //   alert("Chart to load is " + chart)
-    //   $('#chart_selector').submit();
-    // });
+    console.log('Calling my_JQ.js');
 
     $("#err_resolve").click(function(){
       $("td").each(function() {
@@ -286,4 +277,9 @@ function toggle_UI_Msg(){
 }
 
 // set focus on team name input on create team form
-// document.getElementById("teamName").focus();
+if (typeof $("#teamName").val() === 'undefined'){
+  ; //ignore/do nothing as the element is not on the page
+}
+else{
+  $("#teamName").focus();
+}

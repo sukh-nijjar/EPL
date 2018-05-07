@@ -162,6 +162,24 @@ td[class='stats']{
 	margin: 25px 0 0 50px;
 }
 
+#key_facts{
+	/* position: relative; */
+	margin-left: 619px;
+	margin-top: -241px;
+}
+
+#key_facts_home{
+	/* position: relative; */
+	margin-left: 619px;
+	margin-top: -241px;
+}
+
+#key_facts_away{
+	/* position: relative; */
+	margin-left: 619px;
+	margin-top: -241px;
+}
+
 #league_table{
 	font-size: 15px;
 }
@@ -271,6 +289,17 @@ td[class='stats']{
 	color: red;
 }
 
+#compare_button{
+	background: #ffffff;
+	border: 1px solid #D9D6D3;
+	border-radius: 12px;
+	color: #D9D6D3;
+	font-family: 'Baloo', cursive;
+	/* margin-right: 300px;
+	margin-top: -185px;
+	position:relative; */
+}
+
 .closeMsg{
 	margin:12px 12px 20px 0;
 }
@@ -352,7 +381,7 @@ td[class='stats']{
 /* table holding the overall stats for a team */
 .stats_table{
 	/* border: 1px solid blue; */
-	/* margin-left: 0; */
+	margin-left: 0;
 }
 
 .resolve_error_buttons{
@@ -390,7 +419,6 @@ td[class='stats']{
 }
 
 .team_column{
-	font-weight: bold;
 	text-align: left;
 	/*border-right: 1px solid red;*/
 }

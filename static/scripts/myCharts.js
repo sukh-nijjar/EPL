@@ -46,6 +46,44 @@ $(document).ready(function() {
     $('#chart_form').submit();
   });
 
+  // when page FIRST loads the compare button needs to be disabled
+  $('#compare_button').prop('disabled', true);
+
+  // when checkboxes are checked/unchecked function runs
+  // to check the number of boxes selected, if two the button
+  // becomes active else the button remains inactive
+  $('input[name=team_checked]').change(function(){
+    if ($('input[name=team_checked]:checked').length == 2){
+      console.log('button will be active')
+      $('#compare_button').prop('disabled', false).css('background-color','#44c154');
+    }
+    else{
+      console.log('button will be inactive')
+      $('#compare_button').prop('disabled', true).css('background-color','#ffffff');
+    }
+  });
+
+  $('#compare_button').on('click',function(e){
+    e.preventDefault();
+    var teams_for_comparison = new Array;
+    // var data = {'teams[]' : []};
+
+    $('input[name=team_checked]:checked').each(function(){
+      // data['teams[]'].push($(this).val());
+      teams_for_comparison.push($(this).val());
+    });
+    // alert(teams_for_comparison);
+    $.ajax({
+      url: '/get_comparison_data',
+      data: {teams_for_comparison}
+    })
+    .done(function(data){
+      console.log(data.teams[0].Team, data.teams[0].Rating);
+      console.log(data.teams[1].Team, data.teams[1].Rating);
+      // window.location.href = "/upload_errors/";
+    });
+  });
+
   function drawChartWDL() {
     var data = new google.visualization.DataTable();
     //create the header row
@@ -206,18 +244,18 @@ $(document).ready(function() {
         data_2.addRow(['Goals scored', team_data['GS']]);
         data_2.addRow(['Goals conceded', team_data['GC']]);
 
-        var options_1 = { width:400,
+        var options_1 = { width:300,
                           height:300,
                           'pieHole': 0.5,
                           'colors': ['green', 'orange', 'red'],
-                          chartArea: {left:5},
+                          chartArea: {left:20},
                           legend: { position: 'top', alignment:'center' },
                         };
-        var options_2 = { width:400,
+        var options_2 = { width:300,
                           height:300,
                           'pieHole': 0.5,
                           'colors': ['green', 'red'],
-                          chartArea: {left:5,},
+                          chartArea: {left:20,},
                           legend: { position: 'top', alignment:'center' },
                         };
        var chart_1 = new google.visualization.PieChart(document.getElementById('WDL_chart'));
