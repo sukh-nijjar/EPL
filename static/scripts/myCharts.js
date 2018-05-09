@@ -54,11 +54,11 @@ $(document).ready(function() {
   // becomes active else the button remains inactive
   $('input[name=team_checked]').change(function(){
     if ($('input[name=team_checked]:checked').length == 2){
-      console.log('button will be active')
+      // console.log('button will be active')
       $('#compare_button').prop('disabled', false).css('background-color','#44c154');
     }
     else{
-      console.log('button will be inactive')
+      // console.log('button will be inactive')
       $('#compare_button').prop('disabled', true).css('background-color','#ffffff');
     }
   });
@@ -66,21 +66,19 @@ $(document).ready(function() {
   $('#compare_button').on('click',function(e){
     e.preventDefault();
     var teams_for_comparison = new Array;
-    // var data = {'teams[]' : []};
 
     $('input[name=team_checked]:checked').each(function(){
-      // data['teams[]'].push($(this).val());
       teams_for_comparison.push($(this).val());
     });
-    // alert(teams_for_comparison);
     $.ajax({
       url: '/get_comparison_data',
       data: {teams_for_comparison}
     })
     .done(function(data){
-      console.log(data.teams[0].Team, data.teams[0].Rating);
-      console.log(data.teams[1].Team, data.teams[1].Rating);
-      // window.location.href = "/upload_errors/";
+      params = JSON.stringify({ data })
+      window.location = "/comparison/"+params;
+    }).fail(function(){
+      console.log("!!!ERROR!!!");
     });
   });
 

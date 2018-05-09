@@ -28,7 +28,6 @@ def home():
         teams_in_goals_scored_order = sorted(teams, key=attrgetter('goals_scored'))
         teams_in_GD_order = sorted(teams, key=methodcaller('goal_difference'), reverse=True)
         teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
-        print("{}".format(type(teams_in_points_order)))
         # i = 1
         # for tipo in teams_in_points_order:
         #     print("{} {} {}".format(i, tipo.name, tipo.trend()))
@@ -479,9 +478,14 @@ def stats_drill_down(team):
     away_form_dict = get_stats_away_form(team_stats)
     min_week = Result.select(fn.MIN(Result.week))
     max_week = Result.select(fn.MAX(Result.week))
+    # get all valid results
     team_positions = get_results_by_week(min_week,max_week)
+    # get the TeamPostion domain object for the team in question
     position_history = [x for x in team_positions if x.team == team]
+    # get a list of weekly positions from the object's postion property
+    # note there is only one object in the list
     positions = position_history[0].position
+    # print("{}".format(position_history[0].team))
     average_pos = mean(positions)
 
     weeks = range(1,39)
@@ -496,21 +500,40 @@ def stats_drill_down(team):
                             history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict)
 
 @app.route('/get_comparison_data', methods=['GET'])
+# build up the data requirements for the display_comparison(data) action
 def get_comparison_data():
     teams_filter = request.args.getlist('teams_for_comparison[]');
     teams = Team.select().where(Team.name.in_(teams_filter))
+    min_week = Result.select(fn.MIN(Result.week))
+    max_week = Result.select(fn.MAX(Result.week))
+    # get valid results
+    team_positions = get_results_by_week(min_week,max_week)
     comparison_data = []
     for team in teams:
         performance_data = {}
+        # get the TeamPostion domain objects for the teams in question
+        position_history = [x for x in team_positions if x.team == team.name]
+        positions = position_history[0].position
+
         performance_data['Team'] = team.name
         performance_data['Rating'] = team.rating()
+        performance_data['CurrentPosition'] = positions[-1]
+        performance_data['Average'] = mean(positions)
         comparison_data.append(performance_data)
     return jsonify({'teams' : comparison_data})
-    # t1 = teams[0]
-    # print("lenght = {}".format(len(teams)))
-    # for t in teams:
-    #     print("Team = {}, pts = {}".format(t.name,t.points()))
-    # return render_template("comparison.html",teams_for_comparison=teams)
+
+@app.route('/comparison/<data>', methods=['GET'])
+def display_comparison(data):
+    data_in = json.loads(data)
+    team1 = data_in['data']['teams'][0]
+    team2 = data_in['data']['teams'][1]
+    teams = [team1['Team'], team2['Team']]
+    # get the results between the 2 teams
+    results=Result.select().where(((Result.home_team == teams[0]) | (Result.away_team == teams[0]))
+                                   & ((Result.home_team == teams[1]) | (Result.away_team == teams[1])))
+    for r in results:
+        print("{}:{} - {}:{}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team))
+    return render_template("comparison.html",team1=team1,team2=team2)
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():

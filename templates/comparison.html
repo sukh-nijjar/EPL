@@ -1,4 +1,18 @@
 {%extends "master_layout.html"%}
 {%block content%}
-  <p>{{teams_for_comparison[0]}}</p>
+  <section>
+    <p>NAME = {{team1['Team']}}</p>
+    <p>RATING = {{team1['Rating']}}</p>
+    <p>CURRENT POS = {{team1['CurrentPosition']}}</p>
+    <p>AVG POS= {{team1['Average'] | round | int }}</p>
+  </section>
+  <section>
+    <p>NAME = {{team2['Team']}}</p>
+    <p>RATING ={{team2['Rating']}}</p>
+    <p>CURRENT POS = {{team2['CurrentPosition']}}</p>
+    <p>AVG POS = {{team2['Average'] | round | int }}</p>
+  </section>
+  <section>
+
+  </section>
 {%endblock%}
