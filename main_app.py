@@ -519,6 +519,12 @@ def get_comparison_data():
         performance_data['Rating'] = team.rating()
         performance_data['CurrentPosition'] = positions[-1]
         performance_data['Average'] = mean(positions)
+        performance_data['Points'] = team.points()
+        performance_data['GS'] = team.goals_scored
+        performance_data['GC'] = team.goals_conceded
+        performance_data['Won'] = team.won
+        performance_data['Drawn'] = team.drawn
+        performance_data['Lost'] = team.lost
         comparison_data.append(performance_data)
     return jsonify({'teams' : comparison_data})
 
@@ -528,12 +534,25 @@ def display_comparison(data):
     team1 = data_in['data']['teams'][0]
     team2 = data_in['data']['teams'][1]
     teams = [team1['Team'], team2['Team']]
-    # get the results between the 2 teams
+
+    # wrap data required for the comparison charts into dict:
+    comparison_chart_data = {}
+    comparison_chart_data['T1_GS'] = team1['GS']
+    comparison_chart_data['T1_GC'] = team1['GC']
+    comparison_chart_data['T1_Won'] = team1['Won']
+    comparison_chart_data['T1_Drawn'] = team1['Drawn']
+    comparison_chart_data['T1_Lost'] = team1['Lost']
+    comparison_chart_data['T2_GS'] = team2['GS']
+    comparison_chart_data['T2_GC'] = team2['GC']
+    comparison_chart_data['T2_Won'] = team2['Won']
+    comparison_chart_data['T2_Drawn'] = team2['Drawn']
+    comparison_chart_data['T2_Lost'] = team2['Lost']
+    print(comparison_chart_data)
+    # get the actual results between the 2 teams
     results=Result.select().where(((Result.home_team == teams[0]) | (Result.away_team == teams[0]))
                                    & ((Result.home_team == teams[1]) | (Result.away_team == teams[1])))
-    for r in results:
-        print("{}:{} - {}:{}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team))
-    return render_template("comparison.html",team1=team1,team2=team2)
+    return render_template("comparison.html",team1=team1,team2=team2,
+                            chart_data=comparison_chart_data,results=results)
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():

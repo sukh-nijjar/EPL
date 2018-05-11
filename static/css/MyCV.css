@@ -449,6 +449,25 @@ td[class='stats']{
   background-color: orange;
 }
 /* ------------------------------ */
-/*Fonts
-font-family: 'Bungee', cursive;
-font-family: 'Baloo', cursive;*/
+.team_stat{
+	border-right: 3px solid black;
+	float: left;
+	/* margin-left: 10px; */
+	padding: 0px 10px;
+}
+
+/* #team1{
+	outline: 1px solid blue;
+} */
+
+#team2{
+	outline: 2px solid red;
+}
+
+#team1_charts{
+	outline: 1px solid green;
+}
+
+#team2_charts{
+	outline: 2px solid yellow;
+}

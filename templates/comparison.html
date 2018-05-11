@@ -1,18 +1,59 @@
 {%extends "master_layout.html"%}
+{% block script %}
+<script type="text/javascript">
+  var chart_to_load = 'comparison';
+  var teams = '{{chart_data|tojson}}';
+</script>
+{% endblock %}
 {%block content%}
-  <section>
-    <p>NAME = {{team1['Team']}}</p>
-    <p>RATING = {{team1['Rating']}}</p>
-    <p>CURRENT POS = {{team1['CurrentPosition']}}</p>
-    <p>AVG POS= {{team1['Average'] | round | int }}</p>
+  <section id="team1">
+    <p class="team_stat">{{team1['Team']}}</p>
+    <p class="team_stat">RATING = {{team1['Rating']}}</p>
+    <p class="team_stat">POINTS = {{team1['Points']}}</p>
+    <p class="team_stat">CURRENT POS = {{team1['CurrentPosition']}}</p>
+    <p class="team_stat">AVG POS= {{team1['Average'] | round | int }}</p>
   </section>
-  <section>
+  <section id="team1_charts">
+    <table>
+      <tr>
+        <td><div id="T1_WDL_chart"></div></td>
+        <td><div id="T1_goals_chart"></div></td>
+      </tr>
+    </table>
+  </section>
+
+  <section id="team2">
     <p>NAME = {{team2['Team']}}</p>
     <p>RATING ={{team2['Rating']}}</p>
+    <p>POINTS = {{team2['Points']}}</p>
     <p>CURRENT POS = {{team2['CurrentPosition']}}</p>
     <p>AVG POS = {{team2['Average'] | round | int }}</p>
   </section>
-  <section>
+  <section id="team2_charts">
+      <table>
+        <tr>
+          <td><div id="T2_WDL_chart"></div></td>
+          <td><div id="T2_goals_chart"></div></td>
+        </tr>
+      </table>
+  </section>
+
+  <section id="actual_results">
+    <table>
+      {% for result in results %}
+        <tr>
+          <td>{{result.home_team.title()}}</td>
+          <td>{{result.home_ftg}}</td>
+          <td>{{result.away_ftg}}</td>
+          <td>{{result.away_team.title()}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </section>
+  <section id="predicted_results">
 
   </section>
 {%endblock%}
+{% block bottomscript %}
+  <script src="{{url_for('static', filename='scripts/myCharts.js')}}"></script>
+{% endblock %}

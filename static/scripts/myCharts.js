@@ -8,9 +8,9 @@ $(document).ready(function() {
   var chart = chart_to_load;
   var team_data = JSON.parse(teams); //note this kills the order of the dict!!
 
-  //when stats_breakdown.html loads home_stats
-  //and away_stats will not necessarily be defined
-  //hence the checks:
+  //when charts_home.html loads home_stats
+  //and away_stats will not be defined however
+  //myCharts.js will run, hence the checks:
   if (typeof home_stats === 'undefined'){
     home_stats = null;
   }
@@ -39,6 +39,9 @@ $(document).ready(function() {
       break;
     case 'pieChart':
       google.charts.setOnLoadCallback(drawChartPie);
+      break;
+    case 'comparison':
+      google.charts.setOnLoadCallback(drawComparison);
   }//end switch
 
   //submit form when chart selected in drop-down list
@@ -83,6 +86,7 @@ $(document).ready(function() {
   });
 
   function drawChartWDL() {
+    console.log(team_data);
     var data = new google.visualization.DataTable();
     //create the header row
     data.addColumn('string', 'Team');
@@ -148,7 +152,7 @@ $(document).ready(function() {
       duration: 1500,
       easing: 'out',},
       // width:1800,
-      height:1000,
+      height:800,
       chartArea:{
         left:75,top:50,width:'100%',
       },
@@ -300,5 +304,74 @@ $(document).ready(function() {
         chart_away_goals.draw(away_goals_data,options_2);
 
   }//end function drawChartPie
+
+  function drawComparison(){
+    console.log(team_data);
+    // create options and data tables for pie charts (PC)
+    var PC_team_1 = new google.visualization.DataTable();
+    PC_team_1.addColumn('string', 'Result_Outcome');
+    PC_team_1.addColumn('number', 'Result_Count');
+    PC_team_1.addRow(['Wins', team_data['T1_Won']]);
+    PC_team_1.addRow(['Draws', team_data['T1_Drawn']]);
+    PC_team_1.addRow(['Losses', team_data['T1_Lost']]);
+    var PC_team_2 = new google.visualization.DataTable();
+    PC_team_2.addColumn('string', 'Result_Outcome');
+    PC_team_2.addColumn('number', 'Result_Count');
+    PC_team_2.addRow(['Wins', team_data['T2_Won']]);
+    PC_team_2.addRow(['Draws', team_data['T2_Drawn']]);
+    PC_team_2.addRow(['Losses', team_data['T2_Lost']]);
+
+    var PC_options = { width:300,
+                      height:300,
+                      // 'pieHole': 0.4,
+                      'colors': ['green', 'orange', 'red'],
+                      chartArea: {left:20},
+                      is3D: true,
+                      legend: { position: 'top', alignment:'center' },
+                    };
+
+    // create options and data tables for column charts (CC)
+    // note the row added must have the same number of elements as
+    // number of columns
+    var CC_team_1 = new google.visualization.DataTable();
+    CC_team_1.addColumn('string', '');
+    CC_team_1.addColumn('number', 'scored');
+    CC_team_1.addColumn('number', 'conceded');
+    CC_team_1.addRow(['', team_data['T1_GS'], team_data['T1_GC']]);
+    var CC_team_2 = new google.visualization.DataTable();
+    CC_team_2.addColumn('string', '');
+    CC_team_2.addColumn('number', 'scored');
+    CC_team_2.addColumn('number', 'conceded');
+    CC_team_2.addRow(['', team_data['T2_GS'], team_data['T2_GC']]);
+
+    var CC_options = {
+        animation: {"startup": true,
+        duration: 1500,
+        easing: 'out',},
+        width:300,
+        height:300,
+        bar: { groupWidth: '61.8%' },
+        isStacked: false,
+        orientation: 'vertical',
+        colors:['green', 'red'],
+        legend: { position: 'top', alignment:'center' },
+        hAxis: {
+            maxValue: 120,
+            ticks: [20, 40, 60, 80, 100, 120]
+          },
+      };
+
+    //render the charts feeding in data tables and display options
+    var PCTeam1 = new google.visualization.PieChart(document.getElementById('T1_WDL_chart'));
+    var PCTeam2 = new google.visualization.PieChart(document.getElementById('T2_WDL_chart'));
+    PCTeam1.draw(PC_team_1, PC_options);
+    PCTeam2.draw(PC_team_2, PC_options);
+
+    var CCTeam1 = new google.visualization.ColumnChart(document.getElementById('T1_goals_chart'));
+    var CCTeam2 = new google.visualization.ColumnChart(document.getElementById('T2_goals_chart'));
+    CCTeam1.draw(CC_team_1, google.charts.Bar.convertOptions(CC_options));
+    CCTeam2.draw(CC_team_2, google.charts.Bar.convertOptions(CC_options));
+
+  }// end function drawComparison
 
 });//end document ready function
