@@ -1,7 +1,12 @@
-/*Premier League CSS*/
+/* GLOBAL PAGE SETTINGS */
 *{
-	margin: 0 auto 0 auto; /*auto ensure all elements are 'reset' to a consistent start point*/
+	margin: 0 auto 0 auto;
 	text-align:left;
+}
+
+#wrapper{
+  width:1200px;
+	overflow: hidden;
 }
 
 a, a:visited{
@@ -15,13 +20,17 @@ body{
 	overflow-y:scroll;
 }
 
-
+/* NOT BEING USED:
 div[class='error']{
 	font-family: 'News Cycle', sans-serif;
 	font-weight: bold;
 	color: green;
 	border: 3px solid green;
 	text-align: center;
+}*/
+
+li{
+  list-style: none;
 }
 
 img{
@@ -29,17 +38,44 @@ img{
   width: 30px;
 }
 
-li{
-  list-style: none;
+/* CHECKBOX STYLES */
+/* input[type="checkbox"]{
+	opacity: 0;
+	width: 0;
+	margin: 0;
+} */
+
+/* get 'label' elements which are
+	 children of 'anchor' elements which succeed a checked input (!) */
+input:checked + a > label{
+	color: #ce1010;
 }
 
-/*the validate plug-in adds to the dom a label element to display errors.
-By making it block level it appears on a new line underneath the fieldset
-with the error*/
-/*label {
-	display:block;
-	color: red;
-}*/
+input[type="submit"]{
+	background: #fff;
+	border: 2px solid #d9d6d3;
+	border-radius: 4px;
+	color: #d9d6d3;
+	font-size: 20px;
+	padding: 10px;
+}
+
+input[type="submit"]:hover{
+	border: 2px solid #e25f70;
+	box-shadow: 5px 5px;
+	color: #e25f70;
+}
+
+/* TEXT BOX STYLES */
+input[type="text"]{
+	font-size: 24px;
+	letter-spacing: 0.1em;
+	padding: 10px;
+}
+
+label{
+	cursor: pointer;
+}
 
 table {
 	border-collapse: collapse; /*this allows border property to be applied to <tr>*/
@@ -53,30 +89,39 @@ th, td{
 
 /*ensures only rows of the class have hover effect applied*/
 tr[class='table_rows']:hover{
-	background-color: pink;
-	/*border-bottom: 1px solid blue;*/
+	/* background-color: pink; */
+	background-color: black;
+	color: #ffffff;
 }
 
+.table_rows{
+	border-bottom: 1px solid red;
+}
+
+/* doesn't seem below is used anywhere? */
 td[class='team_filter']{
 	text-align:left;
-	width:20%;
+	margin: 20px 0;
 }
 
 fieldset{
 	font-size: 12px;
+	border: 3px solid #8bcbc8;
 }
 
 legend{
 	font-size: 18px;
+	letter-spacing: 0.1em;
+	padding: 10px;
 }
 
 footer{
+	background: #D3D3D3;
 	border-top: thick solid black;
 	bottom:17px;
 	font-family: 'Baloo', cursive;
 	position:fixed;
 	width: 1200px;
-	/* outline: 1px solid red; */
 }
 
 header{
@@ -85,7 +130,7 @@ header{
 	width: 1200px;
 	text-align: center;
 	border-bottom: thick solid black;
-	margin-bottom: 5px; /*this specifies the gap downwards from header's bottom boundary*/
+	margin-bottom: 5px; /*specifies gap downwards from header's bottom boundary*/
 	/*outline:  1px solid red;*/
 }
 
@@ -97,7 +142,7 @@ header h1{
 }
 
 header h1 a{
-	display: inline-block; /*this allows height to be set*/
+	/* display: inline-block; /*this allows height to be set*/ */
 	height: 120px;
 	/*outline: 2px solid yellow;*/
 }
@@ -108,30 +153,37 @@ section h2{
 
 nav{
   width: 240px;
-  float: left; /*otherwise it would be centered*/
-  /* font-family: 'Unica One', cursive; */
+  float: left; /*otherwise it would be centered */
 	font-family: 'Baloo', cursive;
-	/*outline: 1px solid blue;*/
 }
 
 
 nav ul{
-	padding: 0px; /*this makes the menu options sit flush on the left of screen*/
-	/*border : 1px solid green;*/
+	padding: 0px; /*position menu options flush on the left of screen*/
 }
 
 nav li{
+	opacity: 0.7;
 	margin-bottom: 10px;
 	margin-left: 0px;
 	font-size: 25px;
-	float: left;
+	/* float: left; */
 	width: 240px;
 	/* outline: 1px dashed red; */
 }
 
 nav li:hover{
-	font-weight: bolder;
-	text-decoration: underline;
+	-webkit-opacity: 1;
+	-moz-opacity: 1;
+	opacity: 1;
+	-webkit-transition: all 0.85s ease;
+	-moz-transition: all 0.85s ease;
+	-ms-transition: all 0.85s ease;
+	-o-transition: all 0.85s ease;
+	transition: all 0.85s ease;
+	color: #000;
+	text-shadow: 1px 1px;
+	/* text-shadow: 0 0 3px #FF0000; */
 }
 
 section{
@@ -145,9 +197,10 @@ section{
 }
 
 td[class='stats']{
-	display:inline-block;
+	/* display:inline-block; */
 }
 
+/* FORM AND FORM CONTROLS */
 #create_team_form{
 	margin-left: 62px;
 	margin-top: 20px;
@@ -158,12 +211,25 @@ td[class='stats']{
 	margin-top: 20px;
 }
 
+/*appearance:none removes default style for element (select in this case)
+however there is a JQ UI style being applied via my.JQ.js*/
+select{
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	-ms-appearance: none;
+	appearance: none;
+}
+
+/*the div that holds the table of invalid results in upload errors*/
 #invalid_results{
 	margin: 25px 0 0 50px;
 }
 
 #key_facts{
-	/* position: relative; */
+	position: relative;
+	/* top: -238px;
+	left: 619px; */
 	margin-left: 619px;
 	margin-top: -241px;
 }
@@ -180,8 +246,19 @@ td[class='stats']{
 	margin-top: -241px;
 }
 
+/* LEAGUE TABLE */
 #league_table{
 	font-size: 15px;
+}
+
+#league_table th{
+	font-weight: 100;
+	padding: 10px;
+	border-bottom: 2px solid red;
+}
+
+.team_column{
+	text-align: left;
 }
 
 #msg_span{
@@ -261,9 +338,7 @@ td[class='stats']{
 	color: DarkCyan;
 }*/
 
-#wrapper{
-  width:1200px;
-}
+
 
 .banner{
 	margin-left: 242px;
@@ -304,17 +379,20 @@ td[class='stats']{
 	margin:12px 12px 20px 0;
 }
 
-/* message panels that get displayed to user */
+/* red error panel that get displayed to user */
 .error{
 	border-radius: 15px;
 	background: #ff0000;
 	color: white;
 	display: none;
-	font-weight: bold;
+	font-size: 35px;
+	font-weight: 100;
+	padding: 5px;
 	text-align: center;
 	width: 675px;
 }
 
+/* class error_desc is used for upload errors */
 .error_desc{
 	color: red;
 	font-size: 15px;
@@ -325,7 +403,8 @@ td[class='stats']{
 	background: Blue;
 	color: white;
 	display: none;
-	font-weight: bold;
+	font-weight: 100;
+	padding: 5px;
 	text-align: center;
 	width: 675px;
 }
@@ -418,11 +497,6 @@ td[class='stats']{
 	width: 25px;
 }
 
-.team_column{
-	text-align: left;
-	/*border-right: 1px solid red;*/
-}
-
 .teamDropDowns{
 	padding: 0px 0px 25px 60px;
 }
@@ -430,10 +504,6 @@ td[class='stats']{
 .team_filter a:hover{
 	font-weight: bolder;
 	text-decoration: underline;
-}
-
-.table_rows{
-	border-bottom: 1px solid red;
 }
 
 /*next 3 classes used in team details view  */
@@ -458,7 +528,7 @@ td[class='stats']{
 
 /* #team1{
 	outline: 1px solid blue;
-} */
+}
 
 #team2{
 	outline: 2px solid red;
@@ -470,4 +540,4 @@ td[class='stats']{
 
 #team2_charts{
 	outline: 2px solid yellow;
-}
+} */

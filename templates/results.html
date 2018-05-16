@@ -8,7 +8,6 @@
         <table id="results_grid">
           <tr>
             <th hidden scope="col">ID</th>
-            <th scope="col">TEMP - Wk</th>
             <th scope="col">Home</th>
             <th scope="col">FT</th>
             <th scope="col">HT</th>
@@ -20,7 +19,6 @@
           {% if result.home_ftg == None or result.home_htg == None or result.away_ftg == None or result.away_htg == None %}
             <tr class="fixture">
               <td hidden name="ID">{{result.result_id}}</td>
-              <td name="temp">{{result.week}}</td>
               <td name="home_team">{{result.home_team.title()}}</td>
               <td><input type="number" min="0" value="0" name="hftg" disabled/></td>
               <td><input type="number" min="0" value="0" name="hhtg" disabled/></td>
@@ -32,7 +30,6 @@
           {% else %}
           <tr class="result">
             <td hidden name="ID">{{result.result_id}}</td>
-            <td name="temp">{{result.week}}</td>
             <td name="home_team" class="team">{{result.home_team.title()}}</td>
             <td name="hftg">{{result.home_ftg}}</td>
             <td name="hhtg">{{result.home_htg}}</td>

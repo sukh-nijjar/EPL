@@ -192,7 +192,7 @@ def create_result():
     UI_msg,new_result = results_validator.result_is_new(teams)
     if not new_result:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams)
 
     # check valid team(s)selected and not the default text
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)

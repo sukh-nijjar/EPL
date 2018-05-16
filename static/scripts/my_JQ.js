@@ -108,6 +108,7 @@ $(document).ready(function() {
         }
         else {
           $('section').prepend('<h3 id="UI_Msg" class="error">Team name is mandatory</h3>');
+
           toggle_UI_Msg();
         }
      });
