@@ -241,6 +241,7 @@ $(document).ready(function() {
     });
 
        $( ".selectmenu" ).selectmenu();
+       
        $(".spinner").spinner({
           min: 0
        });

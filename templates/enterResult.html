@@ -5,7 +5,7 @@
     {% endif %}
 
       <div id="enter_result_form">
-        <form action="/create_result/" id="create_result" method="post">
+        <form action="/create_result/" id="create_result_form" method="post">
           <p class="teamDropDowns">
             <!-- <span>Home Team</span> -->
             <select name="home_team" class="selectmenu">
@@ -18,16 +18,12 @@
                 <option value='{{team.name}}'>{{team.name.title()}}</option>
               {% endfor %}
             </select>
-
-            <!-- Home HT -->
-            <!-- <span>Half Time Goals</span> -->
+            <!-- Home Half Time Goals -->
             <input class="spinner" name="hhtg" value="0">
-
-            <!-- Home FT -->
+            <!-- Home Full Time Goals -->
             <input class="spinner" name="hftg" value="0">
           </p>
           <p class="teamDropDowns">
-            <!-- <span>Away Team</span> -->
             <select name="away_team" class="selectmenu">
               {% if error %}
                 <option selected="selected" value='{{teams["Away"]}}'>{{teams['Away'].title()}}</option>
@@ -38,17 +34,13 @@
                 <option value='{{team.name}}'>{{team.name.title()}}</option>
               {% endfor %}
             </select>
-
-            <!-- Away HT -->
-            <input class="spinner" name="ahtg" value="0">
-
-            <!-- Away FT -->
-            <input class="spinner" name="aftg" value="0">
+            <!-- Away Half Time Goals -->
+            <input class="spinner" name="ahtg" min="0" value="0">
+            <!-- Away Full Time Goals -->
+            <input class="spinner" name="aftg" min="0" value="0">
           </p>
-
           <p><input type="submit" value="save result" id="submitSaveResult"></p>
         </form>
-
       </div> <!--create_team_form-->
 
 {%endblock%}

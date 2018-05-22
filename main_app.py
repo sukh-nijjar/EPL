@@ -43,6 +43,10 @@ def new_team():
 
 @app.route('/create/', methods=['POST'])
 def create_team():
+    if Team.select().count() >= 20:
+        error = '20 teams in league - unable to add any more'
+        return render_template('createTeam.html',error=error)
+
     team_name_to_validate = request.form['team'].lower().strip()
     if team_name_valid(team_name_to_validate):
         try:
@@ -70,6 +74,10 @@ def display_upload_form():
 def perform_teams_upload():
     error = None
     invalid_rows = []
+    if Team.select().count() >= 20:
+        error = '20 teams in league - unable to add any more'
+        return render_template('upload.html',error=error)
+
     with db.atomic() as transaction:
         try:
             with open('2017Teams.csv') as team_csv:
@@ -108,7 +116,6 @@ def perform_results_upload():
     Reads in result data from csv file. Validates each result and creates a dB
     record for valid results or writes invalid result to text file as errors.
     """
-    error_MSG = None
     feedback = None
     error_found = False
     errors_list = []
@@ -117,7 +124,7 @@ def perform_results_upload():
         return render_template('feedback.html', feedback=feedback)
 
     try:
-        with open('2017Results.csv') as results_csv:
+        with open('2017ResultsShortVersion.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
             #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
@@ -170,7 +177,7 @@ def perform_results_upload():
             else:
                 return redirect(url_for('view_results'))
     except IOError:
-        error_MSG = 'That file has not been found'
+        error = 'Input file has not been found'
         return render_template('upload.html',error=error)
 
 @app.route('/enter_result/')
@@ -226,6 +233,7 @@ def create_result():
 
 @app.route('/view_results/')
 def view_results():
+    print("CALLING VIEW RESULTS FOR PAGE {}".format(request.args))
     feedback = None
     results = Result.select().where(Result.is_error == False)
     if len(results) > 0:

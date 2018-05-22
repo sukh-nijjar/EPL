@@ -20,15 +20,6 @@ body{
 	overflow-y:scroll;
 }
 
-/* NOT BEING USED:
-div[class='error']{
-	font-family: 'News Cycle', sans-serif;
-	font-weight: bold;
-	color: green;
-	border: 3px solid green;
-	text-align: center;
-}*/
-
 li{
   list-style: none;
 }
@@ -38,15 +29,8 @@ img{
   width: 30px;
 }
 
-/* CHECKBOX STYLES */
-/* input[type="checkbox"]{
-	opacity: 0;
-	width: 0;
-	margin: 0;
-} */
-
 /* get 'label' elements which are
-	 children of 'anchor' elements which succeed a checked input (!) */
+	 children of 'anchor' elements which happen succeed a checked input (!) */
 input:checked + a > label{
 	color: #ce1010;
 }
@@ -66,12 +50,23 @@ input[type="submit"]:hover{
 	color: #e25f70;
 }
 
-/* TEXT BOX STYLES */
+/* INPUT TEXT BOX STYLES */
 input[type="text"]{
 	font-size: 24px;
 	letter-spacing: 0.1em;
 	padding: 10px;
 }
+
+/* INPUT NUMBER BOX STYLES */
+/* input[type="number"]{
+	background: url(../images/up_triangle_filled.png) no-repeat 95% center;
+	background-size: 20px;
+	border: 3px solid #55ffdd;
+	border-radius: 5px;
+	margin: 30px 0;
+	padding: 10px 50px 10px 10px;
+	width: 30px;
+} */
 
 label{
 	cursor: pointer;
@@ -148,7 +143,7 @@ header h1 a{
 }
 
 section h2{
-	background-color: pink;
+	font-weight: 100;
 }
 
 nav{
@@ -211,15 +206,41 @@ td[class='stats']{
 	margin-top: 20px;
 }
 
+#create_result_form{
+	position: relative;
+	top: 40px;
+	left: 80px;
+}
+
+#submitSaveResult{
+	position: relative;
+	left: -84px;
+}
+
 /*appearance:none removes default style for element (select in this case)
 however there is a JQ UI style being applied via my.JQ.js*/
-select{
+/* select{
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
 	-ms-appearance: none;
 	appearance: none;
-}
+
+	background: url(../images/drop_down_icon_filled.png) no-repeat 95% center;
+	background-size: 20px;
+	border: 3px solid #55ffdd;
+	border-radius: 5px;
+	margin: 30px 0;
+	padding: 10px 50px 10px 10px;
+} */
+
+/* input[type="number"]{
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	-ms-appearance: none;
+	appearance: none;
+} */
 
 /*the div that holds the table of invalid results in upload errors*/
 #invalid_results{
@@ -266,20 +287,21 @@ select{
 }
 
 #paginated_navigation{
-	/* border-top: thick solid black; */
-	margin-left: 10px;
-	margin-top: 15px;
+	border-top: thick solid black;
+	margin-top: 25px;
 	text-align: center;
-	width:659px;
-	/* outline: 2px solid green; */
+	padding: 5px;
+	position: relative;
+	left: 261px;
 }
 
 #paginated_navigation a{
-	padding: 0px 8px;
+	padding: 0px 6px;
 }
 
 #paginated_navigation a:hover{
 	background: orange;
+	border-radius: 10px;
 }
 
 #submitSaveResult{
@@ -337,12 +359,6 @@ select{
 	font-weight: bold;
 	color: DarkCyan;
 }*/
-
-
-
-.banner{
-	margin-left: 242px;
-}
 
 .button_upload{
 	background: #ffffff;
@@ -436,12 +452,31 @@ select{
 	background-color: #e8f7f3;
 }
 
+#results_list{
+	margin-top: 50px;
+
+}
+
+#results_grid{
+	position: relative;
+	left: 40px;
+}
+
+#results_grid tr:nth-child(even){
+	background: #dae9e4;
+}
+
 #results_grid input{
 	width: 50px;
 }
 
 #results_grid .team_name input{
 	width: 145px;
+}
+
+.banner{
+	position: relative;
+	left:300px;
 }
 
 .erroneous_result_delete{
@@ -489,12 +524,13 @@ select{
 	font-weight:lighter;
 }
 
-.goals_spinner {
+/* .goals_spinner {
 	margin: 20px;
-}
+} */
 
 .spinner{
 	width: 25px;
+	margin: 20px;
 }
 
 .teamDropDowns{

@@ -30,7 +30,7 @@ class ResultsValidator:
         elif goals['FT_Home'] >= goals['HT_Home'] and goals['FT_Away'] >= goals['HT_Away']:
             return None,True
         else:
-            msg = "FT goals cannot be less than HT goals"
+            msg = "Full time goals cannot be less than Half time goals"
             return msg,False
         print("After - {}".format(goals))
 

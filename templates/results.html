@@ -43,25 +43,32 @@
         </table>
       </form>
     </div> <!--results_list-->
-      <nav id="paginated_navigation">
-        <!-- {{pagination.get_page_count(),page}} -->
-        <!-- {% for number in range(pagination.get_page_count()) %}
-          <a href="{{ url_for('view_results',page=number+1) }}">{{number + 1}}</a>
-        {% endfor %} -->
-        <!-- {% for number in range(5) %}
-          <a href="{{ url_for('view_results',page=number+1) }}">{{number + 1}}</a>
-        {% endfor %} -->
+    <nav id="paginated_navigation">
+      <!-- <p>{{pagination.get_page_count(),page}}</p>
+      <p>{{page + 5 > pagination.get_page_count()}}</p>
+      <p>{{pagination.get_page_count() - page}}</p> -->
 
-        {% if page > 0 %}
-          <a href="{{ url_for('view_results', page=page - 5) }}"><<</a>
-        {% endif %}
+      <!-- the variable named 'page' refers to the current page (showing results for that week) -->
+      {% if page > 0 %}
+        <a href="{{ url_for('view_results', page=page - 5) }}"><<</a>
+      {% endif %}
+      <!-- the pagination links must not exceed the number of results pages actually available
+           hence the check to ensure displaying a set of 5 pagination links does not create links
+           for pages that do not exist (no data availble for them) -->
+      {% if page + 5 > pagination.get_page_count() %}
+        {% for number in range(page,pagination.get_page_count()+1) %}
+          <a href="{{ url_for('view_results',page=number) }}">{{number}}</a>
+        {% endfor %}
+      {% else %}
         {% for number in range(page,page+5) %}
           <a href="{{ url_for('view_results',page=number) }}">{{number}}</a>
         {% endfor %}
-        {% if page < pagination.get_page_count() %}
-          <a href="{{ url_for('view_results', page=page + 5) }}">>></a>
-        {% endif %}
-      </nav>
-      <!-- <div id="saved" class="success_msg"></div> -->
+      {% endif %}
+      {% if page < pagination.get_page_count() %}
+        <a href="{{ url_for('view_results', page=page + 5) }}">>></a>
+      {% endif %}
+      
+    </nav>
+    <!-- <div id="saved" class="success_msg"></div> -->
 
 {%endblock%}
