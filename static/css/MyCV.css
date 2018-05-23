@@ -45,9 +45,9 @@ input[type="submit"]{
 }
 
 input[type="submit"]:hover{
-	border: 2px solid #e25f70;
+	border: 2px solid red;
 	box-shadow: 5px 5px;
-	color: #e25f70;
+	color: red;
 }
 
 /* INPUT TEXT BOX STYLES */
@@ -137,7 +137,7 @@ header h1{
 }
 
 header h1 a{
-	/* display: inline-block; /*this allows height to be set*/ */
+	/* display: inline-block; /*this allows height to be set*/
 	height: 120px;
 	/*outline: 2px solid yellow;*/
 }
@@ -282,6 +282,19 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	text-align: left;
 }
 
+/* ERRORS TABLE */
+#errors_table{
+	font-size: 15px;
+}
+
+#errors_table tr:nth-child(2){
+	border-top: 2px solid red;
+}
+
+#errors_table tr:hover{
+	background-color: #edff03;
+}
+
 #msg_span{
 	float: right;
 }
@@ -395,54 +408,70 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	margin:12px 12px 20px 0;
 }
 
-/* red error panel that get displayed to user */
-.error{
-	border-radius: 15px;
-	background: #ff0000;
-	color: white;
-	display: none;
-	font-size: 35px;
-	font-weight: 100;
-	padding: 5px;
-	text-align: center;
-	width: 675px;
-}
-
-/* class error_desc is used for upload errors */
+/* class error_desc is used for error descriptions in errors_table */
 .error_desc{
 	color: red;
 	font-size: 15px;
 }
 
-.feedback{
-	border-radius: 15px;
-	background: Blue;
+/* red error panel that get displayed to user */
+.error{
+	border-radius: 12px;
+	background: #ff0000;
+	border: 2px solid #c92d39;
+	box-shadow: 5px 5px black;
 	color: white;
 	display: none;
-	font-weight: 100;
-	padding: 5px;
+	font-weight: lighter;
+	letter-spacing: 0.1em;
+	margin-top: 10px;
+	padding: 10px;
+	text-align: center;
+	width: 675px;
+}
+
+.feedback{
+	border-radius: 12px;
+	background: #070ff9;
+	border: 2px solid #3aa6dd;
+	box-shadow: 5px 5px black;
+	color: white;
+	display: none;
+	font-weight: lighter;
+	letter-spacing: 0.1em;
+	margin-top: 10px;
+	padding: 10px;
 	text-align: center;
 	width: 675px;
 }
 
 .success_msg{
-	border-radius: 15px;
+	border-radius: 12px;
 	background: green;
+	border: 2px solid #23f907;
+	box-shadow: 5px 5px black;
 	color: white;
 	display:none;
-	font-weight: bold;
+	font-weight: lighter;
+	letter-spacing: 0.1em;
+	margin-top: 10px;
+	padding: 10px;
 	text-align: center;
 	width: 675px;
 	/* outline: 5px solid black; */
 }
 
 .warning{
-	border-radius: 15px;
+	border-radius: 12px;
 	background: #fcc438;
 	border: 2px solid #ef8d22;
+	box-shadow: 5px 5px black;
 	color: black;
 	display: none;
-	font-weight: bold;
+	font-weight: lighter;
+	letter-spacing: 0.1em;
+	margin-top: 10px;
+	padding: 10px;
 	text-align: center;
 	width: 675px;
 }
@@ -481,6 +510,8 @@ however there is a JQ UI style being applied via my.JQ.js*/
 
 .erroneous_result_delete{
 	border: 2px solid #D9D6D3;
+	border-radius: 12px;
+	padding: 5px;
 }
 
 .full_time{
@@ -515,6 +546,7 @@ however there is a JQ UI style being applied via my.JQ.js*/
 
 .resolve_error_buttons:hover{
 	border: 2px solid red;
+	box-shadow: 5px 5px;
 	color: red;
 }
 
