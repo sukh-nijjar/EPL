@@ -58,7 +58,7 @@ $(document).ready(function() {
   $('input[name=team_checked]').change(function(){
     if ($('input[name=team_checked]:checked').length == 2){
       // console.log('button will be active')
-      $('#compare_button').prop('disabled', false).css('background-color','#44c154');
+      $('#compare_button').prop('disabled', false).css('background-color','blue');
     }
     else{
       // console.log('button will be inactive')

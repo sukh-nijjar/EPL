@@ -1,24 +1,11 @@
 {%extends "master_layout.html"%}
 {%block content%}
   <div id="teamDetails">
-      <div id="team_details_Headline">
         <!-- <h1 id="team_details_name">{{team.name.title()}} - {{team.points()}} pts</h1> -->
-        <table id="team_details_table">
-          <tr>
-            <!-- <td id="team_details_name" colspan="3">{{team.name.title()}} - {{team.points()}} pts</td> -->
-            <td id="team_details_name" colspan="3"><a href="#">{{team.name.title()}}</a></td>
-          </tr>
-          <!-- <tr class="team_details_rows">
-            <td id="td_wins">Wins = {{team.win_rate()}}%</td>
-            <td id="td_draws">Draws = {{team.draw_rate()}}%</td>
-            <td id="td_losses">Losses = {{team.loss_rate()}}%</td>
-          </tr> -->
-        </table>
-      </div> <!--team_details_Headline-->
-      <div id="chart_div"></div>
-      <div id="qwerty"><!--change this id!!!-->
+        <h1 id="team_details_name">{{team.name.title()}}</h1>
         <table id="team_results">
           <tr>
+            <th scope="col">Week</th>
             <th scope="col">Home</th>
             <th scope="col">HT</th>
             <th scope="col">FT</th>
@@ -29,6 +16,7 @@
           </tr>
           {% for result in object_list %}
             <tr class="result_row">
+              <td>{{result.week}}</td>
               <td class="home_team">{{result.home_team.title()}}</td>
               <td>[{{result.home_htg}}]</td>
               <td class="home">{{result.home_ftg}}</td>
@@ -39,7 +27,6 @@
             </tr>
           {% endfor %}
         </table>
-      </div>
       <nav id="paginated_navigation">
         {% for number in range(pagination.get_page_count()) %}
           <a href="{{ url_for('drill_down', team=team.name,page=number+1) }}">{{number + 1}}</a>

@@ -124,7 +124,7 @@ def perform_results_upload():
         return render_template('feedback.html', feedback=feedback)
 
     try:
-        with open('2017ResultsShortVersion.csv') as results_csv:
+        with open('2017Results.csv') as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
             #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
@@ -412,8 +412,11 @@ def drill_down(team):
     team=Team.get(Team.name == team)
     print("{} team id is {}, wins = {}".format(team.name, team.team_id, team.won))
     results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
-    # object_list method creates a PaginatedQuery object calls get_object_list
-    return object_list('teamDetails.html',results,paginate_by=9,team=team)
+    if results:
+        # object_list method creates a PaginatedQuery object calls get_object_list
+        return object_list('teamDetails.html',results,paginate_by=9,team=team)
+    else:
+        return render_template("feedback.html", feedback = "There are no results to view for " + team.name.title())
 
 # @app.route('/get_chart_data', methods=['GET'])
 # def ReturnChartData():
@@ -647,45 +650,45 @@ def result_is_valid(teams,goals,**kwargs):
     UI_msg, goal_types_valid = results_validator.validate_goal_types(goals)
     if not goal_types_valid:
         res['Errors'].append(UI_msg)
-    print("Outcome = {}".format(goal_types_valid))
+    # print("Outcome = {}".format(goal_types_valid))
     # print("{} : message = {}. Outcome = {}".format(res, UI_msg, goal_types_valid))
     UI_msg, goal_values_valid = results_validator.validate_goal_values(goals)
     if not goal_values_valid:
         res['Errors'].append(UI_msg)
-    print("Outcome = {}".format(goal_values_valid))
+    # print("Outcome = {}".format(goal_values_valid))
 
     UI_msg, team_names_provided = results_validator.validate_team_names_present(teams)
     if not team_names_provided:
         res['Errors'].append(UI_msg)
-    print("Outcome = {}".format(team_names_provided))
+    # print("Outcome = {}".format(team_names_provided))
 
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
     if not teams_exist:
         res['Errors'].append(UI_msg)
-    print("Outcome = {}".format(teams_exist))
+    # print("Outcome = {}".format(teams_exist))
 
     UI_msg, different_teams = results_validator.validate_home_and_away_teams_different(teams)
     if not different_teams:
         res['Errors'].append(UI_msg)
-    print("Outcome = {}".format(different_teams))
+    # print("Outcome = {}".format(different_teams))
 
     #this validation needs to skipped when result is being re-validated after upload
     if 'ignore_result_is_new' in kwargs:
         UI_msg = None
         new_result = True
-        print("Ignored so Outcome = {}".format(new_result))
+        # print("Ignored so Outcome = {}".format(new_result))
     else:
         UI_msg, new_result = results_validator.result_is_new(teams)
 
     if not new_result:
         res['Errors'].append(UI_msg)
-    print("Outcome = {}".format(new_result))
+    # print("Outcome = {}".format(new_result))
 
     if goal_types_valid and goal_values_valid and team_names_provided and teams_exist and different_teams and new_result:
-        print("Valid result - {}".format(res))
+        # print("Valid result - {}".format(res))
         return True
     else:
-        print("ERROR in {}".format(res))
+        # print("ERROR in {}".format(res))
         return res
 
 def team_name_valid(team_name):

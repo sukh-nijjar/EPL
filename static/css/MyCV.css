@@ -18,6 +18,7 @@ a, a:visited{
 body{
 	margin-top: 5px;
 	overflow-y:scroll;
+	/* background-color: #54ff9f; */
 }
 
 li{
@@ -100,8 +101,8 @@ td[class='team_filter']{
 }
 
 fieldset{
-	font-size: 12px;
 	border: 3px solid #8bcbc8;
+	font-size: 12px;
 }
 
 legend{
@@ -113,9 +114,11 @@ legend{
 footer{
 	background: #D3D3D3;
 	border-top: thick solid black;
-	bottom:17px;
 	font-family: 'Baloo', cursive;
+	letter-spacing: 0.1em;
+	text-align: center;
 	position:fixed;
+	bottom:0px;
 	width: 1200px;
 }
 
@@ -188,7 +191,7 @@ section{
 	padding-left: 15px;
 	font-family: 'Baloo', cursive;
 	font-size: 18px;
-	/* outline: 2px solid purple; */
+	/* outline: 1px solid purple; */
 }
 
 td[class='stats']{
@@ -219,7 +222,7 @@ td[class='stats']{
 
 /*appearance:none removes default style for element (select in this case)
 however there is a JQ UI style being applied via my.JQ.js*/
-/* select{
+/* #chart_selection{
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
@@ -228,23 +231,19 @@ however there is a JQ UI style being applied via my.JQ.js*/
 
 	background: url(../images/drop_down_icon_filled.png) no-repeat 95% center;
 	background-size: 20px;
-	border: 3px solid #55ffdd;
+	border: 3px solid red;
 	border-radius: 5px;
 	margin: 30px 0;
 	padding: 10px 50px 10px 10px;
 } */
 
-/* input[type="number"]{
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	-o-appearance: none;
-	-ms-appearance: none;
-	appearance: none;
-} */
+#chart_selection{
+	margin-top: 50px;
+}
 
 /*the div that holds the table of invalid results in upload errors*/
 #invalid_results{
-	margin: 25px 0 0 50px;
+	margin: 25px 0 0 -15px;
 }
 
 #key_facts{
@@ -252,7 +251,7 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	/* top: -238px;
 	left: 619px; */
 	margin-left: 619px;
-	margin-top: -241px;
+	margin-top: -259px;
 }
 
 #key_facts_home{
@@ -266,6 +265,20 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	margin-left: 619px;
 	margin-top: -241px;
 }
+
+.key_facts_card{
+	border: 2px solid #000;
+	border-radius: 4px;
+	width: 25%;
+}
+
+.card_title{
+	background: #5abaa7;
+	border-bottom: 1px solid #000;
+	text-align: center;
+	margin-left: -15px;
+}
+
 
 /* LEAGUE TABLE */
 #league_table{
@@ -283,16 +296,27 @@ however there is a JQ UI style being applied via my.JQ.js*/
 }
 
 /* ERRORS TABLE */
-#errors_table{
+#errors_table th, #errors_table td {
 	font-size: 15px;
+	font-weight: lighter;
+	padding: 10px;
 }
 
 #errors_table tr:nth-child(2){
 	border-top: 2px solid red;
 }
 
-#errors_table tr:hover{
-	background-color: #edff03;
+#errors_table tr[class='table_rows']:hover{
+	color: #000;
+	background-color: #e5e5e5;
+}
+
+#errors_table input{
+	width: 50px;
+}
+
+#errors_table .team_name input{
+	width: 145px;
 }
 
 #msg_span{
@@ -304,8 +328,9 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	margin-top: 25px;
 	text-align: center;
 	padding: 5px;
-	position: relative;
-	left: 261px;
+	position: fixed;
+	left: 900px;
+	top: 776px;
 }
 
 #paginated_navigation a{
@@ -350,17 +375,44 @@ however there is a JQ UI style being applied via my.JQ.js*/
 }
 
 #team_details_name{
+	border-bottom: 2px solid black;
 	font-family: 'Bungee', cursive;
 	font-size: 40px;
+	letter-spacing: 0.1em;
+	padding-bottom: 5px;
+	text-align: center;
+	text-shadow: 2px 2px cadetblue;
 }
 
+#team_results{
+	/* outline: 1px solid pink; */
+	margin-top: 20px;
+	position: relative;
+	left: 60px;
+}
+
+#team_results th, #team_results td {
+	font-size: 18px;
+	font-weight: lighter;
+}
+
+#team_results tr:nth-child(2){
+	border-top: 2px solid red;
+}
+
+#team_results tr:nth-child(even){
+	background: #dae9e4;
+}
+
+/*
 #team_details_table{
-	/* border: 1px solid red; */
+	border: 1px solid red;
 	/* left:45px;
-	position: relative; */
+	position: relative;
 	padding: 0px 0px;
 	width: 70%;
 }
+*/
 
 /*#usr_messages{
 	  width: 300px;
@@ -394,14 +446,16 @@ however there is a JQ UI style being applied via my.JQ.js*/
 }
 
 #compare_button{
-	background: #ffffff;
+	background: #fff;
 	border: 1px solid #D9D6D3;
-	border-radius: 12px;
-	color: #D9D6D3;
+	border-radius: 4px;
+	color: #d9d6d3;
 	font-family: 'Baloo', cursive;
-	/* margin-right: 300px;
+	margin-right: 300px;
 	margin-top: -185px;
-	position:relative; */
+	position: relative;
+  top: -208px;
+  left: 247px;
 }
 
 .closeMsg{
@@ -570,7 +624,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 }
 
 .team_filter a:hover{
-	font-weight: bolder;
 	text-decoration: underline;
 }
 
@@ -609,3 +662,41 @@ however there is a JQ UI style being applied via my.JQ.js*/
 #team2_charts{
 	outline: 2px solid yellow;
 } */
+
+.rating{
+	/* font-family: 'Dosis', sans-serif; */
+	font-size: 25px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.stats{
+	padding-left: 0px;
+}
+
+.stats_banner{
+	/* outline: 1px solid pink; */
+	cursor: pointer;
+	letter-spacing: 0.1em;
+	padding-left: 10px;
+}
+
+#stats_overall{
+	/* background: #c1e4f7; */
+	background: rgb(193,228,247);
+	background: linear-gradient(90deg, rgba(193,228,247,1) 28%, rgba(153,213,202,1) 77%);
+}
+
+#stats_home{
+	/* background-color: #83bbe5; */
+	background: rgb(131,187,229);
+	background: linear-gradient(90deg, rgba(131,187,229,1) 28%, rgba(90,186,167,1) 77%);
+
+
+}
+
+#stats_away{
+	/* background-color: #0c7cba; */
+	background: rgb(25,150,125);
+	background: linear-gradient(90deg, rgba(25,150,125,1) 28%, rgba(12,124,186,1) 77%);
+}

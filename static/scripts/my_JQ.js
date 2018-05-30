@@ -15,7 +15,8 @@ $(document).ready(function() {
         }
         //else it is a team name
         else if ($(this).hasClass("team_name")){
-          $(this).after('<td class="team_name"><input type="text" value="' + input_value + '" name="' + name + '"/></td>');
+          // $(this).after('<td class="team_name"><input type="text" value="' + input_value + '" name="' + name + '"/></td>');
+          $(this).after('<td class="team_name"><input value="' + input_value + '" name="' + name + '"/></td>');
           $(this).remove(); //removes the read-only values
         }
         else if (input_value === 'None'){
@@ -241,7 +242,7 @@ $(document).ready(function() {
     });
 
        $( ".selectmenu" ).selectmenu();
-       
+
        $(".spinner").spinner({
           min: 0
        });

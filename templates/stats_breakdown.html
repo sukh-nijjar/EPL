@@ -8,10 +8,11 @@
   </script>
   {% endblock %}
   {% block content %}
-  <section class="stats_headline">
-    <p>{{team_data['TeamName'].title()}}</p>
-    <p>Rating : {{team_data['Rating']}}</p>
+  <section>
+    <p id=team_details_name>{{team_data['TeamName'].title()}}</p>
+    <p class="rating">Performance Rating : {{team_data['Rating']}}</p>
   </section>
+  <!-- </section>
     {% block chart_options %}
     <form action="/charts/" id="chart_form" method="get">
       <p>
@@ -30,9 +31,9 @@
       </p>
     </form>
     {% endblock %}
-    <a href="{{url_for('GetCharts')}}">Visualization</a>
+    <a href="{{url_for('GetCharts')}}">Visualization</a> -->
     <section class='stats'>
-      <h2 id="stats_overall">overall stats</h2>
+      <h2 id="stats_overall" class="stats_banner">Overall stats</h2>
       <div id="overall">
         <table class="stats_table">
         <tr>
@@ -40,7 +41,8 @@
           <td><div id="goals_chart"></div></td>
         </tr>
       </table>
-      <section id="key_facts">
+      <section id="key_facts" class="key_facts_card">
+        <h2 class="card_title">Key Facts</h2>
         <p>Current Position : {{history[-1]}}</p>
         <p>Average Position : {{team_data['Average'] | round | int }}</p>
         <p>Highest Position : {{ history|sort|first }}</p>
@@ -52,7 +54,7 @@
     </section>
 
     <section class='stats'>
-      <h2 id="stats_home">home stats</h2>
+      <h2 id="stats_home" class="stats_banner">Home stats</h2>
       <div id="home">
         <table class="stats_table">
         <tr>
@@ -60,7 +62,8 @@
           <td><div id="goals_chart_home"></div></td>
         </tr>
       </table>
-      <section id="key_facts_home">
+      <section id="key_facts_home" class="key_facts_card">
+        <h2 class="card_title">Key Facts</h2>
         <p>Home rating : {{Home_Form['Rating']}}</p>
         <p>Scored per match : {{ (Home_Form['GS'] / Home_Form['Played']) | round(2) }}</p>
         <p>Conceded per match : {{ (Home_Form['GC'] / Home_Form['Played']) | round(2) }}</p>
@@ -69,7 +72,7 @@
     </section>
 
     <section class='stats'>
-      <h2 id="stats_away">away stats</h2>
+      <h2 id="stats_away" class="stats_banner">Away stats</h2>
       <div id="away">
         <table class="stats_table">
         <tr>
@@ -77,7 +80,8 @@
           <td><div id="goals_chart_away"></div></td>
         </tr>
       </table>
-      <section id="key_facts_away">
+      <section id="key_facts_away" class="key_facts_card">
+        <h2 class="card_title">Key Facts</h2>
         <p>Away rating : {{Away_Form['Rating']}}</p>
         <p>Scored per match : {{ (Away_Form['GS'] / Away_Form['Played']) | round(2) }}</p>
         <p>Conceded per match : {{ (Away_Form['GC'] / Away_Form['Played']) | round(2) }}</p>
