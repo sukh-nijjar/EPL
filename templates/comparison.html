@@ -6,12 +6,13 @@
 </script>
 {% endblock %}
 {%block content%}
-  <section id="team1">
-    <p class="team_stat">{{team1['Team'].title()}}</p>
+  <section id="team1" class="key_facts_card">
+    <!-- <p class="team_stat">{{team1['Team'].title()}}</p> -->
+    <p class="card_title">{{team1['Team'].title()}}</p>
     <p class="team_stat">RATING = {{team1['Rating']}}</p>
     <p class="team_stat">POINTS = {{team1['Points']}}</p>
     <p class="team_stat">CURRENT POSITION = {{team1['CurrentPosition']}}</p>
-    <p class="team_stat">AVG POSITION= {{team1['Average'] | round | int }}</p>
+    <p class="team_stat">AVG POSITION = {{team1['Average'] | round | int }}</p>
   </section>
   <section id="team1_charts">
     <table>
@@ -22,8 +23,8 @@
     </table>
   </section>
 
-  <section id="team2">
-    <p class="team_stat">{{team2['Team'].title()}}</p>
+  <section id="team2" class="key_facts_card">
+    <p class="card_title">{{team2['Team'].title()}}</p>
     <p class="team_stat">RATING = {{team2['Rating']}}</p>
     <p class="team_stat">POINTS = {{team2['Points']}}</p>
     <p class="team_stat">CURRENT POSITION = {{team2['CurrentPosition']}}</p>
@@ -38,22 +39,24 @@
       </table>
   </section>
 
-  <section id="actual_results">
+  <section id="head_to_head" class="key_facts_card">
+    <h2 class="card_title">Head to head results</h2>
+    <!-- {% for result in results %}
+    <p>{{result.home_team.title()}}</p>
+    <p>{{result.home_ftg}}</p>
+    <p>{{result.away_ftg}}</p>
+    <p>{{result.away_team.title()}}</p>
+    {% endfor %} -->
     <table>
-
+      {% for result in results %}
         <tr>
-          {% for result in results %}
           <td>{{result.home_team.title()}}</td>
           <td>{{result.home_ftg}}</td>
           <td>{{result.away_ftg}}</td>
           <td>{{result.away_team.title()}}</td>
-          {% endfor %}
         </tr>
-
+      {% endfor %}
     </table>
-  </section>
-  <section id="predicted_results">
-
   </section>
 {%endblock%}
 {% block bottomscript %}

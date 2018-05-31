@@ -112,7 +112,7 @@ legend{
 }
 
 footer{
-	background: #D3D3D3;
+	background: linear-gradient(90deg, #f8ff00 0%, #3ad59f 100%);
 	border-top: thick solid black;
 	font-family: 'Baloo', cursive;
 	letter-spacing: 0.1em;
@@ -267,9 +267,11 @@ however there is a JQ UI style being applied via my.JQ.js*/
 }
 
 .key_facts_card{
+	box-shadow: 0 2px #000;
 	border: 2px solid #000;
 	border-radius: 4px;
 	width: 25%;
+
 }
 
 .card_title{
@@ -640,11 +642,38 @@ however there is a JQ UI style being applied via my.JQ.js*/
   background-color: orange;
 }
 /* ------------------------------ */
+
+#team1, #team2{
+	margin-top: 20px;
+	text-align: center;
+	width: 100%;
+}
+
+#team1 p:nth-child(1), #team2 p:nth-child(1) {
+	background: #c92d39;
+	color: #fff;
+	font-size: 30px;
+	letter-spacing: 0.2em;
+}
+
 .team_stat{
-	border-right: 3px solid black;
-	float: left;
-	/* margin-left: 10px; */
-	padding: 0px 10px;
+	display: inline;
+	padding: 0px 20px;
+}
+
+#head_to_head{
+	/* without setting margin bottom the section's content was being obscured by the footer  */
+	margin-bottom: 57px;
+	width: 100%;
+}
+
+#head_to_head > h2{
+	background: #fcc438;
+}
+
+#head_to_head > table{
+	font-size: 25px;
+	width: 80%;
 }
 
 /* #team1{
