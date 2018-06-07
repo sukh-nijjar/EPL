@@ -256,6 +256,12 @@ $(document).ready(function() {
       $('.success_msg').fadeIn("slow");
       $('.warning').fadeIn("slow");
 
+      // if ($('#stats_home').length > 0) {
+      //   // $('#hmmm').css('visibility','visible');
+      //   $('#hmmm').addClass('animated fadeIn');
+      //   // console.log('#home element on this page');
+      // }
+
       $('#stats_home').bind('click',function(){
         $('#home').slideToggle();
       });
@@ -268,6 +274,27 @@ $(document).ready(function() {
         $('#overall').slideToggle();
       });
 
+      // Load data page:
+      // disable button when no file has been selected for uploading:
+      $("#upload_results_button").prop('disabled',true);
+      // demo messages are hidden until radio button selected:
+      $("#valid_file_msg").hide();
+      $("#file_with_errors_msg").hide();
+
+      $("#valid_file_RB").bind('click', function(){
+        $("#valid_file_msg").show();
+        $("#file_with_errors_msg").hide();
+        $("#file_load_feedback").hide();
+        $("#upload_results_button").prop('disabled',false);
+      });
+
+      $("#invalid_file_RB").bind('click', function(){
+        $("#file_with_errors_msg").show();
+        $("#valid_file_msg").hide();
+        $("#file_load_feedback").hide();
+        $("#upload_results_button").prop('disabled',false);
+      });
+
 });//end top document.ready function
 
 function toggle_UI_Msg(){
@@ -278,6 +305,8 @@ function toggle_UI_Msg(){
          location.reload(true);
        })},3000);
 }
+
+
 
 // set focus on team name input on create team form
 if (typeof $("#teamName").val() === 'undefined'){

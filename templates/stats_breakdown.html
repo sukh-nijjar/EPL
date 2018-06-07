@@ -8,30 +8,13 @@
   </script>
   {% endblock %}
   {% block content %}
+  <div id="loader"></div>
+  <div id="hmmm">
   <section>
     <p id=team_details_name>{{team_data['TeamName'].title()}}</p>
     <p class="rating">Performance Rating : {{team_data['Rating']}}</p>
   </section>
-  <!-- </section>
-    {% block chart_options %}
-    <form action="/charts/" id="chart_form" method="get">
-      <p>
-        <select name="week_select_start" id="week_selection_start">
-            <option selected="selected">Select start week...</option>
-            {% for week in weeks %}
-              <option value="{{week}}">{{week}}</option>
-            {% endfor %}
-        </select>
-        <select name="week_select_end" id="week_selection_end">
-          <option selected="selected">Select end week...</option>
-          {% for week in weeks %}
-            <option value="{{week}}">{{week}}</option>
-          {% endfor %}
-        </select>
-      </p>
-    </form>
-    {% endblock %}
-    <a href="{{url_for('GetCharts')}}">Visualization</a> -->
+  
     <section class='stats'>
       <h2 id="stats_overall" class="stats_banner">Overall stats</h2>
       <div id="overall">
@@ -88,7 +71,7 @@
       </section>
     </div>
     </section>
-
+  </div><!--end hmmm-->
     {% endblock %}
     {% block bottomscript %}
       <script src="{{url_for('static', filename='scripts/myCharts.js')}}"></script>

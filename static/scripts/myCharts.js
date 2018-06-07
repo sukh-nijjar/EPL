@@ -300,6 +300,7 @@ $(document).ready(function() {
 
         var chart_away_form = new google.visualization.PieChart(document.getElementById('WDL_chart_away'));
         var chart_away_goals = new google.visualization.PieChart(document.getElementById('goals_chart_away'));
+        // google.visualization.events.addListener(chart_away_form, 'ready', readyHandler)
         chart_away_form.draw(away_data, options_1);
         chart_away_goals.draw(away_goals_data,options_2);
 
@@ -357,7 +358,7 @@ $(document).ready(function() {
         legend: { position: 'top', alignment:'center' },
         hAxis: {
             maxValue: 120,
-            ticks: [20, 40, 60, 80, 100, 120]
+            ticks: [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120]
           },
       };
 

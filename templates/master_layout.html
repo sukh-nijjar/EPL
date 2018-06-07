@@ -7,6 +7,7 @@
   <meta charset="UTF-8">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/MyCV.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/animate.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.css')}}">
   <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play|Baloo|Bungee" rel="stylesheet">
   <style>
@@ -38,7 +39,7 @@
         </ul>
       </nav>
 
-      <section>
+      <section id="master_section">
         <!-- <div id="usr_messages"></div> -->
         {%block content%}
           <div>
@@ -58,7 +59,7 @@
       </footer>
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
-      <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script>
+      <!-- <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script> -->
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}"></script>
       {% block bottomscript %}

@@ -20,6 +20,10 @@ def before_request():
 def teardown_request(exception):
     db.close()
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html',feedback="Results not available for week requested"),404
+
 @app.route('/')
 def home():
     feedback = None
@@ -119,12 +123,20 @@ def perform_results_upload():
     feedback = None
     error_found = False
     errors_list = []
+    if request.form['file_selected']=="":
+        return render_template('feedback.html', feedback='Please select a file to load')
+
     if Team.select().count() < 1:
         feedback = "Teams must be loaded before loading results"
         return render_template('feedback.html', feedback=feedback)
 
+    if request.form['file_selected'] == 'validFile':
+        file_to_load = '2017Results.csv'
+    else:
+        file_to_load = '2017ResultsWithErrors.csv'
+
     try:
-        with open('2017Results.csv') as results_csv:
+        with open(file_to_load) as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
             #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!

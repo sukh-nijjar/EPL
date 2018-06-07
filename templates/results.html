@@ -1,6 +1,6 @@
 {%extends "master_layout.html"%}
 {%block content%}
-    <div id="results_list">
+    <div id="results_list" class="animated fadeIn">
       <div class="banner">
         <h2>Week {{page}} Results</h2>
       </div>
@@ -67,7 +67,7 @@
       {% if page < pagination.get_page_count() %}
         <a href="{{ url_for('view_results', page=page + 5) }}">>></a>
       {% endif %}
-      
+
     </nav>
     <!-- <div id="saved" class="success_msg"></div> -->
 

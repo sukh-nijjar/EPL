@@ -1,0 +1,8 @@
+{%extends "master_layout.html"%}
+{%block content%}
+    {% if feedback %}
+      <h3 class="feedback">{{feedback}}:
+        <p class="back_from_error"><a href="{{ url_for('view_results') }}">Go back to viewing results</a></p>
+      </h3>
+    {% endif %}
+{%endblock%}

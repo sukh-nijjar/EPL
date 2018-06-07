@@ -6,12 +6,22 @@
     {% if error %}
       <h3 class="error">{{error}}</h3>
     {% endif %}
-    <!-- <h1 class="feedback">UPLOAD FORM :D</h1> -->
     <form action="/upload_teams/" method="post">
       <p><input type="submit" value="upload teams" class="button_upload"></p>
     </form>
 
+    <!-- <section class="feedback" id="file_load_feedback">Please select either valid results file or file containing errors before uploading results</section> -->
     <form action="/upload_results/" method="post">
-      <p><input type="submit" value="upload results" class="button_upload"></p>
+      <section id="results_file_selection">
+        <p><input type="radio" value="validFile" name="file_selected" id="valid_file_RB"/> Valid results file</p>
+        <p><input type="radio" value="fileWithErrors" name="file_selected" id="invalid_file_RB"/> Invalid results file (contains errors)</p>
+      </section>
+      <section class="demo_message animated fadeIn" id="valid_file_msg">
+      <span>This file contains all the results from season 2017/18. Behinds the scenes it is a CSV file.
+      The upload process validates each result to ensure it conforms to the domain rules and updates the league table accordingly.</span></section>
+      <section class="demo_message animated fadeIn" id="file_with_errors_msg">
+      <span>This CSV results file deliberately contains errors that do not conform to the the domain rules.
+      This is to demonstrate the system’s ability to trap errors and help an end user to resolve them. When errors are identified a view is presented describing the issues found.</span></section>
+      <p><input type="submit" value="upload results" class="button_upload" id="upload_results_button"></p>
     </form>
 {%endblock%}
