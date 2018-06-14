@@ -295,6 +295,20 @@ $(document).ready(function() {
         $("#upload_results_button").prop('disabled',false);
       });
 
+      //-- ABOUT AND HINTS FUNCTIONALITY --//
+      //when page loads close all panels except the first one
+      $(".panel_content").not(":first").hide();
+      //ensure first panel content is showing on page load
+      $(".panel_content:first").show();
+      //add a class to denote header is currently the active one
+      $(".panel_header:first").addClass("active_header");
+
+      $(".panel_header").click(function(){
+          $(".panel_content:visible").slideUp("slow").prev().removeClass("active_header");
+          $(this).addClass("active_header").next().slideDown("slow");
+      });
+      //-- END ABOUT AND HINTS FUNCTIONALITY --//
+
 });//end top document.ready function
 
 function toggle_UI_Msg(){

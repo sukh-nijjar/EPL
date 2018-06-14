@@ -765,6 +765,59 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	background: rgb(25,150,125);
 	background: linear-gradient(90deg, rgba(25,150,125,1) 28%, rgba(12,124,186,1) 77%);
 }
+
+/* ABOUT AND HINTS STYLES */
+#demo_information{
+	background: #FFF6BF;
+  padding:.8em;
+	/* outline: 1px solid purple; */
+}
+
+#demo_information a{
+	text-decoration: underline;
+}
+
+#demo_information li{
+	list-style:disc;
+}
+
+#accordian{
+	/* outline: 1px solid purple; */
+}
+
+.panel_header{
+	border-bottom: 2px solid #FFD324;
+  cursor: pointer;
+  font-weight: 100;
+  letter-spacing: 0.1em;
+  margin: 0;
+	padding-left: 5px;
+	/* outline: 1px solid green; */
+}
+
+.panel_header:hover{
+	background: #f3c18c;
+}
+
+.panel_content{
+	margin: 0;
+	padding: 0 0 0 5px;
+	font-size: 16px;
+}
+
+.active_header{
+	background: #ef8d22;
+  /*setting margin to zero prevents a jerky panel close*/
+  margin: 0;
+}
+
+#start_demo{
+	font-size: 1.5em;
+	text-align: center;
+	margin-top: 10px;
+}
+
+/* END ABOUT AND HINTS STYLES */
 /*
 #loader {
   position: absolute;

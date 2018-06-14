@@ -14,7 +14,7 @@
     <p id=team_details_name>{{team_data['TeamName'].title()}}</p>
     <p class="rating">Performance Rating : {{team_data['Rating']}}</p>
   </section>
-  
+
     <section class='stats'>
       <h2 id="stats_overall" class="stats_banner">Overall stats</h2>
       <div id="overall">
@@ -24,7 +24,7 @@
           <td><div id="goals_chart"></div></td>
         </tr>
       </table>
-      <section id="key_facts" class="key_facts_card">
+      <section id="key_facts" class="key_facts_card" >
         <h2 class="card_title">Key Facts</h2>
         <p>Current Position : {{history[-1]}}</p>
         <p>Average Position : {{team_data['Average'] | round | int }}</p>

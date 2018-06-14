@@ -1,0 +1,53 @@
+{%extends "master_layout.html"%}
+{%block content%}
+<section id="demo_information" class="animated fadeIn">
+  <p>Welcome to this demo application built by me. My motivation for creating this application is to put the skills I have
+    learnt into practice and to demonstrate my enthusiasm for coding, showing I have the capabilities required to work as a developer.</p>
+  <div class="accordian">
+      <h3 class="panel_header">ABOUT</h3>
+      <section class="panel_content">
+          <p >The application is based on the Premier League. I chose this domain as football results are fairly familiar to most people and provide enough scope to include elements found in most designs, namely:</p>
+          <ul>
+              <li>A clean interface</li>
+              <li>Creation and updating of data</li>
+              <li>Data visualization</li>
+              <li>Feedback - clear messages informing what has happened in response to user action</li>
+          </ul>
+      </section>
+      <h3 class="panel_header">ARCHITECTURE</h3>
+      <section class="panel_content">
+          <p></p>
+          <ul>
+              <li>Web application framework : <a href="http://flask.pocoo.org/" target="_blank">Flask</a></li>
+              <li>Client-side : HTML, CSS, Javascript</li>
+              <li>Server-side : Python, Javascript</li>
+              <li>ORM : <a href="http://docs.peewee-orm.com/en/latest/index.html" target="_blank">PeeWee</a></li>
+              <li>Database : <a href="https://www.sqlite.org/index.html" target="_blank">SQLite</a></li>
+              <li><a href="static/images/Architecture.png" target="_blank">Architecture Diagram</a></li>
+          </ul>
+      </section>
+      <h3 class="panel_header">DOMAIN</h3>
+      <section class="panel_content">
+          <p>Key facts for this domain are:</p>
+          <ul>
+              <li>There can be a maximum of 20 teams in the league</li>
+              <li>Each team must have a unique name</li>
+              <li>A team is awarded 3 points for a win , 1 point for a draw and 0 points for a defeat</li>
+              <li>A result is between 2 teams</li>
+              <li>Results cannot be entered unless a minimum of 2 teams exist in the system</li>
+              <li>Half time scoreline cannot be greater than full time scoreline</li>
+          </ul>
+      </section>
+      <h3 class="panel_header">ENHANCEMENTS</h3>
+      <section class="panel_content">
+          <p>Like every application there's always new ideas that can be implemented to enrich the system. Two such ideas I have are:</p>
+          <ul>
+              <li>The ability to set up multiple leagues and seasons</li>
+              <li>Results prediction driven by AI algorithms</li>
+          </ul>
+          <p>However, its also important to recognise when a 'product' is good enough to meet current priorities and the main priority right now for me is securing a fulfulling developer role!</p>
+      </section>
+  </div> <!--end CLASS ACCORDIAN-->
+  <p id="start_demo"><a href="{{ url_for('home') }}">Go to the demo!</a></p>
+</section>
+{%endblock%}

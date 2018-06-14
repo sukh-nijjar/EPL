@@ -25,6 +25,11 @@ def page_not_found(e):
     return render_template('404.html',feedback="Results not available for week requested"),404
 
 @app.route('/')
+def landing_page():
+    return render_template('landing_page.html')
+
+# @app.route('/')
+@app.route('/league/')
 def home():
     feedback = None
     teams = Team.select()

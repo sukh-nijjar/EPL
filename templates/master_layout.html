@@ -6,7 +6,7 @@
   {% endblock %}
   <meta charset="UTF-8">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/MyCV.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/PL_site.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/animate.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.css')}}">
   <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play|Baloo|Bungee" rel="stylesheet">
@@ -20,7 +20,7 @@
     <div id="wrapper">
 
       <header>
-        <h1><a href="/">Premier League</a></h1>
+        <h1><a href="/league/">Premier League</a></h1>
       </header>
 
       <nav>
@@ -36,6 +36,7 @@
             <li><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"> </span>Load data</a></li>
             <li><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/errors.png')}}"> </span>Upload errors</a></li>
             <li><a href="{{url_for('GetCharts')}}"><span><img class="icons" src="{{url_for('static', filename='images/data_visualization.png')}}"> </span>Visualization</a></li>
+            <li><a href="{{url_for('landing_page')}}"><span><img class="icons" src="{{url_for('static', filename='images/about.png')}}"> </span>About</a></li>
         </ul>
       </nav>
 
@@ -54,7 +55,7 @@
           <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a>,
           <a href="https://www.flaticon.com/authors/eucalyp" title="Eucalyp">Eucalyp</a>
           <a href="https://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">& Gregor Cresnar</a>
-          from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
+          from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a>.
           Licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
       </footer>
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
