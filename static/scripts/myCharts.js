@@ -53,8 +53,8 @@ $(document).ready(function() {
   $('#compare_button').prop('disabled', true);
 
   // when checkboxes are checked/unchecked function runs
-  // to check the number of boxes selected, if two the button
-  // becomes active else the button remains inactive
+  // to check the number of boxes selected, if two the compare button
+  // becomes active else the comapare button remains inactive
   $('input[name=team_checked]').change(function(){
     if ($('input[name=team_checked]:checked').length == 2){
       // console.log('button will be active')

@@ -1,5 +1,9 @@
 $(document).ready(function() {
-    console.log('Calling my_JQ.js');
+    if (typeof(Storage) !== "undefined") {
+        console.log("LOCAL STORAGE AVAILBALE");
+    } else {
+        console.log("LOCAL STORAGE *NOT* AVAILBALE")
+    }
 
     $("#err_resolve").click(function(){
       $("td").each(function() {
@@ -295,7 +299,7 @@ $(document).ready(function() {
         $("#upload_results_button").prop('disabled',false);
       });
 
-      //-- ABOUT AND HINTS FUNCTIONALITY --//
+      //-- HINTS FUNCTIONALITY --//
       //when page loads close all panels except the first one
       $(".panel_content").not(":first").hide();
       //ensure first panel content is showing on page load
@@ -307,7 +311,51 @@ $(document).ready(function() {
           $(".panel_content:visible").slideUp("slow").prev().removeClass("active_header");
           $(this).addClass("active_header").next().slideDown("slow");
       });
-      //-- END ABOUT AND HINTS FUNCTIONALITY --//
+
+      // set hints panel to either on or off when page loads:
+      // if switch 'on' premier league header is hidden
+      if (localStorage.getItem("switch_state") == 'on'){
+      // if ($("input[name=onoffswitch]:checked")){
+        $("#hints").prop("hidden",false);
+        $("#logo").prop("hidden",true);
+        console.log('ON');
+      }
+      // if switch 'off' hints header is hidden
+      else if (localStorage.getItem("switch_state") == 'off'){
+      // else if ($("input[name=onoffswitch]:not checked")){
+        $("#hints").prop("hidden",true);
+        $("#logo").prop("hidden",false);
+        console.log('OFF');
+      }
+      else{
+        $("#logo").prop("hidden",true);
+      }
+
+
+      $("input[name=onoffswitch]").change(function(){
+        if ($("input[name=onoffswitch]:checked").length){
+          localStorage.setItem("switch_state", "on");
+          $("#logo").prop("hidden",true);
+          $("#hints").prop("hidden",false);
+          $("#hints").addClass('animated fadeInLeftBig');
+        }
+        else{
+          localStorage.setItem("switch_state", "off");
+          $("#logo").prop("hidden",false);
+          $("#hints").prop("hidden",true);
+          $("#logo").addClass('animated fadeInRightBig');
+          $("hints").removeClass('animated fadeInLeftBig');
+        }
+      });
+
+      if (localStorage.getItem("switch_state") == 'on'){
+        $("#myonoffswitch").prop("checked",true);
+      }
+      else{
+        $("#myonoffswitch").prop("checked",false);
+      }
+
+      //-- END HINTS FUNCTIONALITY --//
 
 });//end top document.ready function
 

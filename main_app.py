@@ -31,6 +31,8 @@ def landing_page():
 # @app.route('/')
 @app.route('/league/')
 def home():
+    """Add docstrings to methods
+    """
     feedback = None
     teams = Team.select()
     if len(teams) > 0:

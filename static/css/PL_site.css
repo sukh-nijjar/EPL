@@ -817,36 +817,72 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	margin-top: 10px;
 }
 
+/* #hints{
+	display:none;
+} */
+
 /* END ABOUT AND HINTS STYLES */
-/*
-#loader {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 1;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-	outline: 1px solid red;
+
+/* HINTS SWITCH */
+.onoffswitch {
+    position: absolute;
+		top:580px;
+		left:350px;
+		width: 115px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
 
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+/*hide the checkbox that forms the basis of the switch*/
+.onoffswitch-checkbox {
+    display: none;
 }
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-} */
-
-/* #hmmm{
-	visibility: hidden;
-} */
+.onoffswitch-label {
+    display: block;
+		overflow: hidden;
+		cursor: pointer;
+    border: 2px solid #999999; border-radius: 10px;
+		font-family: 'Iceland', cursive;
+}
+.onoffswitch-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 30px;
+    padding: 0;
+    line-height: 30px; /*horizontal placement of 'on' and 'off' labels*/
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "Hints ON";
+    padding-left: 10px;
+    background-color: green; color: #fff;
+}
+.onoffswitch-inner:after {
+    content: "Hints OFF";
+    padding-right: 4px;
+    background-color: red; color: #fff;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 18px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 80px; /* set position of switch circle */
+    border: 2px solid #999999; border-radius: 20px;
+    transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0px;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}

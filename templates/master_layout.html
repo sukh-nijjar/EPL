@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/PL_site.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/animate.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.css')}}">
-  <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play|Baloo|Bungee" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=News+Cycle|Bungee+Shade|Unica+One|Play|Baloo|Bungee|Iceland" rel="stylesheet">
   <style>
   .ui-widget-overlay {
     position: absolute;
@@ -19,8 +19,14 @@
 <body>
     <div id="wrapper">
 
-      <header>
+      <header id="logo">
         <h1><a href="/league/">Premier League</a></h1>
+      </header>
+
+      <header id="hints">
+        <section>
+          HINTS TO GO HERE
+        </section>
       </header>
 
       <nav>
@@ -40,6 +46,14 @@
         </ul>
       </nav>
 
+      <div class="onoffswitch">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+        <label class="onoffswitch-label" for="myonoffswitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+        </label>
+      </div>
+
       <section id="master_section">
         <!-- <div id="usr_messages"></div> -->
         {%block content%}
@@ -56,7 +70,7 @@
           <a href="https://www.flaticon.com/authors/eucalyp" title="Eucalyp">Eucalyp</a>
           <a href="https://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">& Gregor Cresnar</a>
           from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a>.
-          Licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+          Licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
       </footer>
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
