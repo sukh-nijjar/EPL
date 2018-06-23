@@ -3,6 +3,9 @@
 <head>
   <title>Premiership 2017/18</title>
   {% block script %}
+  <script type="text/javascript">
+    var sys_state = '{{state}}';
+  </script>
   {% endblock %}
   <meta charset="UTF-8">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -24,9 +27,9 @@
       </header>
 
       <header id="hints">
-        <section>
+        <!-- <section>
           HINTS TO GO HERE
-        </section>
+        </section> -->
       </header>
 
       <nav>
@@ -35,9 +38,9 @@
             <li><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
             <li><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
             <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
-            <form id="deleteAllTeams" action="delete_all_teams/" method="post">
+            <form id="deleteAllTeams" action="/delete_all_teams/" method="post">
               <li><a  id="submitDeleteAllTeams" href="#"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete teams</a></li>
-              <input type="hidden">
+              <!-- <input type="hidden"> -->
             </form>
             <li><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"> </span>Load data</a></li>
             <li><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/errors.png')}}"> </span>Upload errors</a></li>

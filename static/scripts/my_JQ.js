@@ -85,7 +85,8 @@ $(document).ready(function() {
       })
       .done(function(data) {
         if (data.done) {
-          $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+          console.log(data);
+          $('#master_section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
           toggle_UI_Msg();
         }
       })
@@ -112,8 +113,7 @@ $(document).ready(function() {
           $('#create_team').submit();
         }
         else {
-          $('section').prepend('<h3 id="UI_Msg" class="error">Team name is mandatory</h3>');
-
+          $('#master_section').prepend('<h3 id="UI_Msg" class="error">Team name is mandatory</h3>');
           toggle_UI_Msg();
         }
      });
@@ -188,12 +188,12 @@ $(document).ready(function() {
           })
           .done(function(data) {
             if (data.done) {
-              $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+              $('#master_section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
               toggle_UI_Msg();
             }
             else {
               // alert(data.error);
-              $('section').prepend('<h3 id="UI_Msg" class="error">' + data.error + '</h3>');
+              $('#master_section').prepend('<h3 id="UI_Msg" class="error">' + data.error + '</h3>');
               toggle_UI_Msg();
             }
           })
@@ -212,7 +212,7 @@ $(document).ready(function() {
           })
           .done(function(data) {
             if (data.done) {
-              $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+              $('#master_section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
               toggle_UI_Msg();
             }
           })
@@ -331,13 +331,14 @@ $(document).ready(function() {
         $("#logo").prop("hidden",true);
       }
 
-
+      var state = sys_state;
       $("input[name=onoffswitch]").change(function(){
         if ($("input[name=onoffswitch]:checked").length){
           localStorage.setItem("switch_state", "on");
           $("#logo").prop("hidden",true);
           $("#hints").prop("hidden",false);
-          $("#hints").addClass('animated fadeInLeftBig');
+          $("#hints").addClass("animated fadeInLeftBig");
+          $("#hints").html("<section>" + state + "</section>");
         }
         else{
           localStorage.setItem("switch_state", "off");
@@ -360,7 +361,6 @@ $(document).ready(function() {
 });//end top document.ready function
 
 function toggle_UI_Msg(){
-  // $('section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
   $('#UI_Msg').slideDown();
   window.setTimeout(function(){
        $('#UI_Msg').slideUp(400,function(){

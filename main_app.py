@@ -1,7 +1,7 @@
 import csv, os, shutil, re
 from collections import defaultdict
 from domain import TeamPosition
-from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify
+from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify, g
 from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
 from operator import methodcaller, attrgetter
@@ -15,6 +15,7 @@ app = Flask(__name__)
 @app.before_request
 def before_request():
     init_db()
+    g.state = get_system_state()
 
 @app.teardown_request
 def teardown_request(exception):
@@ -26,7 +27,9 @@ def page_not_found(e):
 
 @app.route('/')
 def landing_page():
-    return render_template('landing_page.html')
+    print("STATE = {}".format(g.get('state',None)))
+    state = g.get('state',None);
+    return render_template('landing_page.html',state=state)
 
 # @app.route('/')
 @app.route('/league/')
@@ -34,6 +37,7 @@ def home():
     """Add docstrings to methods
     """
     feedback = None
+    state = g.get('state',None);
     teams = Team.select()
     if len(teams) > 0:
         teams_in_goals_scored_order = sorted(teams, key=attrgetter('goals_scored'))
@@ -43,10 +47,10 @@ def home():
         # for tipo in teams_in_points_order:
         #     print("{} {} {}".format(i, tipo.name, tipo.trend()))
         #     i += 1
-        return render_template('home.html', teams=teams_in_points_order)
+        return render_template('home.html', teams=teams_in_points_order,state=state)
     else:
         feedback = "There are no teams in the system. Please add some."
-        return render_template('feedback.html', feedback = feedback)
+        return render_template('feedback.html', feedback = feedback,state=state)
 
 @app.route('/new_team/')
 def new_team():
@@ -416,6 +420,7 @@ def delete_all_results():
 def delete_all_teams():
     """deleting teams also causes all results and errors to be deleted
     """
+    print("**CALLING /delete_all_teams/")
     delete_query = Team.delete()
     delete_query.execute()
     delete_query = Error.delete()
@@ -868,6 +873,16 @@ def get_stats_away_form(team):
     rating = team.rating(points,played)
     print("home rating from method call {}".format(rating))
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
+
+def get_system_state():
+    if Team.select().count() == 0 and Result.select().count() == 0:
+        return "NO DATA"
+    elif Team.select().count() < 2 and Result.select().count() == 0:
+        return "ADD MORE TEAMS - NO RESULT DATA"
+    elif Team.select().count() >= 2 and Result.select().count() > 0:
+        return "TEAM AND RESULT DATA EXIST"
+    else:
+         return "ONLY TEAM DATA EXISTS"
 
 #debug helpers
 def display_all_error_in_DB():
