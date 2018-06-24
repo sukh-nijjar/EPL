@@ -312,11 +312,13 @@ $(document).ready(function() {
           $(this).addClass("active_header").next().slideDown("slow");
       });
 
+      var state = sys_state;
       // set hints panel to either on or off when page loads:
       // if switch 'on' premier league header is hidden
       if (localStorage.getItem("switch_state") == 'on'){
-      // if ($("input[name=onoffswitch]:checked")){
+        hint = state_message(state)
         $("#hints").prop("hidden",false);
+        $("#hints").html("<section>" + hint + "</section>");
         $("#logo").prop("hidden",true);
         console.log('ON');
       }
@@ -331,14 +333,14 @@ $(document).ready(function() {
         $("#logo").prop("hidden",true);
       }
 
-      var state = sys_state;
       $("input[name=onoffswitch]").change(function(){
+        hint = state_message(state)
         if ($("input[name=onoffswitch]:checked").length){
           localStorage.setItem("switch_state", "on");
           $("#logo").prop("hidden",true);
           $("#hints").prop("hidden",false);
           $("#hints").addClass("animated fadeInLeftBig");
-          $("#hints").html("<section>" + state + "</section>");
+          $("#hints").html("<section>" + hint + "</section>");
         }
         else{
           localStorage.setItem("switch_state", "off");
@@ -368,7 +370,23 @@ function toggle_UI_Msg(){
        })},3000);
 }
 
-
+function state_message(state){
+  switch (state) {
+    case 'NO DATA':
+      $("#new_team").css('border','2px solid red');
+      return 'At the start of this demo the system contains no teams or results data, so if you view the league table (for example) a message is displayed informing of this fact. The first step is to add some data either through New team or Load data options.';
+      break;
+    case '1 TEAM':
+      return 'Add another team so a result can be created...tba';
+      break;
+    case 'DATA EXIST':
+      return 'Now both teams and results are populated...tba';
+      break;
+    case 'TEAM DATA EXISTS':
+      return 'Now we can add results...tba';
+      break;
+  }
+}
 
 // set focus on team name input on create team form
 if (typeof $("#teamName").val() === 'undefined'){

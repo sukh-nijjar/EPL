@@ -15,6 +15,7 @@ app = Flask(__name__)
 @app.before_request
 def before_request():
     init_db()
+    # get the current status of which data exists (or doesn't exist)
     g.state = get_system_state()
 
 @app.teardown_request
@@ -36,8 +37,8 @@ def landing_page():
 def home():
     """Add docstrings to methods
     """
-    feedback = None
     state = g.get('state',None);
+    feedback = None
     teams = Team.select()
     if len(teams) > 0:
         teams_in_goals_scored_order = sorted(teams, key=attrgetter('goals_scored'))
@@ -54,13 +55,15 @@ def home():
 
 @app.route('/new_team/')
 def new_team():
-    return render_template('createTeam.html')
+    state = g.get('state',None);
+    return render_template('createTeam.html',state=state)
 
 @app.route('/create/', methods=['POST'])
 def create_team():
+    state = g.get('state',None);
     if Team.select().count() >= 20:
         error = '20 teams in league - unable to add any more'
-        return render_template('createTeam.html',error=error)
+        return render_template('createTeam.html',error=error,state=state)
 
     team_name_to_validate = request.form['team'].lower().strip()
     if team_name_valid(team_name_to_validate):
@@ -79,19 +82,21 @@ def create_team():
             return render_template('createTeam.html',error=error)
     else:
         error = team_name_to_validate + ' contains invalid characters'
-        return render_template('createTeam.html',error=error)
+        return render_template('createTeam.html',error=error,state=state)
 
 @app.route('/load_data/')
 def display_upload_form():
-    return render_template('upload.html')
+    state = g.get('state',None);
+    return render_template('upload.html',state=state)
 
 @app.route('/upload_teams/', methods=['POST'])
 def perform_teams_upload():
+    state = g.get('state',None);
     error = None
     invalid_rows = []
     if Team.select().count() >= 20:
         error = '20 teams in league - unable to add any more'
-        return render_template('upload.html',error=error)
+        return render_template('upload.html',error=error,state=state)
 
     with db.atomic() as transaction:
         try:
@@ -123,7 +128,7 @@ def perform_teams_upload():
             # print("VALUE ERORR{}".format(v_err.args))
             error = ('{} '.format(v_err.args[0]))
             db.rollback()
-            return render_template('upload.html',error=error)
+            return render_template('upload.html',error=error,state=state)
 
 @app.route('/upload_results/', methods=['POST'])
 def perform_results_upload():
@@ -131,15 +136,16 @@ def perform_results_upload():
     Reads in result data from csv file. Validates each result and creates a dB
     record for valid results or writes invalid result to text file as errors.
     """
+    state = g.get('state',None);
     feedback = None
     error_found = False
     errors_list = []
     if request.form['file_selected']=="":
-        return render_template('feedback.html', feedback='Please select a file to load')
+        return render_template('feedback.html', feedback='Please select a file to load',state=state)
 
     if Team.select().count() < 1:
         feedback = "Teams must be loaded before loading results"
-        return render_template('feedback.html', feedback=feedback)
+        return render_template('feedback.html', feedback=feedback,state=state)
 
     if request.form['file_selected'] == 'validFile':
         file_to_load = '2017Results.csv'
@@ -196,23 +202,25 @@ def perform_results_upload():
 
             if error_found:
                 result_errors = Result.select().where(Result.is_error == True)
-                return render_template('uploadErrors.html',invalid_results=result_errors)
+                return render_template('uploadErrors.html',invalid_results=result_errors,state=state)
             else:
                 return redirect(url_for('view_results'))
     except IOError:
         error = 'Input file has not been found'
-        return render_template('upload.html',error=error)
+        return render_template('upload.html',error=error,state=state)
 
 @app.route('/enter_result/')
 def enter_result():
+    state = g.get('state',None);
     team_dd = Team.select().order_by(Team.name)
     if len(team_dd) > 1:
-        return render_template('enterResult.html',team_dd = team_dd)
+        return render_template('enterResult.html',team_dd = team_dd,state=state)
     else:
-        return render_template("feedback.html", feedback = "There must be a minimum of 2 teams before a result can be added")
+        return render_template("feedback.html", feedback = "There must be a minimum of 2 teams before a result can be added",state=state)
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
+    state = g.get('state',None);
     teams = dict(Home=request.form.get('home_team'), Away=request.form.get('away_team'))
     goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
                  FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
@@ -222,25 +230,25 @@ def create_result():
     UI_msg,new_result = results_validator.result_is_new(teams)
     if not new_result:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams,state=state)
 
     # check valid team(s)selected and not the default text
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
     if not teams_exist:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,state=state)
 
     # check half-time goals are not greater than full-time goals
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
     if not goal_totals_valid:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams,state=state)
 
     # check a team is not both the home and away team - can't play themselves(!)
     UI_msg, two_different_teams = results_validator.validate_home_and_away_teams_different(teams)
     if not two_different_teams:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams,state=state)
 
     if new_result and teams_exist and goal_totals_valid and two_different_teams:
         Result.create(
@@ -256,14 +264,15 @@ def create_result():
 
 @app.route('/view_results/')
 def view_results():
+    state = g.get('state',None);
     print("CALLING VIEW RESULTS FOR PAGE {}".format(request.args))
     feedback = None
     results = Result.select().where(Result.is_error == False)
     if len(results) > 0:
-        return object_list('results.html',results,paginate_by=10)
+        return object_list('results.html',results,paginate_by=10,state=state)
     else:
         feedback = "No results available"
-        return render_template("feedback.html", feedback = feedback)
+        return render_template("feedback.html", feedback = feedback,state=state)
 
 @app.route('/delete_result/', methods=['DELETE'])
 def delete_result():
@@ -420,7 +429,6 @@ def delete_all_results():
 def delete_all_teams():
     """deleting teams also causes all results and errors to be deleted
     """
-    print("**CALLING /delete_all_teams/")
     delete_query = Team.delete()
     delete_query.execute()
     delete_query = Error.delete()
@@ -433,14 +441,15 @@ def delete_all_teams():
 
 @app.route('/team_drill_down/<team>', methods=['GET'])
 def drill_down(team):
+    state = g.get('state',None);
     team=Team.get(Team.name == team)
     print("{} team id is {}, wins = {}".format(team.name, team.team_id, team.won))
     results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
     if results:
         # object_list method creates a PaginatedQuery object calls get_object_list
-        return object_list('teamDetails.html',results,paginate_by=9,team=team)
+        return object_list('teamDetails.html',results,paginate_by=9,team=team,state=state)
     else:
-        return render_template("feedback.html", feedback = "There are no results to view for " + team.name.title())
+        return render_template("feedback.html", feedback = "There are no results to view for " + team.name.title(),state=state)
 
 # @app.route('/get_chart_data', methods=['GET'])
 # def ReturnChartData():
@@ -454,10 +463,11 @@ def drill_down(team):
 
 @app.route('/charts/', methods=['GET'])
 def GetCharts():
+    state = g.get('state',None);
     results = Result.select().where(Result.is_error == False)
     if len(results) == 0:
         feedback = "No results available"
-        return render_template("feedback.html", feedback = feedback)
+        return render_template("feedback.html",feedback = feedback,state=state)
 
     #...otherwise grab any teams that have been submitted via checkboxes
     teams_filter = request.args.getlist('team_checked')
@@ -468,7 +478,7 @@ def GetCharts():
     team_positions_dict = {}
 
     #when page is requested from home page no chart will be displayed so
-    #chartToLoad set to lineChart as default
+    #chartToLoad set to barChartPoints as default
     if chartToLoad is None:
         chartToLoad = 'barChartPoints'
 
@@ -485,12 +495,12 @@ def GetCharts():
                     t = dict(TeamName=team.team,Positions=team.position)
                     team_positions_dict[team.team] = t
             print("team_positions_filtered dict = {}".format(team_positions_dict))
-            return render_template('charts_home.html',team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad)
+            return render_template('charts_home.html',team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad,state=state)
         else:
             for team in team_positions:
                 t = dict(TeamName=team.team,Positions=team.position)
                 team_positions_dict[team.team] = t
-            return render_template('charts_home.html', team_data=team_positions_dict, team_list = team_list,chartToLoad=chartToLoad)
+            return render_template('charts_home.html', team_data=team_positions_dict, team_list = team_list,chartToLoad=chartToLoad,state=state)
     else:
         if len(teams_filter):
             teams = Team.select().where(Team.name.in_(teams_filter))
@@ -501,13 +511,14 @@ def GetCharts():
             team_positions_dict[team.name] = team.lost, team.drawn, team.won, team.points(), team.max_possible()
 
         if len(teams) > 0:
-            return render_template('charts_home.html', team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad)
+            return render_template('charts_home.html', team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad,state=state)
         else:
             feedback = "There are no teams in the system. Please add some."
-            return render_template('feedback.html', feedback = feedback)
+            return render_template('feedback.html', feedback = feedback, state=state)
 
 @app.route('/statiscal_analysis/<team>', methods=['GET'])
 def stats_drill_down(team):
+    state = g.get('state',None);
     team_stats=Team.get(Team.name == team)
     home_form_dict = get_stats_home_form(team_stats)
     away_form_dict = get_stats_away_form(team_stats)
@@ -532,7 +543,7 @@ def stats_drill_down(team):
     # week_end = request.args.get('week_select_end')
     # print("{},{}".format(week_start,week_end))
     return render_template('stats_breakdown.html',team_data=team_dict,weeks=weeks,chartToLoad=chartToLoad,
-                            history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict)
+                            history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict,state=state)
 
 @app.route('/get_comparison_data', methods=['GET'])
 # build up the data requirements for the display_comparison(data) action
@@ -565,6 +576,7 @@ def get_comparison_data():
 
 @app.route('/comparison/<data>', methods=['GET'])
 def display_comparison(data):
+    state = g.get('state',None);
     data_in = json.loads(data)
     team1 = data_in['data']['teams'][0]
     team2 = data_in['data']['teams'][1]
@@ -587,16 +599,17 @@ def display_comparison(data):
     results=Result.select().where(((Result.home_team == teams[0]) | (Result.away_team == teams[0]))
                                    & ((Result.home_team == teams[1]) | (Result.away_team == teams[1])))
     return render_template("comparison.html",team1=team1,team2=team2,
-                            chart_data=comparison_chart_data,results=results)
+                            chart_data=comparison_chart_data,results=results,state=state)
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
+    state = g.get('state',None);
     result_errors = Result.select().where(Result.is_error == True)
     if len(result_errors) > 0:
         return render_template('uploadErrors.html',invalid_results=result_errors,
-                               error_count=Error.select().count())
+                               error_count=Error.select().count(),state=state)
     else:
-        return render_template('uploadErrors.html',feedback = "No errors to report")
+        return render_template('uploadErrors.html',feedback = "No errors to report",state=state)
 
 def get_results_by_week(from_week,to_week):
     results = Result.select().where(Result.week.between(from_week,to_week) &
@@ -875,14 +888,15 @@ def get_stats_away_form(team):
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 def get_system_state():
+    # remember to add in clause for result errors
     if Team.select().count() == 0 and Result.select().count() == 0:
         return "NO DATA"
     elif Team.select().count() < 2 and Result.select().count() == 0:
-        return "ADD MORE TEAMS - NO RESULT DATA"
+        return "1 TEAM"
     elif Team.select().count() >= 2 and Result.select().count() > 0:
-        return "TEAM AND RESULT DATA EXIST"
+        return "DATA EXIST"
     else:
-         return "ONLY TEAM DATA EXISTS"
+         return "TEAM DATA EXISTS"
 
 #debug helpers
 def display_all_error_in_DB():

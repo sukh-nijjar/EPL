@@ -2,10 +2,12 @@
 <html>
 <head>
   <title>Premiership 2017/18</title>
-  {% block script %}
+  {% block state_script %}
   <script type="text/javascript">
     var sys_state = '{{state}}';
   </script>
+  {% endblock %}
+  {% block script %}
   {% endblock %}
   <meta charset="UTF-8">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -34,7 +36,7 @@
 
       <nav>
         <ul>
-            <li><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"> </span>New team</a></li>
+            <li id="new_team"><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"> </span>New team</a></li>
             <li><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
             <li><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
             <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
@@ -77,7 +79,6 @@
       </footer>
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script src="{{url_for('static', filename='scripts/jquery.js')}}"></script>
-      <!-- <script src="{{url_for('static', filename='scripts/jquery.validate.min.js')}}"></script> -->
       <script src="{{url_for('static', filename='scripts/my_JQ.js')}}"></script>
       <script src="{{url_for('static', filename='scripts/jquery-ui.js')}}"></script>
       {% block bottomscript %}
