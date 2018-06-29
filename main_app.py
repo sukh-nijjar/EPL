@@ -202,6 +202,7 @@ def perform_results_upload():
 
             if error_found:
                 result_errors = Result.select().where(Result.is_error == True)
+                state = "ERRORS EXIST";
                 return render_template('uploadErrors.html',invalid_results=result_errors,state=state)
             else:
                 return redirect(url_for('view_results'))
@@ -890,13 +891,20 @@ def get_stats_away_form(team):
 def get_system_state():
     # remember to add in clause for result errors
     if Team.select().count() == 0 and Result.select().count() == 0:
+        print("NO DATA")
         return "NO DATA"
     elif Team.select().count() < 2 and Result.select().count() == 0:
+        print("1 TEAM")
         return "1 TEAM"
-    elif Team.select().count() >= 2 and Result.select().count() > 0:
-        return "DATA EXIST"
+    elif Team.select().count() >= 2 and Result.select().count() > 0 and Error.select().count() == 0:
+        print("TEAM AND RESULT EXIST")
+        return "TEAM AND RESULT EXIST"
+    elif Team.select().count() >= 2 and Error.select().count() > 0:
+        print("ERRORS EXIST")
+        return "ERRORS EXIST"
     else:
-         return "TEAM DATA EXISTS"
+        print("TEAM DATA EXISTS")
+        return "TEAM DATA EXISTS"
 
 #debug helpers
 def display_all_error_in_DB():

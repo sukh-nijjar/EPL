@@ -174,14 +174,14 @@ nav li:hover{
 	-webkit-opacity: 1;
 	-moz-opacity: 1;
 	opacity: 1;
-	-webkit-transition: all 0.85s ease;
-	-moz-transition: all 0.85s ease;
-	-ms-transition: all 0.85s ease;
-	-o-transition: all 0.85s ease;
-	transition: all 0.85s ease;
+	-webkit-transition: all 0.75s ease;
+	-moz-transition: all 0.75s ease;
+	-ms-transition: all 0.75s ease;
+	-o-transition: all 0.75s ease;
+	transition: all 0.75s ease;
 	color: #000;
-	text-shadow: 1px 1px;
-	/* text-shadow: 0 0 3px #FF0000; */
+	/* text-shadow: 1px 1px; */
+	text-shadow: 0 0 3px #FF0000;
 }
 
 section{
@@ -470,10 +470,10 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	border-radius: 4px;
 	color: #d9d6d3;
 	font-family: 'Baloo', cursive;
-	margin-right: 300px;
-	margin-top: -185px;
+	/* margin-right: 300px;
+	margin-top: -185px; */
 	position: relative;
-  top: -208px;
+  top: -121px;
   left: 247px;
 }
 
@@ -770,7 +770,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 #demo_information{
 	background: #FFF6BF;
   padding:.8em;
-	/* outline: 1px solid purple; */
 }
 
 #demo_information a{
@@ -817,16 +816,19 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	margin-top: 10px;
 }
 
-/* #hints{
-	display:none;
-} */
+.hint_text{
+	letter-spacing: 0.1em;
+	margin-top: 20px;
+	margin-left: 154px;
+	color: blue;
+}
 
 /* END ABOUT AND HINTS STYLES */
 
 /* HINTS SWITCH */
 .onoffswitch {
     position: absolute;
-		top:580px;
+		top:625px;
 		left:350px;
 		width: 115px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
@@ -886,3 +888,24 @@ however there is a JQ UI style being applied via my.JQ.js*/
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px;
 }
+
+/* HINTS MENU ITEM STYLES */
+.menu_item{
+	-webkit-animation-delay: 3s;
+	-moz-animation-delay: 3s;
+	-ms-animation-delay: 3s;
+	-o-animation-delay: 3s;
+	animation-delay: 3s;
+	-webkit-animation-duration: 3s;
+	-moz-animation-duration: 3s;
+	-ms-animation-duration: 3s;
+	-o-animation-duration: 3s;
+	animation-duration: 3s;
+	-webkit-animation-iteration-count: 3;
+	-moz-animation-iteration-count: 3;
+	-ms-animation-iteration-count: 3;
+	-o-animation-iteration-count: 3;
+	animation-iteration-count: 3;
+}
+
+/* END HINTS MENU ITEM STYLES */

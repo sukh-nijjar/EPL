@@ -318,7 +318,7 @@ $(document).ready(function() {
       if (localStorage.getItem("switch_state") == 'on'){
         hint = state_message(state)
         $("#hints").prop("hidden",false);
-        $("#hints").html("<section>" + hint + "</section>");
+        $("#hints").html("<section class='hint_text'><p>" + hint + "</p></section>");
         $("#logo").prop("hidden",true);
         console.log('ON');
       }
@@ -340,7 +340,7 @@ $(document).ready(function() {
           $("#logo").prop("hidden",true);
           $("#hints").prop("hidden",false);
           $("#hints").addClass("animated fadeInLeftBig");
-          $("#hints").html("<section>" + hint + "</section>");
+          $("#hints").html("<section class='hint_text'><p>" + hint + "</p></section>");
         }
         else{
           localStorage.setItem("switch_state", "off");
@@ -373,17 +373,20 @@ function toggle_UI_Msg(){
 function state_message(state){
   switch (state) {
     case 'NO DATA':
-      $("#new_team").css('border','2px solid red');
+      // $("#new_team").addClass("animated flash");
       return 'At the start of this demo the system contains no teams or results data, so if you view the league table (for example) a message is displayed informing of this fact. The first step is to add some data either through New team or Load data options.';
       break;
     case '1 TEAM':
-      return 'Add another team so a result can be created...tba';
+      return 'One team has been created, however in order to enter results there needs to be a minimum of two teams as a team cannot play itself! Use New team to add a second team.';
       break;
-    case 'DATA EXIST':
-      return 'Now both teams and results are populated...tba';
+    case 'TEAM AND RESULT EXIST':
+      return 'So now both teams and results are populated which means it is possible to visualise various performance metrics - go to Visualization to see this in action.';
       break;
     case 'TEAM DATA EXISTS':
-      return 'Now we can add results...tba';
+      return 'Now that at least 2 teams have been saved use Enter result to create a result.';
+      break;
+    case 'ERRORS EXIST':
+      return 'The results upload process has identified some errors. Errors can be corrected by selecting the Resolve Errors button or simply deleted.';
       break;
   }
 }

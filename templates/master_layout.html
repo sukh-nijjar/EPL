@@ -36,7 +36,8 @@
 
       <nav>
         <ul>
-            <li id="new_team"><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"> </span>New team</a></li>
+            <li class="menu_item"><a href="{{ url_for('home') }}"><span><img class="icons" src="{{url_for('static', filename='images/league_table.png')}}"> </span>League table</a></li>
+            <li id="new_team" class="menu_item"><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"> </span>New team</a></li>
             <li><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
             <li><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
             <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
