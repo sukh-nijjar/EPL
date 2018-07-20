@@ -58,17 +58,6 @@ input[type="text"]{
 	padding: 10px;
 }
 
-/* INPUT NUMBER BOX STYLES */
-/* input[type="number"]{
-	background: url(../images/up_triangle_filled.png) no-repeat 95% center;
-	background-size: 20px;
-	border: 3px solid #55ffdd;
-	border-radius: 5px;
-	margin: 30px 0;
-	padding: 10px 50px 10px 10px;
-	width: 30px;
-} */
-
 label{
 	cursor: pointer;
 }
@@ -219,23 +208,6 @@ td[class='stats']{
 	position: relative;
 	left: -84px;
 }
-
-/*appearance:none removes default style for element (select in this case)
-however there is a JQ UI style being applied via my.JQ.js*/
-/* #chart_selection{
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	-o-appearance: none;
-	-ms-appearance: none;
-	appearance: none;
-
-	background: url(../images/drop_down_icon_filled.png) no-repeat 95% center;
-	background-size: 20px;
-	border: 3px solid red;
-	border-radius: 5px;
-	margin: 30px 0;
-	padding: 10px 50px 10px 10px;
-} */
 
 #chart_selection{
 	margin-top: 50px;
@@ -404,27 +376,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	background: #dae9e4;
 }
 
-/*
-#team_details_table{
-	border: 1px solid red;
-	/* left:45px;
-	position: relative;
-	padding: 0px 0px;
-	width: 70%;
-}
-*/
-
-/*#usr_messages{
-	  width: 300px;
-		border: 1px solid green;
-}*/
-
-/*.integrity_error{
-	font-family: 'Unica One', cursive;
-	font-weight: bold;
-	color: DarkCyan;
-}*/
-
 .back_from_error{
 	text-align: center;
 	text-decoration: underline;
@@ -458,10 +409,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	position: relative;
 	top: 19px;
 	right: -165px;
-
-	/* position: relative;
-	top: 10px;
-	left: 100px; */
 }
 
 #compare_button{
@@ -470,8 +417,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	border-radius: 4px;
 	color: #d9d6d3;
 	font-family: 'Baloo', cursive;
-	/* margin-right: 300px;
-	margin-top: -185px; */
 	position: relative;
   top: -121px;
   left: 247px;
@@ -563,8 +508,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 #upload_results_button:disabled:hover{
 	border: 2px solid #D9D6D3;
 	color: #D9D6D3;
-	/* -webkit-box-shadow: none;
-	-moz-box-shadow: none; */
 	box-shadow: none;
 
 }
@@ -612,12 +555,10 @@ however there is a JQ UI style being applied via my.JQ.js*/
 
 .icons{
 	vertical-align: middle; /*lines up icons with menu text*/
-	/* outline: 1px solid pink; */
 }
 
 /* table holding the overall stats for a team */
 .stats_table{
-	/* border: 1px solid blue; */
 	margin-left: 0;
 }
 
@@ -647,10 +588,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	font-size: 30px;
 	font-weight:lighter;
 }
-
-/* .goals_spinner {
-	margin: 20px;
-} */
 
 .spinner{
 	width: 25px;
@@ -711,22 +648,6 @@ however there is a JQ UI style being applied via my.JQ.js*/
 	font-size: 25px;
 	width: 80%;
 }
-
-/* #team1{
-	outline: 1px solid blue;
-}
-
-#team2{
-	outline: 2px solid red;
-}
-
-#team1_charts{
-	outline: 1px solid green;
-}
-
-#team2_charts{
-	outline: 2px solid yellow;
-} */
 
 .rating{
 	/* font-family: 'Dosis', sans-serif; */

@@ -15,7 +15,9 @@ app = Flask(__name__)
 @app.before_request
 def before_request():
     init_db()
-    # get the current status of which data exists (or doesn't exist)
+    # get the current status of which data exists
+    # There are 3 possibilities :
+    # no data in system, team data available or both team and results data is available
     g.state = get_system_state()
 
 @app.teardown_request
@@ -28,14 +30,13 @@ def page_not_found(e):
 
 @app.route('/')
 def landing_page():
-    print("STATE = {}".format(g.get('state',None)))
     state = g.get('state',None);
     return render_template('landing_page.html',state=state)
 
 # @app.route('/')
 @app.route('/league/')
 def home():
-    """Add docstrings to methods
+    """ display the league table showing teams ordered by points in descending order
     """
     state = g.get('state',None);
     feedback = None
@@ -44,10 +45,6 @@ def home():
         teams_in_goals_scored_order = sorted(teams, key=attrgetter('goals_scored'))
         teams_in_GD_order = sorted(teams, key=methodcaller('goal_difference'), reverse=True)
         teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
-        # i = 1
-        # for tipo in teams_in_points_order:
-        #     print("{} {} {}".format(i, tipo.name, tipo.trend()))
-        #     i += 1
         return render_template('home.html', teams=teams_in_points_order,state=state)
     else:
         feedback = "There are no teams in the system. Please add some."
@@ -60,6 +57,9 @@ def new_team():
 
 @app.route('/create/', methods=['POST'])
 def create_team():
+    """creates a team submitted by user via input form as long as there are
+       less than the allowed maximum 20 teams and the team doesn't already exist
+    """
     state = g.get('state',None);
     if Team.select().count() >= 20:
         error = '20 teams in league - unable to add any more'
@@ -78,7 +78,7 @@ def create_team():
             )
             return redirect(url_for('home'))
         except IntegrityError:
-            error = 'Team already exists'
+            error = team_name_to_validate.upper() + ' already exists. Cannot be added twice.'
             return render_template('createTeam.html',error=error)
     else:
         error = team_name_to_validate + ' contains invalid characters'
@@ -86,11 +86,16 @@ def create_team():
 
 @app.route('/load_data/')
 def display_upload_form():
+    """display view to load data (csv files)"""
     state = g.get('state',None);
     return render_template('upload.html',state=state)
 
 @app.route('/upload_teams/', methods=['POST'])
 def perform_teams_upload():
+    """creates teams via upload of csv as long as there are
+       less than the allowed maximum 20 teams and any team doesn't
+       already exist. If an error is found no more rows are proceesed and
+       the operation is rolled back"""
     state = g.get('state',None);
     error = None
     invalid_rows = []
@@ -101,6 +106,7 @@ def perform_teams_upload():
     with db.atomic() as transaction:
         try:
             with open('2017Teams.csv') as team_csv:
+            # with open('2017TeamsWithErrors.csv') as team_csv:
                 csv_reader = csv.reader(team_csv)
                 next(csv_reader)
                 for row in csv_reader:
@@ -114,18 +120,17 @@ def perform_teams_upload():
                         goals_conceded = 0
                         )
                     else:
-                        raise ValueError(row[0] + " contains invalid characters")
+                        raise ValueError("Error found in row " + str(csv_reader.line_num) + " : " + row[0] + " contains invalid characters")
                 return redirect(url_for('home'))
 
         except IOError:
-            error = 'That file has not been found'
+            error = 'Specified upload file has not been found'
             return render_template('upload.html',error=error)
         except IntegrityError:
-            error = 'IntegrityError detected'
+            error = row[0].upper() + ' already exists. Cannot be added twice.'
             db.rollback()
             return render_template('upload.html',error=error)
         except ValueError as v_err:
-            # print("VALUE ERORR{}".format(v_err.args))
             error = ('{} '.format(v_err.args[0]))
             db.rollback()
             return render_template('upload.html',error=error,state=state)
@@ -134,7 +139,7 @@ def perform_teams_upload():
 def perform_results_upload():
     """
     Reads in result data from csv file. Validates each result and creates a dB
-    record for valid results or writes invalid result to text file as errors.
+    record for valid results or writes invalid result dB record.
     """
     state = g.get('state',None);
     feedback = None
@@ -196,9 +201,6 @@ def perform_results_upload():
                         result = Result.select().order_by(Result.result_id.desc()).get()
                         for err in each_error:
                             error = Error.create(result_id=result, description=err)
-                        #get all errors for a given result
-                        # for error in result.error_set:
-                        #     print (error.description)
 
             if error_found:
                 result_errors = Result.select().where(Result.is_error == True)
@@ -207,11 +209,12 @@ def perform_results_upload():
             else:
                 return redirect(url_for('view_results'))
     except IOError:
-        error = 'Input file has not been found'
+        error = 'Specified upload file has not been found'
         return render_template('upload.html',error=error,state=state)
 
 @app.route('/enter_result/')
 def enter_result():
+    """display view with form to enter results data"""
     state = g.get('state',None);
     team_dd = Team.select().order_by(Team.name)
     if len(team_dd) > 1:
@@ -221,6 +224,9 @@ def enter_result():
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
+    """if data is valid creates result from data submitted by input form,
+       if data is not valid a message is displayed informing what the issue isself.
+       When a result is created stats for the teams involved are updated"""
     state = g.get('state',None);
     teams = dict(Home=request.form.get('home_team'), Away=request.form.get('away_team'))
     goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
@@ -237,7 +243,7 @@ def create_result():
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
     if not teams_exist:
         team_dd = Team.select().order_by(Team.name)
-        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,state=state)
+        return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams,state=state)
 
     # check half-time goals are not greater than full-time goals
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
@@ -266,7 +272,6 @@ def create_result():
 @app.route('/view_results/')
 def view_results():
     state = g.get('state',None);
-    print("CALLING VIEW RESULTS FOR PAGE {}".format(request.args))
     feedback = None
     results = Result.select().where(Result.is_error == False)
     if len(results) > 0:

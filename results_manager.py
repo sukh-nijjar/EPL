@@ -21,7 +21,6 @@ class ResultsValidator:
         """validates goals are not negative values and
             FT goals are more than or equal to HT goals"""
         #TO DO : Negative goal values MASKS ELSE CLAUSE ERROR
-        # print("VALIDATE GOAL VALUES()")
         if all(g == None for g in goals.values()):
             return None,True
         if any(g < 0 for g in goals.values()):
@@ -32,7 +31,6 @@ class ResultsValidator:
         else:
             msg = "Full time goals cannot be less than Half time goals"
             return msg,False
-        # print("After - {}".format(goals))
 
     def validate_team_names_present(self,teams):
         # the IF checks if team names have a value
@@ -63,7 +61,7 @@ class ResultsValidator:
                                     (Result.away_team == result["Away"].lower()) &
                                     (Result.is_error == False))
         if res.exists():
-            msg = "Duplicate result"
+            msg = "Duplicate result : A result for " + result["Home"].title() + " vs " + result["Away"].title() + " already exists"
             return msg,False
         else:
             #it's a new result

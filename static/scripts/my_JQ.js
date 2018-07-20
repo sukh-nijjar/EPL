@@ -316,7 +316,9 @@ $(document).ready(function() {
       // set hints panel to either on or off when page loads:
       // if switch 'on' premier league header is hidden
       if (localStorage.getItem("switch_state") == 'on'){
+        $("#myonoffswitch").prop("checked",true);
         hint = state_message(state)
+        // $("#wrapper").html("<header id='hints'><section class='hint_text'><p>" + hint + "</p></section></header>");
         $("#hints").prop("hidden",false);
         $("#hints").html("<section class='hint_text'><p>" + hint + "</p></section>");
         $("#logo").prop("hidden",true);
@@ -324,13 +326,16 @@ $(document).ready(function() {
       }
       // if switch 'off' hints header is hidden
       else if (localStorage.getItem("switch_state") == 'off'){
-      // else if ($("input[name=onoffswitch]:not checked")){
+        $("#myonoffswitch").prop("checked",false);
         $("#hints").prop("hidden",true);
         $("#logo").prop("hidden",false);
         console.log('OFF');
       }
       else{
-        $("#logo").prop("hidden",true);
+        // settings when local storage has not yet been set
+        $("#logo").prop("hidden",false);
+        $("#hints").prop("hidden",true);
+        $("#myonoffswitch").prop("checked",false);
       }
 
       $("input[name=onoffswitch]").change(function(){
@@ -338,6 +343,7 @@ $(document).ready(function() {
         if ($("input[name=onoffswitch]:checked").length){
           localStorage.setItem("switch_state", "on");
           $("#logo").prop("hidden",true);
+          // $("#wrapper").html("<header id='hints'><section class='hint_text'><p>" + hint + "</p></section></header>");
           $("#hints").prop("hidden",false);
           $("#hints").addClass("animated fadeInLeftBig");
           $("#hints").html("<section class='hint_text'><p>" + hint + "</p></section>");
@@ -351,12 +357,12 @@ $(document).ready(function() {
         }
       });
 
-      if (localStorage.getItem("switch_state") == 'on'){
-        $("#myonoffswitch").prop("checked",true);
-      }
-      else{
-        $("#myonoffswitch").prop("checked",false);
-      }
+      // if (localStorage.getItem("switch_state") == 'on'){
+      //   $("#myonoffswitch").prop("checked",true);
+      // }
+      // else{
+      //   $("#myonoffswitch").prop("checked",false);
+      // }
 
       //-- END HINTS FUNCTIONALITY --//
 
