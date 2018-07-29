@@ -1,5 +1,5 @@
 class TeamPosition:
-    """Represents a team's league weekly league position."""
+    """Represents a team's weekly position in the league"""
     def __init__(self,team_name,points=0,scored=0,conceded=0):
         self.team = team_name
         self.points = points

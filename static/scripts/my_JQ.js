@@ -44,13 +44,6 @@ $(document).ready(function() {
     });
 
     $("#invalid_results").on("click", "#err_save", function () {
-      // $('td [type=number]').css('background','blue');
-      // $('td [type=number]').each(function (i,value) {
-      //   console.log(this)
-      //   if (this.value.length === 0) {
-      //     this.css('background','red')};
-      //   alert("i = " + i + " " + this.value);
-      // });
       var deferreds = [];
       $("tr.table_rows").each(function(){
         var ajax = $.ajax({
@@ -70,6 +63,7 @@ $(document).ready(function() {
         deferreds.push(ajax);
       }); //end 'each'
       $.when.apply($, deferreds).then(function() {
+          console.log("All promises resolved");
           window.location.href = "/upload_errors/";
       });
     });
@@ -87,9 +81,15 @@ $(document).ready(function() {
         if (data.done) {
           console.log(data);
           $('#master_section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
-          toggle_UI_Msg();
+          toggle_UI_Msg(data.path);
         }
       })
+      // .always(function(data) {
+      //   console.log("ALWAYS");
+      //   window.setTimeout(function() {
+      //     window.location.href = "/upload_errors/";
+      //   },3005);
+      // });
     });
 
     // $("#team_details_name").click(function(){
@@ -356,19 +356,15 @@ $(document).ready(function() {
           $("hints").removeClass('animated fadeInLeftBig');
         }
       });
-
-      // if (localStorage.getItem("switch_state") == 'on'){
-      //   $("#myonoffswitch").prop("checked",true);
-      // }
-      // else{
-      //   $("#myonoffswitch").prop("checked",false);
-      // }
-
       //-- END HINTS FUNCTIONALITY --//
 
 });//end top document.ready function
 
 function toggle_UI_Msg(){
+  // if (arguments.length > 0){
+  //   var path = arguments[0];
+  //   location.pathname = path;
+  // }
   $('#UI_Msg').slideDown();
   window.setTimeout(function(){
        $('#UI_Msg').slideUp(400,function(){

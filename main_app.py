@@ -57,8 +57,8 @@ def new_team():
 
 @app.route('/create/', methods=['POST'])
 def create_team():
-    """creates a team submitted by user via input form as long as there are
-       less than the allowed maximum 20 teams and the team doesn't already exist
+    """If validation passes creates a team submitted by input form. If validation fails
+       a message is displayed informing what the issue is.
     """
     state = g.get('state',None);
     if Team.select().count() >= 20:
@@ -224,13 +224,19 @@ def enter_result():
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
-    """if data is valid creates result from data submitted by input form,
-       if data is not valid a message is displayed informing what the issue isself.
-       When a result is created stats for the teams involved are updated"""
+    """If validation passes creates result from data submitted by input form,
+       if validation fails a message is displayed informing what the issue is.
+       When a result is created stats (matches won, drawn, lost, goals scored and conceded)
+       for the teams involved are updated which in turn updates the league table"""
     state = g.get('state',None);
     teams = dict(Home=request.form.get('home_team'), Away=request.form.get('away_team'))
-    goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
-                 FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+    try:
+        goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
+                     FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+    except ValueError:
+        team_dd = Team.select().order_by(Team.name)
+        error = "Only whole numbers (zero or above) can be entered for goals!"
+        return render_template('enterResult.html', error = error, team_dd = team_dd,teams=teams,state=state)
 
     results_validator = ResultsValidator()
 
@@ -271,6 +277,7 @@ def create_result():
 
 @app.route('/view_results/')
 def view_results():
+    """Display valid results if any exist otherwise present message informing no results are available for display"""
     state = g.get('state',None);
     feedback = None
     results = Result.select().where(Result.is_error == False)
@@ -282,6 +289,8 @@ def view_results():
 
 @app.route('/delete_result/', methods=['DELETE'])
 def delete_result():
+    """Deletes a specific result submitted by input form and update each teams stats
+       (matches won, drawn, lost, goals scored and conceded) to reflect data deletion"""
     result_to_delete = Result.get(Result.result_id == int(request.form['resid']))
     print("result_to_delete ID = {}".format(result_to_delete.result_id))
     #get the teams from database whose stats will need amending due to result deletion
@@ -323,14 +332,17 @@ def delete_result():
 def delete_erroneous_result():
     erroneous_result_to_delete = Result.get(Result.result_id == int(request.form['resid']))
     erroneous_result_to_delete.delete_instance(recursive=True)
-    return jsonify({'done' : 'Erroneous Result deleted'})
+    return jsonify({'done' : 'Erroneous Result deleted', 'path' : '/upload_errors/'})
 
 @app.route('/update_score/', methods=['PUT'])
 def update_score():
     results_validator = ResultsValidator()
     teams = dict(Home=request.form['home_team'],Away=request.form['away_team'])
-    goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
-                 FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+    try:
+        goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
+                     FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+    except ValueError:
+        return jsonify({'error' : 'Goal value cannot be blank'})
     #i need to refactor out the below var = request form []...stick with the dicts now!
     home_team = request.form['home_team']
     away_team = request.form['away_team']
@@ -421,7 +433,7 @@ def verify():
 
 @app.route('/delete_all_results/')
 def delete_all_results():
-    """deletes all results and resets teams stats to no games played"""
+    """Deletes all results and resets every team's stats (matches won, drawn, lost, goals scored and conceded) to zero"""
     delete_query = Error.delete()
     delete_query.execute()
     delete_query = Result.delete()
@@ -618,21 +630,34 @@ def display_upload_errors():
         return render_template('uploadErrors.html',feedback = "No errors to report",state=state)
 
 def get_results_by_week(from_week,to_week):
+    """"""
     results = Result.select().where(Result.week.between(from_week,to_week) &
                                        (Result.is_error == False))
     return create_weekly_position_table(results)
 
 def create_weekly_position_table(results):
-    print("CALLED create_weekly_position_table()")
+    """
+    This function obtains and returns for each team their positional history in the league week by week.
+    This data feeds the data visualisation functionality where it is used to create a trendline for each team.
+    Input parameter 'results' is a set of results returned by a query executed in get_results_by_week(from_week,to_week).
+    TeamPosition objects store the week by week league table position history based on a teams performance.
+    For each week results data is processed and for each result the result type is determined (which will either be a home win, away win or a draw).
+    Based on this the TeamPosition's points, goals scored and conceded attributes are updated.
+    Once these stats are updated the 'positions' list is sorted so TeamPosition objects are in ascending points order (stored in in_points_order list).
+    Now the in_points_order list is looped through getting the index of each TeamPosition object), this index
+    (when 1 is added to it therefore negating zero based numbering) represents the league position for a team in the week being currently iterated,
+    this league position is added the position list for the team - this postion attribute (list) represents the position history of a team through the season.
+    """
     teams = Team.select(Team.name)
     teams_list = []
     for team in teams:
         team_position = TeamPosition(team.name)
         teams_list.append((team_position))
-
+    # 'week_range' is a set of distinct weeks that informs how many weeks of results data is to be processed
     week_range = results.select(Result.week).distinct()
     for w in week_range:
         match_week = [w.week]
+        # 'positions' is a list of match weeks and TeamPosition objects
         positions = [*match_week,*teams_list]
         for result in results:
             if result.week == positions[0]:
@@ -676,8 +701,11 @@ def create_weekly_position_table(results):
         in_goals_scored_order = sorted(positions[1:], key=attrgetter('scored'))
         in_GD_order = sorted(in_goals_scored_order, key=methodcaller('goal_difference'), reverse=True)
         in_points_order = sorted(in_GD_order, key=attrgetter('points'),reverse=True)
+        print("Length of in_points_order is {}".format(len(in_points_order)))
         for pos in in_points_order:
+            print("pos equals {}".format(pos))
             i = in_points_order.index(pos)
+            print("i equals {}".format(i))
             pos.position.append(i+1)
     return in_points_order
 
@@ -896,19 +924,14 @@ def get_stats_away_form(team):
 def get_system_state():
     # remember to add in clause for result errors
     if Team.select().count() == 0 and Result.select().count() == 0:
-        print("NO DATA")
         return "NO DATA"
     elif Team.select().count() < 2 and Result.select().count() == 0:
-        print("1 TEAM")
         return "1 TEAM"
     elif Team.select().count() >= 2 and Result.select().count() > 0 and Error.select().count() == 0:
-        print("TEAM AND RESULT EXIST")
         return "TEAM AND RESULT EXIST"
     elif Team.select().count() >= 2 and Error.select().count() > 0:
-        print("ERRORS EXIST")
         return "ERRORS EXIST"
     else:
-        print("TEAM DATA EXISTS")
         return "TEAM DATA EXISTS"
 
 #debug helpers
