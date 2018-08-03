@@ -81,14 +81,31 @@ $(document).ready(function() {
         if (data.done) {
           console.log(data);
           $('#master_section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
+
+          // start experiment
+          //following line causes a reload to occur to /upload_errors/;
+          //else it reloads /upload_results/ causing re-posting
+          // location.pathname = data.path;
+          // $('#UI_Msg').slideDown();
+          // window.setTimeout(function(){
+          //      $('#UI_Msg').slideUp(400,function(){
+          //        location.pathname = data.path;
+          //        // alert("Location just before reload " + location);
+          //        // location.reload(true);
+          //        // alert("Location straight after reload " + location);
+          //      })},3000);
+          // end experiment
+
+
           toggle_UI_Msg(data.path);
         }
-      })
+      });
       // .always(function(data) {
       //   console.log("ALWAYS");
-      //   window.setTimeout(function() {
-      //     window.location.href = "/upload_errors/";
-      //   },3005);
+      //   toggle_UI_Msg(data.path);
+      //   // window.setTimeout(function() {
+      //   //   window.location.href = "/upload_errors/";
+      //   // },3005);
       // });
     });
 
@@ -360,16 +377,47 @@ $(document).ready(function() {
 
 });//end top document.ready function
 
+// function toggle_UI_Msg(){
+//   console.log("Path is " + location.pathname);
+//   $('#UI_Msg').slideDown();
+//   window.setTimeout(function(){
+//        $('#UI_Msg').slideUp(400,function(){
+//          location.reload(true);
+//        })},3000);
+// }
+
 function toggle_UI_Msg(){
-  // if (arguments.length > 0){
-  //   var path = arguments[0];
-  //   location.pathname = path;
-  // }
+  let args_in = arguments.length;
+  let path = arguments[0];
+  alert(arguments[0]);
   $('#UI_Msg').slideDown();
   window.setTimeout(function(){
        $('#UI_Msg').slideUp(400,function(){
-         location.reload(true);
+         if (args_in > 0){
+           if (reload_required(path)){
+             alert("window about to be reloaded");
+             location.reload(true);
+           }
+           else{
+             alert("window about to be redirected");
+             location.pathname = path;
+           }
+         }
+         else{
+           location.reload(true);
+         }
        })},3000);
+}
+
+function reload_required(path){
+  //if current pathname is /upload_errors/ then reload required
+  if (location.pathname === path){
+    return true;
+  }
+  else{
+    //no need to reload but change the pathname instead to avoid re-posting of data
+    return false;
+  }
 }
 
 function state_message(state){
