@@ -389,17 +389,16 @@ $(document).ready(function() {
 function toggle_UI_Msg(){
   let args_in = arguments.length;
   let path = arguments[0];
-  alert(arguments[0]);
   $('#UI_Msg').slideDown();
   window.setTimeout(function(){
        $('#UI_Msg').slideUp(400,function(){
          if (args_in > 0){
            if (reload_required(path)){
-             alert("window about to be reloaded");
+             //window reloaded
              location.reload(true);
            }
            else{
-             alert("window about to be redirected");
+             //window redirected
              location.pathname = path;
            }
          }

@@ -89,16 +89,21 @@ class Result(BaseModel):
     away_ftg = IntegerField(null=True)
     result_has_been_updated = BooleanField(default=False)
     is_error = BooleanField(default=False)
+    match_status = CharField(null=True,default='result')
 
     def result_type(self):
         """returns the result type which is either home win,
             away win_rate, draw or no result"""
+        print(self)
         if self.home_ftg > self.away_ftg:
             return 'home win'
         elif self.home_ftg < self.away_ftg:
             return 'away win'
         else:
             return 'draw'
+
+    def __str__(self):
+        return 'Week={0}, home={1}, away={2}, home_ftg={3}, away_ftg={4}, status={5}'.format(self.week, self.home_team, self.away_team, self.home_ftg, self.away_ftg, self.match_status)
 
 class Error(BaseModel):
     error_id = PrimaryKeyField()

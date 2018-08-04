@@ -30,7 +30,7 @@ def page_not_found(e):
 
 @app.route('/')
 def landing_page():
-    state = g.get('state',None);
+    state = g.get('state',None)
     return render_template('landing_page.html',state=state)
 
 # @app.route('/')
@@ -38,7 +38,8 @@ def landing_page():
 def home():
     """ display the league table showing teams ordered by points in descending order
     """
-    state = g.get('state',None);
+    display_fixtures_in_DB()
+    state = g.get('state',None)
     feedback = None
     teams = Team.select()
     if len(teams) > 0:
@@ -52,7 +53,7 @@ def home():
 
 @app.route('/new_team/')
 def new_team():
-    state = g.get('state',None);
+    state = g.get('state',None)
     return render_template('createTeam.html',state=state)
 
 @app.route('/create/', methods=['POST'])
@@ -60,7 +61,7 @@ def create_team():
     """If validation passes creates a team submitted by input form. If validation fails
        a message is displayed informing what the issue is.
     """
-    state = g.get('state',None);
+    state = g.get('state',None)
     if Team.select().count() >= 20:
         error = '20 teams in league - unable to add any more'
         return render_template('createTeam.html',error=error,state=state)
@@ -87,7 +88,7 @@ def create_team():
 @app.route('/load_data/')
 def display_upload_form():
     """display view to load data (csv files)"""
-    state = g.get('state',None);
+    state = g.get('state',None)
     return render_template('upload.html',state=state)
 
 @app.route('/upload_teams/', methods=['POST'])
@@ -96,7 +97,7 @@ def perform_teams_upload():
        less than the allowed maximum 20 teams and any team doesn't
        already exist. If an error is found no more rows are proceesed and
        the operation is rolled back"""
-    state = g.get('state',None);
+    state = g.get('state',None)
     error = None
     invalid_rows = []
     if Team.select().count() >= 20:
@@ -141,7 +142,7 @@ def perform_results_upload():
     Reads in result data from csv file. Validates each result and creates a dB
     record for valid results or writes invalid result dB record.
     """
-    state = g.get('state',None);
+    state = g.get('state',None)
     feedback = None
     error_found = False
     errors_list = []
@@ -161,7 +162,7 @@ def perform_results_upload():
         with open(file_to_load) as results_csv:
             csv_reader = csv.reader(results_csv)
             next(csv_reader)
-            #introducing the db.atomic() command speeded up the process from 64 secs to 2 secs!!
+            #introducing the db.atomic() command speeded up the process from 64 secs to an eyeblink!!
             with db.atomic():
                 for row in csv_reader:
                     teams = dict(Home=row[0].lower().strip(), Away=row[1].lower().strip(),Week=row[6])
@@ -180,9 +181,15 @@ def perform_results_upload():
                             home_htg = goals['HT_Home'],
                             away_htg = goals['HT_Away'],
                             week = teams['Week'])
+                        #check if any of the values in the goals dict has a None value
                         if None not in goals.values():
                             # the result has a score therefore stats for each team need updating
                             update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
+                        else:
+                            # goal values are None therefore the match status is updated to a 'fixture' (from the default of 'result')
+                            last_inserted = Result.select().order_by(Result.result_id.desc()).get()
+                            update_query = Result.update(match_status = 'fixture').where(Result.result_id == last_inserted)
+                            update_query.execute()
                     else:
                         error_found = True
                         Result.create(
@@ -215,7 +222,7 @@ def perform_results_upload():
 @app.route('/enter_result/')
 def enter_result():
     """display view with form to enter results data"""
-    state = g.get('state',None);
+    state = g.get('state',None)
     team_dd = Team.select().order_by(Team.name)
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd,state=state)
@@ -228,7 +235,7 @@ def create_result():
        if validation fails a message is displayed informing what the issue is.
        When a result is created stats (matches won, drawn, lost, goals scored and conceded)
        for the teams involved are updated which in turn updates the league table"""
-    state = g.get('state',None);
+    state = g.get('state',None)
     teams = dict(Home=request.form.get('home_team'), Away=request.form.get('away_team'))
     try:
         goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
@@ -278,7 +285,7 @@ def create_result():
 @app.route('/view_results/')
 def view_results():
     """Display valid results if any exist otherwise present message informing no results are available for display"""
-    state = g.get('state',None);
+    state = g.get('state',None)
     feedback = None
     results = Result.select().where(Result.is_error == False)
     if len(results) > 0:
@@ -355,13 +362,15 @@ def update_score():
     result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
     if goal_totals_valid:
-        if result.home_ftg == None and result.home_htg == None and result.away_ftg == None and result.away_htg == None:
+        # if result.home_ftg == None and result.home_htg == None and result.away_ftg == None and result.away_htg == None:
+        if result.match_status == 'fixture':
             print("This is the initial result for this fixture")
             update_query = Result.update(
             home_htg = home_htg,
             away_htg = away_htg,
             home_ftg = home_ftg,
-            away_ftg = away_ftg
+            away_ftg = away_ftg,
+            match_status = 'result'
             ).where(Result.result_id == result.result_id)
             update_query.execute()
             update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
@@ -369,7 +378,7 @@ def update_score():
         else:
             print("existing_result (the result BEFORE getting updated via the 'Edit')")
             existing_result = dict(ID = result.result_id, home_FT = result.home_ftg, home_HT = result.home_htg,
-            away_HT = result.away_htg, away_FT = result.away_ftg, outcome=result.result_type())
+                                   away_HT = result.away_htg, away_FT = result.away_ftg, outcome=result.result_type())
 
             update_query = Result.update(
             home_htg = home_htg,
@@ -459,7 +468,7 @@ def delete_all_teams():
 
 @app.route('/team_drill_down/<team>', methods=['GET'])
 def drill_down(team):
-    state = g.get('state',None);
+    state = g.get('state',None)
     team=Team.get(Team.name == team)
     print("{} team id is {}, wins = {}".format(team.name, team.team_id, team.won))
     results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
@@ -481,7 +490,7 @@ def drill_down(team):
 
 @app.route('/charts/', methods=['GET'])
 def GetCharts():
-    state = g.get('state',None);
+    state = g.get('state',None)
     results = Result.select().where(Result.is_error == False)
     if len(results) == 0:
         feedback = "No results available"
@@ -535,8 +544,10 @@ def GetCharts():
             return render_template('feedback.html', feedback = feedback, state=state)
 
 @app.route('/statiscal_analysis/<team>', methods=['GET'])
+# i should refactor this so only the team is processed by create_weekly_position_table
+# as all teams don't need to be processed - waste
 def stats_drill_down(team):
-    state = g.get('state',None);
+    state = g.get('state',None)
     team_stats=Team.get(Team.name == team)
     home_form_dict = get_stats_home_form(team_stats)
     away_form_dict = get_stats_away_form(team_stats)
@@ -594,7 +605,7 @@ def get_comparison_data():
 
 @app.route('/comparison/<data>', methods=['GET'])
 def display_comparison(data):
-    state = g.get('state',None);
+    state = g.get('state',None)
     data_in = json.loads(data)
     team1 = data_in['data']['teams'][0]
     team2 = data_in['data']['teams'][1]
@@ -621,7 +632,7 @@ def display_comparison(data):
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
-    state = g.get('state',None);
+    state = g.get('state',None)
     result_errors = Result.select().where(Result.is_error == True)
     if len(result_errors) > 0:
         return render_template('uploadErrors.html',invalid_results=result_errors,
@@ -631,8 +642,10 @@ def display_upload_errors():
 
 def get_results_by_week(from_week,to_week):
     """"""
+    # get results only - not error results or fixtures
     results = Result.select().where(Result.week.between(from_week,to_week) &
-                                       (Result.is_error == False))
+                                   (Result.is_error == False) &
+                                   (Result.match_status == 'result'))
     return create_weekly_position_table(results)
 
 def create_weekly_position_table(results):
@@ -808,8 +821,8 @@ def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_sco
         update_query.execute()
 
 def amend_team_stats(previous_result):
-    """After a result has been updated this method amends the matches
-    won, drawn, lost, goals scored and conceded stats for each team in the match."""
+    """After a result has been updated this method amends EXISTING stats (matches
+    won, drawn, lost, goals scored and conceded)for each team in the match."""
     print ("previous result = {} ".format(previous_result))
     current_result = Result.get(Result.result_id == previous_result['ID'])
     home_team = Team.get(Team.name == current_result.home_team)
@@ -884,7 +897,7 @@ def amend_team_stats(previous_result):
 def get_stats_home_form(team):
     print("Team object passed in is {}".format(type(team)))
     wins = draws = losses = gs = gc = 0
-    results=Result.select().where(Result.home_team == team.name)
+    results=Result.select().where((Result.home_team == team.name) & (Result.match_status == 'result'))
     for r in results:
         print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
@@ -904,7 +917,7 @@ def get_stats_home_form(team):
 
 def get_stats_away_form(team):
     wins = draws = losses = gs = gc = 0
-    results=Result.select().where(Result.away_team == team.name)
+    results=Result.select().where((Result.away_team == team.name) & (Result.match_status == 'result'))
     for r in results:
         print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
@@ -954,6 +967,11 @@ def display_results_and_errors_in_DB(r_id):
     result = Error.select().join(Result).where(Result.result_id == r_id)
     for error in result:
         print("result_id {} and errors : {}".format(error.result_id,error.description))
+
+def display_fixtures_in_DB():
+    fixtures = Result.select().where(Result.match_status == 'fixture')
+    for f in fixtures:
+        print("{}, {}, {}".format(f.home_team, f.away_team, f.match_status))
 
 
 #end debug helpers

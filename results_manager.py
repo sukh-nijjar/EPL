@@ -53,8 +53,8 @@ class ResultsValidator:
             return msg,False
 
     def result_is_new(self,result):
-        """determines if a result already exists for the
-        combination of the home and away teams"""
+        """determines if a record already exists for the
+        combination of the home and away teams (could be either a result or fixture)"""
         # print("IS RESULT IS NEW()")
         # print("ROW (new method) = {}".format(result))
         res = Result.select().where((Result.home_team == result["Home"].lower()) &
