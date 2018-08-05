@@ -895,9 +895,9 @@ def amend_team_stats(previous_result):
             update_query.execute()
 
 def get_stats_home_form(team):
-    print("Team object passed in is {}".format(type(team)))
+    print("get_stats_HOME_form")
     wins = draws = losses = gs = gc = 0
-    results=Result.select().where((Result.home_team == team.name) & (Result.match_status == 'result'))
+    results=Result.select().where((Result.home_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
         print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
@@ -910,16 +910,20 @@ def get_stats_home_form(team):
         gc += r.away_ftg
     points = (wins*3) + draws
     played = wins + losses + draws
-    rating = team.rating(points,played)
+    if played > 0:
+        rating = team.rating(points,played)
+    else:
+        rating = "Rating not available - no games played"
     print("home rating from method call {}".format(rating))
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 
 def get_stats_away_form(team):
+    print("get_stats_AWAY_form")
     wins = draws = losses = gs = gc = 0
-    results=Result.select().where((Result.away_team == team.name) & (Result.match_status == 'result'))
+    results=Result.select().where((Result.away_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
-        print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
+        # print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
             losses += 1
         elif r.result_type() == 'away win':
@@ -930,8 +934,11 @@ def get_stats_away_form(team):
         gc += r.home_ftg
     points = (wins*3) + draws
     played = wins + losses + draws
-    rating = team.rating(points,played)
-    print("home rating from method call {}".format(rating))
+    if played > 0:
+        rating = team.rating(points,played)
+    else:
+        rating = "Rating not available - no games played"
+    print("away rating from method call {}".format(rating))
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 def get_system_state():

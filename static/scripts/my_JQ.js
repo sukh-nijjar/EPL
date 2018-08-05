@@ -216,7 +216,7 @@ $(document).ready(function() {
           })
         } //end if action type is *SAVE*
         if (action_type === 'Delete'){
-          alert("DELETE CALLED")
+          // alert("DELETE CALLED")
           // var r_id = $(this).closest('tr').find('td input[name=ID]').val();
           var r_id = $(this).closest('tr').find('td [name=ID]').val();
           console.log("r-id is " + r_id);
