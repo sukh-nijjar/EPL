@@ -1,9 +1,9 @@
 $(document).ready(function() {
-    if (typeof(Storage) !== "undefined") {
-        console.log("LOCAL STORAGE AVAILBALE");
-    } else {
-        console.log("LOCAL STORAGE *NOT* AVAILBALE")
-    }
+    // if (typeof(Storage) !== "undefined") {
+    //     console.log("LOCAL STORAGE AVAILBALE");
+    // } else {
+    //     console.log("LOCAL STORAGE *NOT* AVAILBALE")
+    // }
 
     $("#err_resolve").click(function(){
       $("td").each(function() {
@@ -81,32 +81,9 @@ $(document).ready(function() {
         if (data.done) {
           console.log(data);
           $('#master_section').prepend('<h3 id="UI_Msg" class="success_msg">' + data.done +'</h3>');
-
-          // start experiment
-          //following line causes a reload to occur to /upload_errors/;
-          //else it reloads /upload_results/ causing re-posting
-          // location.pathname = data.path;
-          // $('#UI_Msg').slideDown();
-          // window.setTimeout(function(){
-          //      $('#UI_Msg').slideUp(400,function(){
-          //        location.pathname = data.path;
-          //        // alert("Location just before reload " + location);
-          //        // location.reload(true);
-          //        // alert("Location straight after reload " + location);
-          //      })},3000);
-          // end experiment
-
-
           toggle_UI_Msg(data.path);
         }
       });
-      // .always(function(data) {
-      //   console.log("ALWAYS");
-      //   toggle_UI_Msg(data.path);
-      //   // window.setTimeout(function() {
-      //   //   window.location.href = "/upload_errors/";
-      //   // },3005);
-      // });
     });
 
     // $("#team_details_name").click(function(){
@@ -422,7 +399,6 @@ function reload_required(path){
 function state_message(state){
   switch (state) {
     case 'NO DATA':
-      // $("#new_team").addClass("animated flash");
       return 'At the start of this demo the system contains no teams or results data, so if you view the league table (for example) a message is displayed informing of this fact. The first step is to add some data either through New team or Load data options.';
       break;
     case '1 TEAM':

@@ -225,13 +225,11 @@ td[class='stats']{
 }
 
 #key_facts_home{
-	/* position: relative; */
 	margin-left: 619px;
 	margin-top: -241px;
 }
 
 #key_facts_away{
-	/* position: relative; */
 	margin-left: 619px;
 	margin-top: -241px;
 }
@@ -417,8 +415,8 @@ td[class='stats']{
 	color: #d9d6d3;
 	font-family: 'Baloo', cursive;
 	position: relative;
-  top: -121px;
-  left: 247px;
+  top: 72px;
+  left: 250px;
 }
 
 .closeMsg{
@@ -829,3 +827,7 @@ td[class='stats']{
 }
 
 /* END HINTS MENU ITEM STYLES */
+
+/* form{
+	outline: 1px solid red;
+} */

@@ -7,6 +7,11 @@
   {% endblock %}
   {% block content %}
     {% block chart_options %}
+    <!-- the issue of double ajax call is resolved
+    by getting rid of the action attribute : action="/compare_teams/" -->
+    <form>
+        <button type="submit" id="compare_button">Compare Performance</button>
+    </form>
     <form action="/charts/" id="chart_form" method="get">
       <select name="chart_select" id="chart_selection">
         <option selected="selected">Select chart type:</option>
@@ -63,11 +68,6 @@
           </table>
         </fieldset>
       </p>
-    </form>
-    <!-- the issue of double ajax call is resolved
-    by getting rid of the action attribute : action="/compare_teams/" -->
-    <form>
-        <button type="submit" id="compare_button">Compare Performance</button>
     </form>
     {% endblock %}
     <div id="chart_div" style="border: 1px solid #ccc"></div>

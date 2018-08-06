@@ -101,7 +101,7 @@ class Result(BaseModel):
     def result_type(self):
         """returns the result type which is either home win,
             away win_rate, draw or no result"""
-        print(self)
+        # print(self)
         if self.home_ftg > self.away_ftg:
             return 'home win'
         elif self.home_ftg < self.away_ftg:

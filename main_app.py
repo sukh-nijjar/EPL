@@ -38,7 +38,7 @@ def landing_page():
 def home():
     """ display the league table showing teams ordered by points in descending order
     """
-    display_fixtures_in_DB()
+    display_results_in_DB()
     state = g.get('state',None)
     feedback = None
     teams = Team.select()
@@ -126,11 +126,11 @@ def perform_teams_upload():
 
         except IOError:
             error = 'Specified upload file has not been found'
-            return render_template('upload.html',error=error)
+            return render_template('upload.html',error=error,state=state)
         except IntegrityError:
             error = row[0].upper() + ' already exists. Cannot be added twice.'
             db.rollback()
-            return render_template('upload.html',error=error)
+            return render_template('upload.html',error=error,state=state)
         except ValueError as v_err:
             error = ('{} '.format(v_err.args[0]))
             db.rollback()
@@ -518,10 +518,11 @@ def GetCharts():
 
         if len(teams_filter):
             for team in team_positions:
+                # print("TEAM {}".format(team))
                 if team.team in teams_filter:
                     t = dict(TeamName=team.team,Positions=team.position)
                     team_positions_dict[team.team] = t
-            print("team_positions_filtered dict = {}".format(team_positions_dict))
+            # print("team_positions_filtered dict = {}".format(team_positions_dict))
             return render_template('charts_home.html',team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad,state=state)
         else:
             for team in team_positions:
@@ -545,12 +546,18 @@ def GetCharts():
 
 @app.route('/statiscal_analysis/<team>', methods=['GET'])
 # i should refactor this so only the team is processed by create_weekly_position_table
-# as all teams don't need to be processed - waste
+# actually after investigating all teams have to be processed as weekly positional data
+# is in relation to all the other teams positions...otherwise the stats for a single team
+# would have the team is position 1 all the time (nothing to sort against)
 def stats_drill_down(team):
     state = g.get('state',None)
     team_stats=Team.get(Team.name == team)
     home_form_dict = get_stats_home_form(team_stats)
+    # for k,v in home_form_dict.items():
+    #     print("home_form_dict = {} = {}".format(k,v))
     away_form_dict = get_stats_away_form(team_stats)
+    # for k,v in away_form_dict.items():
+    #     print("away_form_dict = {} = {}".format(k,v))
     min_week = Result.select(fn.MIN(Result.week))
     max_week = Result.select(fn.MAX(Result.week))
     # get all valid results
@@ -623,7 +630,7 @@ def display_comparison(data):
     comparison_chart_data['T2_Won'] = team2['Won']
     comparison_chart_data['T2_Drawn'] = team2['Drawn']
     comparison_chart_data['T2_Lost'] = team2['Lost']
-    print(comparison_chart_data)
+    # print(comparison_chart_data)
     # get the actual results between the 2 teams
     results=Result.select().where(((Result.home_team == teams[0]) | (Result.away_team == teams[0]))
                                    & ((Result.home_team == teams[1]) | (Result.away_team == teams[1])))
@@ -714,19 +721,13 @@ def create_weekly_position_table(results):
         in_goals_scored_order = sorted(positions[1:], key=attrgetter('scored'))
         in_GD_order = sorted(in_goals_scored_order, key=methodcaller('goal_difference'), reverse=True)
         in_points_order = sorted(in_GD_order, key=attrgetter('points'),reverse=True)
-        print("Length of in_points_order is {}".format(len(in_points_order)))
+        # print("Length of in_points_order is {}".format(len(in_points_order)))
         for pos in in_points_order:
-            print("pos equals {}".format(pos))
+            # print("pos equals {}".format(pos))
             i = in_points_order.index(pos)
-            print("i equals {}".format(i))
+            # print("i equals {}".format(i))
             pos.position.append(i+1)
     return in_points_order
-
-# def create_dd_of_ints(required_range):
-#     dd = []
-#     for i in range(required_range):
-#         dd.append(i)
-#     return dd
 
 def result_is_valid(teams,goals,**kwargs):
     res = defaultdict(list,{**teams, **goals})
@@ -899,7 +900,7 @@ def get_stats_home_form(team):
     wins = draws = losses = gs = gc = 0
     results=Result.select().where((Result.home_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
-        print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
+        # print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
             wins += 1
         elif r.result_type() == 'away win':
@@ -980,6 +981,10 @@ def display_fixtures_in_DB():
     for f in fixtures:
         print("{}, {}, {}".format(f.home_team, f.away_team, f.match_status))
 
+def display_results_in_DB():
+    res = Result.select().where(Result.match_status == 'result')
+    for f in res:
+        print("{}, {}, {}, {}".format(f.week,f.home_team, f.away_team, f.match_status))
 
 #end debug helpers
 
