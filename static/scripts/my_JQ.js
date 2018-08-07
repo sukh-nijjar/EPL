@@ -115,7 +115,7 @@ $(document).ready(function() {
     $('#submitDeleteAllTeams').on('click', function(e) {
            e.preventDefault();
            $("#dialog-confirm").dialog({
-             title: "Delete all teams?",
+             title: "Delete all teams? (this also deletes results)",
              resizable: false,
              //autoOpen: false,
              height: "auto",
@@ -125,7 +125,7 @@ $(document).ready(function() {
                "No, do not delete all teams": function() {
                  $( this ).dialog( "close" );
                },
-               "Yes, delete all teams": function() {
+               "Yes, delete all teams (and results)": function() {
                  $("#deleteAllTeams").submit();
                }
              } //end buttons
@@ -246,7 +246,7 @@ $(document).ready(function() {
        });
 
        $( "#menu" ).menu();
-       $(" #GDToolTip ").tooltip();
+       $(".tool_tip").tooltip();
 
 
       $('.error').fadeIn("slow");
@@ -399,16 +399,16 @@ function reload_required(path){
 function state_message(state){
   switch (state) {
     case 'NO DATA':
-      return 'At the start of this demo the system contains no teams or results data, so if you view the league table (for example) a message is displayed informing of this fact. The first step is to add some data either through New team or Load data options.';
+      return 'At the start of this demo the system contains no data, so <a href="/league/">if you view the league table</a> feedback is displayed informing there is no team data. The first step is to add data either through the "Load data" or "New team" menu options.';
       break;
     case '1 TEAM':
       return 'One team has been created, however in order to enter results there needs to be a minimum of two teams as a team cannot play itself! Use New team to add a second team.';
       break;
     case 'TEAM AND RESULT EXIST':
-      return 'So now both teams and results are populated which means it is possible to visualise various performance metrics - go to Visualization to see this in action.';
+      return 'Now the system is populated with both team and result data. The effect of the results data is reflected in the <a href="/league/">league table</a> which is ordered in points order. Click on a team to see a results breakdown, view and edit all results using “View results” and see data visualisation of team performances using “Visualization”.';
       break;
     case 'TEAM DATA EXISTS':
-      return 'Now that at least 2 teams have been saved use Enter result to create a result.';
+      return 'The system is now populated with Team data - viewing the <a href="/league/">league table</a> shows each team has played 0 games and therefore has 0 points. Next step is to populate <i>results</i> into the system either through the "Load data" or "Enter result" menu options.';
       break;
     case 'ERRORS EXIST':
       return 'The results upload process has identified some errors. Errors can be corrected by selecting the Resolve Errors button or simply deleted.';

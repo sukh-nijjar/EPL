@@ -17,7 +17,7 @@ def before_request():
     init_db()
     # get the current status of which data exists
     # There are 3 possibilities :
-    # no data in system, team data available or both team and results data is available
+    # no data in system, team data available or both team and results data is available.
     g.state = get_system_state()
 
 @app.teardown_request
@@ -151,7 +151,8 @@ def perform_results_upload():
 
     if Team.select().count() < 1:
         feedback = "Teams must be loaded before loading results"
-        return render_template('feedback.html', feedback=feedback,state=state)
+        # return render_template('feedback.html', feedback=feedback,state=state)
+        return render_template('upload.html', feedback=feedback,state=state)
 
     if request.form['file_selected'] == 'validFile':
         file_to_load = '2017Results.csv'
@@ -214,7 +215,7 @@ def perform_results_upload():
                 state = "ERRORS EXIST";
                 return render_template('uploadErrors.html',invalid_results=result_errors,state=state)
             else:
-                return redirect(url_for('view_results'))
+                return redirect(url_for('home'))
     except IOError:
         error = 'Specified upload file has not been found'
         return render_template('upload.html',error=error,state=state)

@@ -735,10 +735,14 @@ td[class='stats']{
 }
 
 .hint_text{
-	letter-spacing: 0.1em;
+	/* letter-spacing: 0.1em; */
 	margin-top: 20px;
 	margin-left: 154px;
 	color: blue;
+}
+
+.hint_text p > a{
+	text-decoration: underline;
 }
 
 /* END ABOUT AND HINTS STYLES */

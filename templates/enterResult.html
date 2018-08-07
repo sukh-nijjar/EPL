@@ -19,9 +19,9 @@
               {% endfor %}
             </select>
             <!-- Home Half Time Goals -->
-            <input class="spinner" name="hhtg" value="0">
+            <input class="spinner tool_tip" title="Enter home teams goals scored by half time" name="hhtg" value="0">
             <!-- Home Full Time Goals -->
-            <input class="spinner" name="hftg" value="0">
+            <input class="spinner tool_tip" title="Enter home teams goals scored by full time" name="hftg" value="0">
           </p>
           <p class="teamDropDowns">
             <select name="away_team" class="selectmenu">
@@ -35,9 +35,9 @@
               {% endfor %}
             </select>
             <!-- Away Half Time Goals -->
-            <input class="spinner" name="ahtg" min="0" value="0">
+            <input class="spinner tool_tip" title="Enter away teams goals scored by half time" name="ahtg" min="0" value="0">
             <!-- Away Full Time Goals -->
-            <input class="spinner" name="aftg" min="0" value="0">
+            <input class="spinner tool_tip" title="Enter away teams goals scored by full time" name="aftg" min="0" value="0">
           </p>
           <p><input type="submit" value="save result" id="submitSaveResult"></p>
         </form>

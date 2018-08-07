@@ -1,8 +1,8 @@
 {%extends "master_layout.html"%}
 {%block content%}
 <section id="demo_information" class="animated fadeIn">
-  <p>Welcome to this demo application built by me. My motivation for creating this application is to put the skills I have
-    learnt into practice and to demonstrate my enthusiasm for coding, showing I have the capabilities required to work as a developer.</p>
+  <p>Welcome to this demo application. My motivation for creating this application is to showcase the skills I have
+    learnt and to demonstrate my enthusiasm for coding, showing I have the capabilities required to work as a developer.</p>
   <div class="accordian">
       <h3 class="panel_header">ABOUT</h3>
       <section class="panel_content">
@@ -20,7 +20,7 @@
           <ul>
               <li>Web application framework : <a href="http://flask.pocoo.org/" target="_blank">Flask</a></li>
               <li>Client-side : HTML, CSS, Javascript</li>
-              <li>Server-side : Python, Javascript</li>
+              <li>Server-side : Python, Javascript, JQuery</li>
               <li>ORM : <a href="http://docs.peewee-orm.com/en/latest/index.html" target="_blank">PeeWee</a></li>
               <li>Database : <a href="https://www.sqlite.org/index.html" target="_blank">SQLite</a></li>
               <li><a href="static/images/Architecture.png" target="_blank">Architecture Diagram</a></li>
@@ -48,6 +48,6 @@
           <p>However, its also important to recognise when a 'product' is good enough to meet current priorities and the main priority right now for me is securing a fulfulling developer role!</p>
       </section>
   </div> <!--end CLASS ACCORDIAN-->
-  <p id="start_demo"><a href="{{ url_for('home') }}">Go to the demo!</a></p>
+  <p class="tool_tip" title="Hint - turn on the hints to help step through the application" id="start_demo"><a href="{{ url_for('home') }}">Go to the demo!</a></p>
 </section>
 {%endblock%}
