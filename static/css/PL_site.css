@@ -173,6 +173,11 @@ nav li:hover{
 	text-shadow: 0 0 3px #FF0000;
 }
 
+.current_menu{
+	background: linear-gradient(90deg, #f8ff00 0%, #3ad59f 100%);
+	border-radius: 5px;
+}
+
 section{
   width: 900px;
 	float: left;
@@ -810,28 +815,3 @@ td[class='stats']{
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px;
 }
-
-/* HINTS MENU ITEM STYLES */
-.menu_item{
-	-webkit-animation-delay: 3s;
-	-moz-animation-delay: 3s;
-	-ms-animation-delay: 3s;
-	-o-animation-delay: 3s;
-	animation-delay: 3s;
-	-webkit-animation-duration: 3s;
-	-moz-animation-duration: 3s;
-	-ms-animation-duration: 3s;
-	-o-animation-duration: 3s;
-	animation-duration: 3s;
-	-webkit-animation-iteration-count: 3;
-	-moz-animation-iteration-count: 3;
-	-ms-animation-iteration-count: 3;
-	-o-animation-iteration-count: 3;
-	animation-iteration-count: 3;
-}
-
-/* END HINTS MENU ITEM STYLES */
-
-/* form{
-	outline: 1px solid red;
-} */

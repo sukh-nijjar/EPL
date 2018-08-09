@@ -1,9 +1,33 @@
 $(document).ready(function() {
-    // if (typeof(Storage) !== "undefined") {
-    //     console.log("LOCAL STORAGE AVAILBALE");
-    // } else {
-    //     console.log("LOCAL STORAGE *NOT* AVAILBALE")
-    // }
+    var current_path = location.pathname;
+    console.log(current_path);
+    switch (current_path) {
+      case '/':
+        $("#menu_about").addClass("current_menu");
+        break;
+      case '/league/':
+        $("#menu_league").addClass("current_menu");
+        break;
+      case '/load_data/':
+        $("#menu_load_data").addClass("current_menu");
+        break;
+      case '/new_team/':
+          $("#menu_new_team").addClass("current_menu");
+        break;
+      case '/enter_result/':
+        $("#menu_enter_result").addClass("current_menu");
+        break;
+      case '/view_results/':
+        $("#menu_view_results").addClass("current_menu");
+        break;
+      case '/upload_errors/':
+        $("#menu_upload_errors").addClass("current_menu");
+        break;
+      case '/charts/':
+        $("#menu_charts").addClass("current_menu");
+        break;
+      default:
+    }
 
     $("#err_resolve").click(function(){
       $("td").each(function() {
@@ -85,17 +109,6 @@ $(document).ready(function() {
         }
       });
     });
-
-    // $("#team_details_name").click(function(){
-    //     var team = $(this).text();
-    //     $(function() {
-    //       $.getJSON("/get_chart_data", {
-    //         team : team},
-    //           function(data) {
-    //             drawChart(data);
-    //     });
-    //   });
-    // });
 
     $('#submitSaveTeam').on('click', function(e) {
         e.preventDefault();
@@ -354,15 +367,6 @@ $(document).ready(function() {
 
 });//end top document.ready function
 
-// function toggle_UI_Msg(){
-//   console.log("Path is " + location.pathname);
-//   $('#UI_Msg').slideDown();
-//   window.setTimeout(function(){
-//        $('#UI_Msg').slideUp(400,function(){
-//          location.reload(true);
-//        })},3000);
-// }
-
 function toggle_UI_Msg(){
   let args_in = arguments.length;
   let path = arguments[0];
@@ -399,7 +403,7 @@ function reload_required(path){
 function state_message(state){
   switch (state) {
     case 'NO DATA':
-      return 'At the start of this demo the system contains no data, so <a href="/league/">if you view the league table</a> feedback is displayed informing there is no team data. The first step is to add data either through the "Load data" or "New team" menu options.';
+      return 'At the start of this demo the system contains no data, feedback is displayed informing there is no team data. The first step is to add data either through the "Load data" or "New team" menu options.';
       break;
     case '1 TEAM':
       return 'One team has been created, however in order to enter results there needs to be a minimum of two teams as a team cannot play itself! Use New team to add a second team.';
@@ -411,7 +415,7 @@ function state_message(state){
       return 'The system is now populated with Team data - viewing the <a href="/league/">league table</a> shows each team has played 0 games and therefore has 0 points. Next step is to populate <i>results</i> into the system either through the "Load data" or "Enter result" menu options.';
       break;
     case 'ERRORS EXIST':
-      return 'The results upload process has identified some errors. Errors can be corrected by selecting the Resolve Errors button or simply deleted.';
+      return 'The results upload process has identified some <a href="/upload_errors/">errors</a>. Errors can be corrected by selecting the Resolve Errors button or simply deleted. All <a href="/view_results/">valid results</a> have been saved to the database.';
       break;
   }
 }

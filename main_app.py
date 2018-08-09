@@ -1,7 +1,7 @@
 import csv, os, shutil, re
 from collections import defaultdict
 from domain import TeamPosition
-from flask import Flask, render_template, request, url_for, redirect, flash, json, jsonify, g
+from flask import Flask, Markup, render_template, request, url_for, redirect, flash, json, jsonify, g
 from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
 from operator import methodcaller, attrgetter
@@ -94,13 +94,22 @@ def display_upload_form():
 @app.route('/upload_teams/', methods=['POST'])
 def perform_teams_upload():
     """creates teams via upload of csv as long as there are
-       less than the allowed maximum 20 teams and any team doesn't
-       already exist. If an error is found no more rows are proceesed and
+       less than the allowed maximum 20 teams and any team in the csv doesn't
+       already exist in the database. If an error is found no more rows are proceesed and
        the operation is rolled back"""
+    existing_teams = []
     state = g.get('state',None)
     error = None
     invalid_rows = []
-    if Team.select().count() >= 20:
+    teams = Team.select(Team)
+    for team in teams:
+        existing_teams.append(team.name.title())
+    if (teams.count() > 0) & (teams.count() < 19):
+        error = Markup('Upload teams is a way to create teams in bulk - a precondition is there should not be any teams already in the system. '
+        + '<br>Currently the following teams have been detected:' + '<br>' +  ', '.join(existing_teams)
+        + '<br>Please delete these using <i>Delete teams</i> option and then re-try upload teams')
+        return render_template('upload.html',error=error,state=state)
+    if teams.count() >= 20:
         error = '20 teams in league - unable to add any more'
         return render_template('upload.html',error=error,state=state)
 
@@ -375,7 +384,7 @@ def update_score():
             ).where(Result.result_id == result.result_id)
             update_query.execute()
             update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
-            return jsonify({'done' : 'Initial result for this fixture created'})
+            return jsonify({'done' : 'Result created and league table updated'})
         else:
             print("existing_result (the result BEFORE getting updated via the 'Edit')")
             existing_result = dict(ID = result.result_id, home_FT = result.home_ftg, home_HT = result.home_htg,
@@ -390,7 +399,7 @@ def update_score():
             ).where(Result.result_id == existing_result['ID'])
             update_query.execute()
             amend_team_stats(existing_result)
-            return jsonify({'done' : 'Existing result updated'})
+            return jsonify({'done' : 'Result and league table updated'})
     else:
         return jsonify({'error' : UI_msg})
 
