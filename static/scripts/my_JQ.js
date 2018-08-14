@@ -1,4 +1,11 @@
 $(document).ready(function() {
+
+    // if (localStorage.getItem("switch_state") == 'on'){
+    //   $("#myonoffswitch").prop("checked", true);
+    // } else{
+    //   $("#myonoffswitch").prop("checked", false);
+    // }
+
     var current_path = location.pathname;
     console.log(current_path);
     switch (current_path) {
@@ -54,8 +61,6 @@ $(document).ready(function() {
         // remove the delete option when in edit mode
         $(this).find('.erroneous_result_delete').remove();
         $(this).closest('tr').find('td:nth-child(1)').prop('hidden',true);
-        // $('td [name=ID]').prop('hidden',true);
-        // $('td [name=ID]').remove();
       });
       // console.log(this); Note - the context of 'this' is dependent on element selected
       $(this).after('<input class="resolve_error_buttons" id="err_cancel" type="button" value="Cancel"/>');
@@ -261,17 +266,10 @@ $(document).ready(function() {
        $( "#menu" ).menu();
        $(".tool_tip").tooltip();
 
-
       $('.error').fadeIn("slow");
       $('.feedback').fadeIn("slow");
       $('.success_msg').fadeIn("slow");
       $('.warning').fadeIn("slow");
-
-      // if ($('#stats_home').length > 0) {
-      //   // $('#hmmm').css('visibility','visible');
-      //   $('#hmmm').addClass('animated fadeIn');
-      //   // console.log('#home element on this page');
-      // }
 
       $('#stats_home').bind('click',function(){
         $('#home').slideToggle();
@@ -316,12 +314,13 @@ $(document).ready(function() {
 
       $(".panel_header").click(function(){
           $(".panel_content:visible").slideUp("slow").prev().removeClass("active_header");
+          console.log($(this));
           $(this).addClass("active_header").next().slideDown("slow");
       });
 
       var state = sys_state;
       // set hints panel to either on or off when page loads:
-      // if switch 'on' premier league header is hidden
+      // if switch 'on' premier league header is hidden and hints header is displayed
       if (localStorage.getItem("switch_state") == 'on'){
         $("#myonoffswitch").prop("checked",true);
         hint = state_message(state)
@@ -331,7 +330,7 @@ $(document).ready(function() {
         $("#logo").prop("hidden",true);
         console.log('ON');
       }
-      // if switch 'off' hints header is hidden
+      // if switch 'off' hints header is hidden and premier league header is displayed
       else if (localStorage.getItem("switch_state") == 'off'){
         $("#myonoffswitch").prop("checked",false);
         $("#hints").prop("hidden",true);
@@ -346,7 +345,7 @@ $(document).ready(function() {
       }
 
       $("input[name=onoffswitch]").change(function(){
-        hint = state_message(state)
+        hint = state_message(state);
         if ($("input[name=onoffswitch]:checked").length){
           localStorage.setItem("switch_state", "on");
           $("#logo").prop("hidden",true);
@@ -419,6 +418,19 @@ function state_message(state){
       break;
   }
 }
+
+// function set_header() {
+//   if (localStorage.getItem("switch_state") == 'on') {
+//     $("#myonoffswitch").prop("checked",true);
+//     //show hints
+//     $("header").attr( "id", "hints" ).addClass("animated fadeInLeftBig").html("<section class='hint_text'><p>" + hint + "</p></section>");
+//   }
+//   else if (localStorage.getItem("switch_state") == 'off') {
+//     $("#myonoffswitch").prop("checked",false);
+//     //show logo
+//     $("header").attr( "id", "logo").html("<h1><a href='/league/'>Premier League</a></h1>");
+//   }
+// }
 
 // set focus on team name input on create team form
 if (typeof $("#teamName").val() === 'undefined'){

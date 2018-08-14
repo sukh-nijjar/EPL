@@ -6,7 +6,7 @@
 
 #wrapper{
   width:1200px;
-	overflow: hidden;
+	/* overflow: hidden; */
 }
 
 a, a:visited{
@@ -238,6 +238,171 @@ td[class='stats']{
 	margin-left: 619px;
 	margin-top: -241px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .key_facts_card{
 	box-shadow: 0 2px #000;
@@ -652,7 +817,6 @@ td[class='stats']{
 }
 
 .rating{
-	/* font-family: 'Dosis', sans-serif; */
 	font-size: 25px;
 	font-weight: bold;
 	text-align: center;
@@ -703,9 +867,9 @@ td[class='stats']{
 	list-style:disc;
 }
 
-#accordian{
-	/* outline: 1px solid purple; */
-}
+/* #accordian{
+	outline: 1px solid purple;
+} */
 
 .panel_header{
 	border-bottom: 2px solid #FFD324;
@@ -724,13 +888,12 @@ td[class='stats']{
 .panel_content{
 	margin: 0;
 	padding: 0 0 0 5px;
-	font-size: 16px;
 }
 
 .active_header{
 	background: #ef8d22;
   /*setting margin to zero prevents a jerky panel close*/
-  margin: 0;
+  /* margin: 0; erm don't think so cos with commented out still smooth*/
 }
 
 #start_demo{
@@ -754,9 +917,9 @@ td[class='stats']{
 
 /* HINTS SWITCH */
 .onoffswitch {
-    position: absolute;
-		top:625px;
-		left:350px;
+    position: relative;
+		top:498px;
+		left:-542px;
 		width: 115px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
