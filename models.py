@@ -87,7 +87,7 @@ class Team(BaseModel):
 
 class Result(BaseModel):
     result_id = PrimaryKeyField()
-    week = IntegerField(null=False, default=0)
+    week = IntegerField(null=True, default=0)
     home_team = CharField()
     away_team = CharField()
     home_htg = IntegerField(null=True)

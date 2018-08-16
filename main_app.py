@@ -1,4 +1,4 @@
-import csv, os, shutil, re
+import csv, math, os, shutil, re
 from collections import defaultdict
 from domain import TeamPosition
 from flask import Flask, Markup, render_template, request, url_for, redirect, flash, json, jsonify, g
@@ -174,11 +174,11 @@ def perform_results_upload():
             #introducing the db.atomic() command speeded up the process from 64 secs to an eyeblink!!
             with db.atomic():
                 for row in csv_reader:
-                    teams = dict(Home=row[0].lower().strip(), Away=row[1].lower().strip(),Week=row[6])
+                    teams = dict(Home=row[0].lower().strip(), Away=row[1].lower().strip())
                     try:
-                        goals = dict(FT_Home=int(row[2]),HT_Home=int(row[4]),FT_Away=int(row[3]),HT_Away=int(row[5]))
+                        goals = dict(FT_Home=int(row[2]),HT_Home=int(row[4]),FT_Away=int(row[3]),HT_Away=int(row[5]),Week=int(row[6]))
                     except ValueError:
-                        goals = dict(FT_Home=None,HT_Home=None,FT_Away=None,HT_Away=None)
+                        goals = dict(FT_Home=None,HT_Home=None,FT_Away=None,HT_Away=None,Week=None)
 
                     result = result_is_valid(teams,goals)
                     if result == True:
@@ -189,7 +189,7 @@ def perform_results_upload():
                             away_ftg = goals['FT_Away'],
                             home_htg = goals['HT_Home'],
                             away_htg = goals['HT_Away'],
-                            week = teams['Week'])
+                            week = goals['Week'])
                         #check if any of the values in the goals dict has a None value (or not)
                         if None not in goals.values():
                             # the result has a score therefore stats for each team need updating
@@ -208,7 +208,7 @@ def perform_results_upload():
                             away_ftg = goals['FT_Away'],
                             home_htg = goals['HT_Home'],
                             away_htg = goals['HT_Away'],
-                            week = teams['Week'],
+                            week = goals['Week'],
                             is_error = True)
                         each_error = []
                         for err in result['Errors']:
@@ -280,13 +280,19 @@ def create_result():
         return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams,state=state)
 
     if new_result and teams_exist and goal_totals_valid and two_different_teams:
+        #get last inserted for determing week value
+        last_inserted = Result.select(Result.result_id).order_by(Result.result_id.desc()).get()
+        print("WEEK BASED ON MATH.CEIL IS {}".format(math.ceil(last_inserted.result_id/10)))
+        week = math.ceil(last_inserted.result_id/10)
+
         Result.create(
         home_team = request.form.get('home_team'),
         away_team = request.form.get('away_team'),
         home_htg = request.form['hhtg'],
         away_htg = request.form['ahtg'],
         home_ftg = request.form['hftg'],
-        away_ftg = request.form['aftg']
+        away_ftg = request.form['aftg'],
+        week = week
         )
         update_team_stats(request.form['home_team'], request.form['away_team'], int(request.form['hftg']), int(request.form['aftg']))
         return redirect(url_for('home'))
