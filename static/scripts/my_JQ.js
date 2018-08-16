@@ -378,7 +378,7 @@ function toggle_UI_Msg(){
              location.reload(true);
            }
            else{
-             //window redirected
+             //window redirected to avoid re-posting of results upload data
              location.pathname = path;
            }
          }
@@ -402,7 +402,7 @@ function reload_required(path){
 function state_message(state){
   switch (state) {
     case 'NO DATA':
-      return 'At the start of this demo the system contains no data, feedback is displayed informing there is no team data. The first step is to add data either through the "Load data" or "New team" menu options.';
+      return 'At the start of this demo the system contains no data, feedback is displayed informing there is no team data (try the <i>League table</i> menu option to see feedback). The first step is to add data either through the "Load data" or "New team" menu options.';
       break;
     case '1 TEAM':
       return 'One team has been created, however in order to enter results there needs to be a minimum of two teams as a team cannot play itself! Use New team to add a second team.';

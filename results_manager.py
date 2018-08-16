@@ -52,8 +52,8 @@ class ResultsValidator:
         """determines if a record already exists for the
         combination of the home and away teams (could be either a result or fixture)"""
         res = Result.select().where((Result.home_team == result["Home"].lower()) &
-                                    (Result.away_team == result["Away"].lower()) &
-                                    (Result.is_error == False))
+                                    (Result.away_team == result["Away"].lower())) #&
+                                    #(Result.is_error == False))
         if res.exists():
             msg = "Duplicate result : A result for " + result["Home"].title() + " vs " + result["Away"].title() + " already exists"
             return msg,False

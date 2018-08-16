@@ -80,7 +80,7 @@ def create_team():
             return redirect(url_for('home'))
         except IntegrityError:
             error = team_name_to_validate.upper() + ' already exists. Cannot be added twice.'
-            return render_template('createTeam.html',error=error)
+            return render_template('createTeam.html',error=error,state=state)
     else:
         error = team_name_to_validate + ' contains invalid characters'
         return render_template('createTeam.html',error=error,state=state)
@@ -149,7 +149,7 @@ def perform_teams_upload():
 def perform_results_upload():
     """
     Reads in result data from csv file. Validates each result and creates a dB
-    record for valid results or writes invalid result dB record.
+    record for valid results or creates an invalid result dB record (if a data error is detected).
     """
     state = g.get('state',None)
     feedback = None
@@ -160,7 +160,6 @@ def perform_results_upload():
 
     if Team.select().count() < 1:
         feedback = "Teams must be loaded before loading results"
-        # return render_template('feedback.html', feedback=feedback,state=state)
         return render_template('upload.html', feedback=feedback,state=state)
 
     if request.form['file_selected'] == 'validFile':
@@ -191,12 +190,12 @@ def perform_results_upload():
                             home_htg = goals['HT_Home'],
                             away_htg = goals['HT_Away'],
                             week = teams['Week'])
-                        #check if any of the values in the goals dict has a None value
+                        #check if any of the values in the goals dict has a None value (or not)
                         if None not in goals.values():
                             # the result has a score therefore stats for each team need updating
                             update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
                         else:
-                            # goal values are None therefore the match status is updated to a 'fixture' (from the default of 'result')
+                            # goal values are None therefore the match status is updated to a 'fixture' (from the default status of 'result')
                             last_inserted = Result.select().order_by(Result.result_id.desc()).get()
                             update_query = Result.update(match_status = 'fixture').where(Result.result_id == last_inserted)
                             update_query.execute()
@@ -237,7 +236,7 @@ def enter_result():
     if len(team_dd) > 1:
         return render_template('enterResult.html',team_dd = team_dd,state=state)
     else:
-        return render_template("feedback.html", feedback = "There must be a minimum of 2 teams before a result can be added",state=state)
+        return render_template("enterResult.html", feedback = "There must be a minimum of 2 teams before a result can be added",state=state)
 
 @app.route('/create_result/', methods=['POST'])
 def create_result():
@@ -309,7 +308,6 @@ def delete_result():
     """Deletes a specific result submitted by input form and update each teams stats
        (matches won, drawn, lost, goals scored and conceded) to reflect data deletion"""
     result_to_delete = Result.get(Result.result_id == int(request.form['resid']))
-    print("result_to_delete ID = {}".format(result_to_delete.result_id))
     #get the teams from database whose stats will need amending due to result deletion
     home = Team.get(Team.name == result_to_delete.home_team)
     away = Team.get(Team.name == result_to_delete.away_team)
@@ -327,7 +325,7 @@ def delete_result():
         home.save()
         away.lost = Team.lost - 1
         away.save()
-    else: #must be away win
+    else: #must be away win to be deleted
         away.won = Team.won - 1
         away.save()
         home.lost = Team.lost - 1
@@ -343,38 +341,39 @@ def delete_result():
     update_away_for_against.execute()
 
     result_to_delete.delete_instance(recursive=True)
-    return jsonify({'done' : 'Result deleted'})
+    return jsonify({'done' : 'Result deleted and league table updated'})
 
 @app.route('/delete_erroneous_result/', methods=['DELETE'])
 def delete_erroneous_result():
+    """Deletes a result which has been flagged as having 1 or more errors.
+	   Both the result and associated error(s) are deleted from the database"""
     erroneous_result_to_delete = Result.get(Result.result_id == int(request.form['resid']))
     erroneous_result_to_delete.delete_instance(recursive=True)
     return jsonify({'done' : 'Erroneous Result deleted', 'path' : '/upload_errors/'})
 
 @app.route('/update_score/', methods=['PUT'])
 def update_score():
+    """Updates a result record, team stats (matches won, drawn, lost, goals scored and conceded)
+       and the league table when a result/fixture is edited"""
     results_validator = ResultsValidator()
-    teams = dict(Home=request.form['home_team'],Away=request.form['away_team'])
+    teams = dict(Home=request.form['home_team'].lower(),Away=request.form['away_team'].lower())
     try:
         goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
                      FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
     except ValueError:
         return jsonify({'error' : 'Goal value cannot be blank'})
-    #i need to refactor out the below var = request form []...stick with the dicts now!
-    home_team = request.form['home_team']
-    away_team = request.form['away_team']
-    home_htg = request.form['hhtg']
-    away_htg = request.form['ahtg']
-    home_ftg = request.form['hftg']
-    away_ftg = request.form['aftg']
 
-    #the next line holds the result before any requested update is applied to it:
-    result = Result.get((Result.home_team == home_team.lower()) & (Result.away_team == away_team.lower()))
+    home_team = teams['Home']
+    away_team = teams['Away']
+    home_htg = goals['HT_Home']
+    away_htg = goals['HT_Away']
+    home_ftg = goals['FT_Home']
+    away_ftg = goals['FT_Away']
+    #the next line gets the result before any requested update is applied to it:
+    result = Result.get((Result.home_team == teams['Home'].lower()) & (Result.away_team == teams['Away'].lower()))
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
     if goal_totals_valid:
-        # if result.home_ftg == None and result.home_htg == None and result.away_ftg == None and result.away_htg == None:
-        if result.match_status == 'fixture':
-            print("This is the initial result for this fixture")
+        if result.match_status == 'fixture': #this is the initial result for this fixture
             update_query = Result.update(
             home_htg = home_htg,
             away_htg = away_htg,
@@ -383,10 +382,9 @@ def update_score():
             match_status = 'result'
             ).where(Result.result_id == result.result_id)
             update_query.execute()
-            update_team_stats(request.form['home_team'].lower(), request.form['away_team'].lower(), int(request.form['hftg']), int(request.form['aftg']))
-            return jsonify({'done' : 'Result created and league table updated'})
-        else:
-            print("existing_result (the result BEFORE getting updated via the 'Edit')")
+            update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
+            return jsonify({'done' : 'Result created, team stats and league table updated'})
+        else: #record is an existing result - get the result BEFORE 'Edit' is applied
             existing_result = dict(ID = result.result_id, home_FT = result.home_ftg, home_HT = result.home_htg,
                                    away_HT = result.away_htg, away_FT = result.away_ftg, outcome=result.result_type())
 
@@ -399,20 +397,21 @@ def update_score():
             ).where(Result.result_id == existing_result['ID'])
             update_query.execute()
             amend_team_stats(existing_result)
-            return jsonify({'done' : 'Result and league table updated'})
+            return jsonify({'done' : 'Result, team stats and league table updated'})
     else:
         return jsonify({'error' : UI_msg})
 
 @app.route('/verify_resolved_results/', methods=['PUT'])
 def verify():
+    """Re-validates results data which has been re-submitted after errors have been corrected (or not as the case may be)"""
     UI_msg = None
-    teams = dict(Home=request.form['home_team'].lower().strip(),Away=request.form['away_team'].lower().strip())
-    # try:
-    goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
-                 FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
-    # except ValueError:
-    #     goals = dict(FT_Home='',HT_Home='',FT_Away='',HT_Away='')
     result_to_verify = Result.get(Result.result_id == int(request.form['resid']))
+    teams = dict(Home=request.form['home_team'].lower().strip(),Away=request.form['away_team'].lower().strip())
+    try:
+        goals = dict(FT_Home=int(request.form.get('hftg')),HT_Home=int(request.form.get('hhtg')),
+                     FT_Away=int(request.form.get('aftg')),HT_Away=int(request.form.get('ahtg')))
+    except ValueError: #if any unexpected values submitted for goal data use existing goal values from database record
+        goals = dict(FT_Home=result_to_verify.home_ftg, HT_Home=result_to_verify.home_htg, FT_Away=result_to_verify.away_ftg, HT_Away=result_to_verify.away_htg)
 
     update_query = Result.update(
     home_team = teams['Home'],
@@ -423,18 +422,21 @@ def verify():
     away_htg = goals['HT_Away']
     ).where(Result.result_id == result_to_verify.result_id)
     update_query.execute()
-
+    #check if a valid error free 'duplicate' result exists for these 2 teams - it's possible to enter team names
+    #whilst resolving errors that clash with a previously created/uploaded result
     result_count = Result.select().where((Result.home_team == teams["Home"]) & (Result.away_team == teams["Away"])).count()
     result = result_is_valid(teams,goals,ignore_result_is_new=True)
-
+    print("RC", result_count)
     if result == True and result_count == 1:
+        print("result == True and result_count == 1")
         update_query = Result.update(is_error = False).where(Result.result_id == result_to_verify.result_id)
         update_query.execute()
         update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
-        #delete errors for result as no longer relevant
+        #delete errors for result as errors have been verified as cleared and are no longer relevant
         delete_query = Error.delete().where(Result.result_id == result_to_verify.result_id)
         delete_query.execute()
     elif result_count > 1:
+        print("elif result_count > 1")
         #a result record for the same home and away team combination already exists
         #so the duplicate result check is valid
         result = result_is_valid(teams,goals)
@@ -481,7 +483,8 @@ def drill_down(team):
     state = g.get('state',None)
     team=Team.get(Team.name == team)
     print("{} team id is {}, wins = {}".format(team.name, team.team_id, team.won))
-    results=Result.select().where((Result.away_team == team.name) | (Result.home_team == team.name))
+    results=Result.select().where(((Result.away_team == team.name) | (Result.home_team == team.name))
+                                  & ((Result.is_error == False) & (Result.match_status == 'result')))
     if results:
         # object_list method creates a PaginatedQuery object calls get_object_list
         return object_list('teamDetails.html',results,paginate_by=9,team=team,state=state)
@@ -555,10 +558,10 @@ def GetCharts():
             return render_template('feedback.html', feedback = feedback, state=state)
 
 @app.route('/statiscal_analysis/<team>', methods=['GET'])
-# i should refactor this so only the team is processed by create_weekly_position_table
-# actually after investigating all teams have to be processed as weekly positional data
+# I should refactor this so only the team is processed by create_weekly_position_table...
+# Actually after investigating all teams have to be processed as weekly positional data
 # is in relation to all the other teams positions...otherwise the stats for a single team
-# would have the team is position 1 all the time (nothing to sort against)
+# would have the team is position 1 all the time (nothing to sort into order against)
 def stats_drill_down(team):
     state = g.get('state',None)
     team_stats=Team.get(Team.name == team)
@@ -745,39 +748,39 @@ def result_is_valid(teams,goals,**kwargs):
     UI_msg, goal_types_valid = results_validator.validate_goal_types(goals)
     if not goal_types_valid:
         res['Errors'].append(UI_msg)
-    # print("Outcome = {}".format(goal_types_valid))
+    # print("1 - Outcome = {}".format(goal_types_valid))
     # print("{} : message = {}. Outcome = {}".format(res, UI_msg, goal_types_valid))
     UI_msg, goal_values_valid = results_validator.validate_goal_values(goals)
     if not goal_values_valid:
         res['Errors'].append(UI_msg)
-    # print("Outcome = {}".format(goal_values_valid))
+    # print("2 - Outcome = {}".format(goal_values_valid))
 
     UI_msg, team_names_provided = results_validator.validate_team_names_present(teams)
     if not team_names_provided:
         res['Errors'].append(UI_msg)
-    # print("Outcome = {}".format(team_names_provided))
+    # print("3 - Outcome = {}".format(team_names_provided))
 
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
     if not teams_exist:
         res['Errors'].append(UI_msg)
-    # print("Outcome = {}".format(teams_exist))
+    # print("4 - Outcome = {}".format(teams_exist))
 
     UI_msg, different_teams = results_validator.validate_home_and_away_teams_different(teams)
     if not different_teams:
         res['Errors'].append(UI_msg)
-    # print("Outcome = {}".format(different_teams))
+    # print("5 - Outcome = {}".format(different_teams))
 
     #this validation needs to skipped when result is being re-validated after upload
     if 'ignore_result_is_new' in kwargs:
         UI_msg = None
         new_result = True
-        # print("Ignored so Outcome = {}".format(new_result))
+        # print("6 - Ignored so Outcome = {}".format(new_result))
     else:
         UI_msg, new_result = results_validator.result_is_new(teams)
 
     if not new_result:
         res['Errors'].append(UI_msg)
-    # print("Outcome = {}".format(new_result))
+    # print("7 - Outcome = {}".format(new_result))
 
     if goal_types_valid and goal_values_valid and team_names_provided and teams_exist and different_teams and new_result:
         # print("Valid result - {}".format(res))

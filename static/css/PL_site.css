@@ -201,12 +201,15 @@ td[class='stats']{
 
 #enter_result_form{
 	margin-top: 20px;
+	margin-left: -40px;
+	/* outline: 1px solid blue; */
 }
 
 #create_result_form{
 	position: relative;
 	top: 40px;
 	left: 80px;
+	/* outline: 2px solid purple; */
 }
 
 #submitSaveResult{
@@ -762,7 +765,7 @@ td[class='stats']{
 }
 
 .teamDropDowns{
-	padding: 0px 0px 25px 60px;
+	padding: 35px 0px 25px 60px;
 }
 
 .team_filter a:hover{
