@@ -38,7 +38,6 @@ def landing_page():
 def home():
     """ display the league table showing teams ordered by points in descending order
     """
-    display_results_in_DB()
     state = g.get('state',None)
     feedback = None
     teams = Team.select()
@@ -150,6 +149,8 @@ def perform_results_upload():
     """
     Reads in result data from csv file. Validates each result and creates a dB
     record for valid results or creates an invalid result dB record (if a data error is detected).
+    If the csv contains missing values or invalid characters for goals and/or week data the row is
+    stored as a fixture which means it can be edited from the UI
     """
     state = g.get('state',None)
     feedback = None
@@ -177,7 +178,7 @@ def perform_results_upload():
                     teams = dict(Home=row[0].lower().strip(), Away=row[1].lower().strip())
                     try:
                         goals = dict(FT_Home=int(row[2]),HT_Home=int(row[4]),FT_Away=int(row[3]),HT_Away=int(row[5]),Week=int(row[6]))
-                    except ValueError:
+                    except (ValueError,IndexError) as err:
                         goals = dict(FT_Home=None,HT_Home=None,FT_Away=None,HT_Away=None,Week=None)
 
                     result = result_is_valid(teams,goals)
@@ -195,7 +196,7 @@ def perform_results_upload():
                             # the result has a score therefore stats for each team need updating
                             update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
                         else:
-                            # goal values are None therefore the match status is updated to a 'fixture' (from the default status of 'result')
+                            # goal and/or week values are None therefore the match status is updated to a 'fixture' (from the default status of 'result')
                             last_inserted = Result.select().order_by(Result.result_id.desc()).get()
                             update_query = Result.update(match_status = 'fixture').where(Result.result_id == last_inserted)
                             update_query.execute()
@@ -280,10 +281,9 @@ def create_result():
         return render_template('enterResult.html', error = UI_msg, team_dd = team_dd,teams=teams,state=state)
 
     if new_result and teams_exist and goal_totals_valid and two_different_teams:
-        #get last inserted for determing week value
+        #get last inserted for determining week value
         last_inserted = Result.select(Result.result_id).order_by(Result.result_id.desc()).get()
-        print("WEEK BASED ON MATH.CEIL IS {}".format(math.ceil(last_inserted.result_id/10)))
-        week = math.ceil(last_inserted.result_id/10)
+        week = set_week(last_inserted)
 
         Result.create(
         home_team = request.form.get('home_team'),
@@ -361,6 +361,7 @@ def delete_erroneous_result():
 def update_score():
     """Updates a result record, team stats (matches won, drawn, lost, goals scored and conceded)
        and the league table when a result/fixture is edited"""
+    print("CALLING /UPDATE_SCORE/")
     results_validator = ResultsValidator()
     teams = dict(Home=request.form['home_team'].lower(),Away=request.form['away_team'].lower())
     try:
@@ -380,12 +381,14 @@ def update_score():
     UI_msg, goal_totals_valid = results_validator.validate_goal_values(goals)
     if goal_totals_valid:
         if result.match_status == 'fixture': #this is the initial result for this fixture
+            week = set_week(result)
             update_query = Result.update(
             home_htg = home_htg,
             away_htg = away_htg,
             home_ftg = home_ftg,
             away_ftg = away_ftg,
-            match_status = 'result'
+            match_status = 'result',
+            week = week
             ).where(Result.result_id == result.result_id)
             update_query.execute()
             update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
@@ -419,13 +422,15 @@ def verify():
     except ValueError: #if any unexpected values submitted for goal data use existing goal values from database record
         goals = dict(FT_Home=result_to_verify.home_ftg, HT_Home=result_to_verify.home_htg, FT_Away=result_to_verify.away_ftg, HT_Away=result_to_verify.away_htg)
 
+    week = set_week(result_to_verify)
     update_query = Result.update(
     home_team = teams['Home'],
     away_team = teams['Away'],
     home_ftg = goals['FT_Home'],
     away_ftg = goals['FT_Away'],
     home_htg = goals['HT_Home'],
-    away_htg = goals['HT_Away']
+    away_htg = goals['HT_Away'],
+    week = week
     ).where(Result.result_id == result_to_verify.result_id)
     update_query.execute()
     #check if a valid error free 'duplicate' result exists for these 2 teams - it's possible to enter team names
@@ -974,38 +979,9 @@ def get_system_state():
     else:
         return "TEAM DATA EXISTS"
 
-#debug helpers
-def display_all_error_in_DB():
-    errors = Error.select()
-    print("-----------Error Count = {}".format(errors.count()) + "-------------------------")
-    for e in errors:
-      print("Errors_ID : {}, Result_ID : {}, Desc : {}".format(e.error_id,e.result_id,e.description))
-      print("---------------------------------------------------------------")
-
-def display_all_team_in_DB():
-    teams = Team.select()
-    for t in teams:
-      print("---------------------------------------------------------------")
-      print("Team_ID : {}, Team : {}".format(t.team_id,t.name))
-      print("---------------------------------------------------------------")
-
-def display_results_and_errors_in_DB(r_id):
-    print("**param in = {}".format(r_id))
-    result = Error.select().join(Result).where(Result.result_id == r_id)
-    for error in result:
-        print("result_id {} and errors : {}".format(error.result_id,error.description))
-
-def display_fixtures_in_DB():
-    fixtures = Result.select().where(Result.match_status == 'fixture')
-    for f in fixtures:
-        print("{}, {}, {}".format(f.home_team, f.away_team, f.match_status))
-
-def display_results_in_DB():
-    res = Result.select().where(Result.match_status == 'result')
-    for f in res:
-        print("{}, {}, {}, {}".format(f.week,f.home_team, f.away_team, f.match_status))
-
-#end debug helpers
+def set_week(result):
+    print("method set_week returns {}".format(math.ceil(result.result_id/10)))
+    return math.ceil(result.result_id/10)
 
 if __name__ == '__main__':
     app.secret_key ='sum fink' #THIS SHOULD BE IN CONFIG - SECRET_KEY = 'string'
