@@ -1,11 +1,5 @@
 $(document).ready(function() {
 
-    // if (localStorage.getItem("switch_state") == 'on'){
-    //   $("#myonoffswitch").prop("checked", true);
-    // } else{
-    //   $("#myonoffswitch").prop("checked", false);
-    // }
-
     var current_path = location.pathname;
     console.log(current_path);
     switch (current_path) {
@@ -133,17 +127,17 @@ $(document).ready(function() {
     $('#submitDeleteAllTeams').on('click', function(e) {
            e.preventDefault();
            $("#dialog-confirm").dialog({
-             title: "Delete all teams? (this also deletes results)",
+             title: "Delete teams? (this also deletes results)",
              resizable: false,
              //autoOpen: false,
              height: "auto",
              width: 400,
              modal: true,
              buttons: {
-               "No, do not delete all teams": function() {
+               "No, do not delete teams": function() {
                  $( this ).dialog( "close" );
                },
-               "Yes, delete all teams (and results)": function() {
+               "Yes, delete teams (and results)": function() {
                  $("#deleteAllTeams").submit();
                }
              } //end buttons

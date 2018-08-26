@@ -38,9 +38,9 @@ input:checked + a > label{
 
 input[type="submit"]{
 	background: #fff;
-	border: 2px solid #d9d6d3;
+	border: 2px solid #BEBEBE;
 	border-radius: 4px;
-	color: #d9d6d3;
+	color: #BEBEBE;
 	font-size: 20px;
 	padding: 10px;
 }
@@ -169,7 +169,6 @@ nav li:hover{
 	-o-transition: all 0.75s ease;
 	transition: all 0.75s ease;
 	color: #000;
-	/* text-shadow: 1px 1px; */
 	text-shadow: 0 0 3px #FF0000;
 }
 
@@ -181,11 +180,9 @@ nav li:hover{
 section{
   width: 900px;
 	float: left;
-	/*margin-top: 15px;*/
 	padding-left: 15px;
 	font-family: 'Baloo', cursive;
 	font-size: 18px;
-	/* outline: 1px solid purple; */
 }
 
 td[class='stats']{
@@ -196,20 +193,17 @@ td[class='stats']{
 #create_team_form{
 	margin-left: 62px;
 	margin-top: 20px;
-	/*outline: 2px solid purple;*/
 }
 
 #enter_result_form{
 	margin-top: 20px;
 	margin-left: -40px;
-	/* outline: 1px solid blue; */
 }
 
 #create_result_form{
 	position: relative;
 	top: 40px;
 	left: 80px;
-	/* outline: 2px solid purple; */
 }
 
 #submitSaveResult{
@@ -241,171 +235,6 @@ td[class='stats']{
 	margin-left: 619px;
 	margin-top: -241px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .key_facts_card{
 	box-shadow: 0 2px #000;
@@ -513,7 +342,6 @@ td[class='stats']{
 
 #team_details_Headline{
 	text-align: center;
-	/* outline: 2px solid green; */
 }
 
 #team_details_name{
@@ -527,7 +355,6 @@ td[class='stats']{
 }
 
 #team_results{
-	/* outline: 1px solid pink; */
 	margin-top: 20px;
 	position: relative;
 	left: 60px;
@@ -554,9 +381,9 @@ td[class='stats']{
 
 .button_upload{
 	background: #ffffff;
-	border: 2px solid #D9D6D3;
+	border: 2px solid #BEBEBE;
 	border-radius: 12px;
-	color: #D9D6D3;
+	color: #BEBEBE;
 	font-family: 'Baloo', cursive;
 	font-size: 40px;
 	left: 200px;
@@ -583,9 +410,9 @@ td[class='stats']{
 
 #compare_button{
 	background: #fff;
-	border: 1px solid #D9D6D3;
+	border: 1px solid #BEBEBE;
 	border-radius: 4px;
-	color: #d9d6d3;
+	color: #BEBEBE;
 	font-family: 'Baloo', cursive;
 	position: relative;
   top: 72px;
@@ -676,10 +503,9 @@ td[class='stats']{
 /* END message panels */
 
 #upload_results_button:disabled:hover{
-	border: 2px solid #d9d6d3;
-	color: #D9D6D3;
+	border: 2px solid #BEBEBE;
+	color: #BEBEBE;
 	box-shadow: none;
-
 }
 
 .fixture{
@@ -688,7 +514,6 @@ td[class='stats']{
 
 #results_list{
 	margin-top: 50px;
-
 }
 
 #results_grid{
@@ -714,7 +539,7 @@ td[class='stats']{
 }
 
 .erroneous_result_delete{
-	border: 2px solid #D9D6D3;
+	border: 2px solid #BEBEBE;
 	border-radius: 12px;
 	padding: 5px;
 }
@@ -734,9 +559,9 @@ td[class='stats']{
 
 .resolve_error_buttons{
 	background: #ffffff;
-	border: 2px solid #D9D6D3;
+	border: 2px solid #BEBEBE;
 	border-radius: 12px;
-	color: #D9D6D3;
+	color: #BEBEBE;
 	font-family: 'Baloo', cursive;
 	font-size: 19px;
 	left: 70px;
@@ -830,28 +655,22 @@ td[class='stats']{
 }
 
 .stats_banner{
-	/* outline: 1px solid pink; */
 	cursor: pointer;
 	letter-spacing: 0.1em;
 	padding-left: 10px;
 }
 
 #stats_overall{
-	/* background: #c1e4f7; */
 	background: rgb(193,228,247);
 	background: linear-gradient(90deg, rgba(193,228,247,1) 28%, rgba(153,213,202,1) 77%);
 }
 
 #stats_home{
-	/* background-color: #83bbe5; */
 	background: rgb(131,187,229);
 	background: linear-gradient(90deg, rgba(131,187,229,1) 28%, rgba(90,186,167,1) 77%);
-
-
 }
 
 #stats_away{
-	/* background-color: #0c7cba; */
 	background: rgb(25,150,125);
 	background: linear-gradient(90deg, rgba(25,150,125,1) 28%, rgba(12,124,186,1) 77%);
 }
@@ -870,10 +689,6 @@ td[class='stats']{
 	list-style:disc;
 }
 
-/* #accordian{
-	outline: 1px solid purple;
-} */
-
 .panel_header{
 	border-bottom: 2px solid #FFD324;
   cursor: pointer;
@@ -881,7 +696,6 @@ td[class='stats']{
   letter-spacing: 0.1em;
   margin: 0;
 	padding-left: 5px;
-	/* outline: 1px solid green; */
 }
 
 .panel_header:hover{
@@ -906,7 +720,6 @@ td[class='stats']{
 }
 
 .hint_text{
-	/* letter-spacing: 0.1em; */
 	margin-top: 20px;
 	margin-left: 154px;
 	color: blue;

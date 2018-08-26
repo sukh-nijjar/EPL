@@ -282,8 +282,11 @@ def create_result():
 
     if new_result and teams_exist and goal_totals_valid and two_different_teams:
         #get last inserted for determining week value
-        last_inserted = Result.select(Result.result_id).order_by(Result.result_id.desc()).get()
-        week = set_week(last_inserted)
+        result_count = Result.select().count()
+        if result_count > 0:
+            last_inserted = Result.select(Result.result_id).order_by(Result.result_id.desc()).get()
+
+        week = set_week(last_inserted) if result_count > 0 else 1
 
         Result.create(
         home_team = request.form.get('home_team'),
@@ -361,7 +364,6 @@ def delete_erroneous_result():
 def update_score():
     """Updates a result record, team stats (matches won, drawn, lost, goals scored and conceded)
        and the league table when a result/fixture is edited"""
-    print("CALLING /UPDATE_SCORE/")
     results_validator = ResultsValidator()
     teams = dict(Home=request.form['home_team'].lower(),Away=request.form['away_team'].lower())
     try:
@@ -437,9 +439,7 @@ def verify():
     #whilst resolving errors that clash with a previously created/uploaded result
     result_count = Result.select().where((Result.home_team == teams["Home"]) & (Result.away_team == teams["Away"])).count()
     result = result_is_valid(teams,goals,ignore_result_is_new=True)
-    print("RC", result_count)
     if result == True and result_count == 1:
-        print("result == True and result_count == 1")
         update_query = Result.update(is_error = False).where(Result.result_id == result_to_verify.result_id)
         update_query.execute()
         update_team_stats(teams['Home'],teams['Away'],goals['FT_Home'],goals['FT_Away'])
@@ -447,7 +447,6 @@ def verify():
         delete_query = Error.delete().where(Result.result_id == result_to_verify.result_id)
         delete_query.execute()
     elif result_count > 1:
-        print("elif result_count > 1")
         #a result record for the same home and away team combination already exists
         #so the duplicate result check is valid
         result = result_is_valid(teams,goals)
@@ -493,7 +492,6 @@ def delete_all_teams():
 def drill_down(team):
     state = g.get('state',None)
     team=Team.get(Team.name == team)
-    print("{} team id is {}, wins = {}".format(team.name, team.team_id, team.won))
     results=Result.select().where(((Result.away_team == team.name) | (Result.home_team == team.name))
                                   & ((Result.is_error == False) & (Result.match_status == 'result')))
     if results:
@@ -501,16 +499,6 @@ def drill_down(team):
         return object_list('teamDetails.html',results,paginate_by=9,team=team,state=state)
     else:
         return render_template("feedback.html", feedback = "There are no results to view for " + team.name.title(),state=state)
-
-# @app.route('/get_chart_data', methods=['GET'])
-# def ReturnChartData():
-#     team_arg = request.args.get('team')
-#     print("{}".format(request.args.get('team')))
-#     # print("Called 'ReturnChartData', team = {}".format(team))
-#     print("Called 'ReturnChartData'")
-#     team=Team.get(Team.name == team_arg.lower())
-#     print("{} team id is {}".format(team.name, team.team_id))
-#     return jsonify({'won' : team.won,'drawn' : team.drawn, 'lost'  : team.lost})
 
 @app.route('/charts/', methods=['GET'])
 def GetCharts():
@@ -542,11 +530,9 @@ def GetCharts():
 
         if len(teams_filter):
             for team in team_positions:
-                # print("TEAM {}".format(team))
                 if team.team in teams_filter:
                     t = dict(TeamName=team.team,Positions=team.position)
                     team_positions_dict[team.team] = t
-            # print("team_positions_filtered dict = {}".format(team_positions_dict))
             return render_template('charts_home.html',team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad,state=state)
         else:
             for team in team_positions:
@@ -577,11 +563,7 @@ def stats_drill_down(team):
     state = g.get('state',None)
     team_stats=Team.get(Team.name == team)
     home_form_dict = get_stats_home_form(team_stats)
-    # for k,v in home_form_dict.items():
-    #     print("home_form_dict = {} = {}".format(k,v))
     away_form_dict = get_stats_away_form(team_stats)
-    # for k,v in away_form_dict.items():
-    #     print("away_form_dict = {} = {}".format(k,v))
     min_week = Result.select(fn.MIN(Result.week))
     max_week = Result.select(fn.MAX(Result.week))
     # get all valid results
@@ -591,7 +573,6 @@ def stats_drill_down(team):
     # get a list of weekly positions from the object's postion property
     # note there is only one object in the list
     positions = position_history[0].position
-    # print("{}".format(position_history[0].team))
     average_pos = mean(positions)
 
     weeks = range(1,39)
@@ -601,7 +582,6 @@ def stats_drill_down(team):
                      Played=team_stats.games_played(),Average=average_pos)
     # week_start = request.args.get('week_select_start')
     # week_end = request.args.get('week_select_end')
-    # print("{},{}".format(week_start,week_end))
     return render_template('stats_breakdown.html',team_data=team_dict,weeks=weeks,chartToLoad=chartToLoad,
                             history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict,state=state)
 
@@ -654,7 +634,6 @@ def display_comparison(data):
     comparison_chart_data['T2_Won'] = team2['Won']
     comparison_chart_data['T2_Drawn'] = team2['Drawn']
     comparison_chart_data['T2_Lost'] = team2['Lost']
-    # print(comparison_chart_data)
     # get the actual results between the 2 teams
     results=Result.select().where(((Result.home_team == teams[0]) | (Result.away_team == teams[0]))
                                    & ((Result.home_team == teams[1]) | (Result.away_team == teams[1])))
@@ -745,11 +724,8 @@ def create_weekly_position_table(results):
         in_goals_scored_order = sorted(positions[1:], key=attrgetter('scored'))
         in_GD_order = sorted(in_goals_scored_order, key=methodcaller('goal_difference'), reverse=True)
         in_points_order = sorted(in_GD_order, key=attrgetter('points'),reverse=True)
-        # print("Length of in_points_order is {}".format(len(in_points_order)))
         for pos in in_points_order:
-            # print("pos equals {}".format(pos))
             i = in_points_order.index(pos)
-            # print("i equals {}".format(i))
             pos.position.append(i+1)
     return in_points_order
 
@@ -759,17 +735,13 @@ def result_is_valid(teams,goals,**kwargs):
     UI_msg, goal_types_valid = results_validator.validate_goal_types(goals)
     if not goal_types_valid:
         res['Errors'].append(UI_msg)
-    # print("1 - Outcome = {}".format(goal_types_valid))
-    # print("{} : message = {}. Outcome = {}".format(res, UI_msg, goal_types_valid))
     UI_msg, goal_values_valid = results_validator.validate_goal_values(goals)
     if not goal_values_valid:
         res['Errors'].append(UI_msg)
-    # print("2 - Outcome = {}".format(goal_values_valid))
 
     UI_msg, team_names_provided = results_validator.validate_team_names_present(teams)
     if not team_names_provided:
         res['Errors'].append(UI_msg)
-    # print("3 - Outcome = {}".format(team_names_provided))
 
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
     if not teams_exist:
@@ -848,11 +820,9 @@ def update_team_stats(home_team, away_team, goals_scored_by_home_team, goals_sco
 def amend_team_stats(previous_result):
     """After a result has been updated this method amends EXISTING stats (matches
     won, drawn, lost, goals scored and conceded)for each team in the match."""
-    print ("previous result = {} ".format(previous_result))
     current_result = Result.get(Result.result_id == previous_result['ID'])
     home_team = Team.get(Team.name == current_result.home_team)
     away_team = Team.get(Team.name == current_result.away_team)
-    print("DB result type = {}".format(current_result.result_type()))
 
     if current_result.result_has_been_updated:
         scored_change = current_result.home_ftg - previous_result['home_FT']
@@ -920,11 +890,9 @@ def amend_team_stats(previous_result):
             update_query.execute()
 
 def get_stats_home_form(team):
-    print("get_stats_HOME_form")
     wins = draws = losses = gs = gc = 0
     results=Result.select().where((Result.home_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
-        # print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
             wins += 1
         elif r.result_type() == 'away win':
@@ -939,16 +907,13 @@ def get_stats_home_form(team):
         rating = team.rating(points,played)
     else:
         rating = "Rating not available - no games played"
-    print("home rating from method call {}".format(rating))
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 
 def get_stats_away_form(team):
-    print("get_stats_AWAY_form")
     wins = draws = losses = gs = gc = 0
     results=Result.select().where((Result.away_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
-        # print("{}, {} : {}, {} = {}".format(r.home_team,r.home_ftg,r.away_ftg,r.away_team,r.result_type()))
         if r.result_type() == 'home win':
             losses += 1
         elif r.result_type() == 'away win':
@@ -963,11 +928,9 @@ def get_stats_away_form(team):
         rating = team.rating(points,played)
     else:
         rating = "Rating not available - no games played"
-    print("away rating from method call {}".format(rating))
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 def get_system_state():
-    # remember to add in clause for result errors
     if Team.select().count() == 0 and Result.select().count() == 0:
         return "NO DATA"
     elif Team.select().count() < 2 and Result.select().count() == 0:
@@ -980,7 +943,6 @@ def get_system_state():
         return "TEAM DATA EXISTS"
 
 def set_week(result):
-    print("method set_week returns {}".format(math.ceil(result.result_id/10)))
     return math.ceil(result.result_id/10)
 
 if __name__ == '__main__':

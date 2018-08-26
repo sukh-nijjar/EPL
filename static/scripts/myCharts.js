@@ -121,6 +121,10 @@ $(document).ready(function() {
         orientation: 'vertical',
         colors:['red', 'orange', 'green'],
         legend: { position: 'top', alignment:'center' },
+        hAxis: {
+          maxValue:38,
+          ticks: [0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38]
+        },
       };
       var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
       chart.draw(data, google.charts.Bar.convertOptions(histogram_options));
