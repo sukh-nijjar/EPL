@@ -6,7 +6,7 @@ $(document).ready(function() {
   google.charts.load('current', {'packages':['line']});
 
   var chart = chart_to_load;
-  var team_data = JSON.parse(teams); //note this kills the order of the dict!!
+  var team_data = JSON.parse(teams); //note this kills the order of the dict!!!
 
   //when charts_home.html loads home_stats
   //and away_stats will not be defined however

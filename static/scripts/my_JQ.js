@@ -149,7 +149,7 @@ $(document).ready(function() {
       var action_type = $this.find('a').text();
       if (action_type === 'Edit'){
           if ($(this).closest('tr').hasClass('fixture')){
-            // alert("Fixture class row");
+            // alert("Fixture class row!");
             $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
             $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
             $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');

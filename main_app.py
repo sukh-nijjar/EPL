@@ -946,6 +946,6 @@ def set_week(result):
     return math.ceil(result.result_id/10)
 
 if __name__ == '__main__':
-    app.secret_key ='sum fink' #THIS SHOULD BE IN CONFIG - SECRET_KEY = 'string'
+    app.secret_key ='sum fink' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
     app.send_file_max_age_default = 0
     app.run(debug=True)
