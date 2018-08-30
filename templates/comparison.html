@@ -7,7 +7,6 @@
 {% endblock %}
 {%block content%}
   <section id="team1" class="key_facts_card">
-    <!-- <p class="team_stat">{{team1['Team'].title()}}</p> -->
     <p class="card_title">{{team1['Team'].title()}}</p>
     <p class="team_stat">RATING = {{team1['Rating']}}</p>
     <p class="team_stat">POINTS = {{team1['Points']}}</p>
@@ -41,12 +40,6 @@
 
   <section id="head_to_head" class="key_facts_card">
     <h2 class="card_title">Head to head results</h2>
-    <!-- {% for result in results %}
-    <p>{{result.home_team.title()}}</p>
-    <p>{{result.home_ftg}}</p>
-    <p>{{result.away_ftg}}</p>
-    <p>{{result.away_team.title()}}</p>
-    {% endfor %} -->
     <table>
       {% for result in results %}
         <tr>

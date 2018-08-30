@@ -1,7 +1,6 @@
 from peewee import *
 
 db = SqliteDatabase("EPL.db", pragmas=(('foreign_keys', 'on'),))
-# db = SqliteDatabase("EPL.db")
 
 # model definitions -- the standard "pattern" is to define a base model class
 # that specifies which database to use.  then, any subclasses will automatically
@@ -40,8 +39,6 @@ class Team(BaseModel):
     def rating(self,*args):
         # pass in optional params for points and games played
         # from get_stats_home_form/away_form function
-        for a in args:
-            print(a)
         if args:
             points_per_game = args[0] / args[1]
         else:
@@ -54,19 +51,14 @@ class Team(BaseModel):
             return 'No rating available'
         elif points_per_game < 1:
             return 'Terrible'
-            # print("Terrible {}".format(points_per_game))
         elif 1 <= points_per_game < 1.2:
             return 'Bad'
-            # print("Bad {}".format(points_per_game))
         elif 1.2 <= points_per_game < 1.6:
             return 'Okay'
-            # print("Okay {}".format(points_per_game))
         elif 1.6 <= points_per_game < 1.9:
             return 'Good'
-            # print("Good {}".format(points_per_game))
         elif 1.9 <= points_per_game < 2.3:
             return 'Very Good'
-            # print("Very Good {}".format(points_per_game))
         elif points_per_game >= 2.3:
             return 'Excellent'
 

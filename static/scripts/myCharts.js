@@ -25,7 +25,7 @@ $(document).ready(function() {
     away_form = JSON.parse(away_stats);
   }
 
-  //decide which chart to invoke
+  //determine which chart to invoke
   switch(chart){
     case 'barChartGames':
       google.charts.setOnLoadCallback(drawChartWDL);
@@ -177,8 +177,6 @@ $(document).ready(function() {
       // console.log(item.TeamName,i);
       // console.log(item.Positions,i);
       weeks = item.Positions.length;
-      // console.log("============================");
-      // header_row.push(item.TeamName);
     });
 
     //Create the data table.
@@ -304,7 +302,6 @@ $(document).ready(function() {
 
         var chart_away_form = new google.visualization.PieChart(document.getElementById('WDL_chart_away'));
         var chart_away_goals = new google.visualization.PieChart(document.getElementById('goals_chart_away'));
-        // google.visualization.events.addListener(chart_away_form, 'ready', readyHandler)
         chart_away_form.draw(away_data, options_1);
         chart_away_goals.draw(away_goals_data,options_2);
 

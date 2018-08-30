@@ -16,38 +16,34 @@
             <th scope="col">Away</th>
           </tr>
           {% for result in object_list %}
-          {% if result.home_ftg == None or result.home_htg == None or result.away_ftg == None or result.away_htg == None %}
-            <tr class="fixture">
+            {% if result.match_status == 'fixture' %}
+              <tr class="fixture">
+                <td hidden name="ID">{{result.result_id}}</td>
+                <td name="home_team">{{result.home_team.title()}}</td>
+                <td><input type="number" min="0" value="0" name="hftg" disabled/></td>
+                <td><input type="number" min="0" value="0" name="hhtg" disabled/></td>
+                <td><input type="number" min="0" value="0" name="ahtg" disabled/></td>
+                <td><input type="number" min="0" value="0" name="aftg" disabled/></td>
+                <td name="away_team">{{result.away_team.title()}}</td>
+                <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
+              </tr>
+            {% else %}
+            <tr class="result">
               <td hidden name="ID">{{result.result_id}}</td>
-              <td name="home_team">{{result.home_team.title()}}</td>
-              <td><input type="number" min="0" value="0" name="hftg" disabled/></td>
-              <td><input type="number" min="0" value="0" name="hhtg" disabled/></td>
-              <td><input type="number" min="0" value="0" name="ahtg" disabled/></td>
-              <td><input type="number" min="0" value="0" name="aftg" disabled/></td>
-              <td name="away_team">{{result.away_team.title()}}</td>
+              <td name="home_team" class="team">{{result.home_team.title()}}</td>
+              <td name="hftg">{{result.home_ftg}}</td>
+              <td name="hhtg">{{result.home_htg}}</td>
+              <td name="ahtg">{{result.away_htg}}</td>
+              <td name="aftg">{{result.away_ftg}}</td>
+              <td name=away_team class="team">{{result.away_team.title()}}</td>
               <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
             </tr>
-          {% else %}
-          <tr class="result">
-            <td hidden name="ID">{{result.result_id}}</td>
-            <td name="home_team" class="team">{{result.home_team.title()}}</td>
-            <td name="hftg">{{result.home_ftg}}</td>
-            <td name="hhtg">{{result.home_htg}}</td>
-            <td name="ahtg">{{result.away_htg}}</td>
-            <td name="aftg">{{result.away_ftg}}</td>
-            <td name=away_team class="team">{{result.away_team.title()}}</td>
-            <td class="action_link"><a class="AL_edit" href="#">Edit</a> </td>
-          </tr>
-          {% endif %}
+            {% endif %}
           {% endfor %}
         </table>
       </form>
     </div> <!--results_list-->
     <nav id="paginated_navigation">
-      <!-- <p>{{pagination.get_page_count(),page}}</p>
-      <p>{{page + 5 > pagination.get_page_count()}}</p>
-      <p>{{pagination.get_page_count() - page}}</p> -->
-
       <!-- the variable named 'page' refers to the current page (showing results for that week) -->
       {% if page > 0 %}
         <a href="{{ url_for('view_results', page=page - 5) }}"><<</a>
@@ -67,8 +63,5 @@
       {% if page < pagination.get_page_count() %}
         <a href="{{ url_for('view_results', page=page + 5) }}">>></a>
       {% endif %}
-
     </nav>
-    <!-- <div id="saved" class="success_msg"></div> -->
-
 {%endblock%}

@@ -26,14 +26,14 @@ def teardown_request(exception):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html',feedback="Results not available for week requested"),404
+    state = g.get('state',None)
+    return render_template('404.html',feedback="Results not available for week requested",state=state),404
 
 @app.route('/')
 def landing_page():
     state = g.get('state',None)
     return render_template('landing_page.html',state=state)
 
-# @app.route('/')
 @app.route('/league/')
 def home():
     """ display the league table showing teams ordered by points in descending order
@@ -47,7 +47,7 @@ def home():
         teams_in_points_order = sorted(teams_in_GD_order, key=methodcaller('points'), reverse=True)
         return render_template('home.html', teams=teams_in_points_order,state=state)
     else:
-        feedback = "There are no teams in the system. Please add some."
+        feedback = "League table cannot be displayed as there are no teams in the system. Please add some."
         return render_template('feedback.html', feedback = feedback,state=state)
 
 @app.route('/new_team/')
@@ -642,6 +642,7 @@ def display_comparison(data):
 
 @app.route('/upload_errors/', methods=['GET'])
 def display_upload_errors():
+    """Get and display data upload errors if any exist otherwise display message no errors found"""
     state = g.get('state',None)
     result_errors = Result.select().where(Result.is_error == True)
     if len(result_errors) > 0:
@@ -651,7 +652,7 @@ def display_upload_errors():
         return render_template('uploadErrors.html',feedback = "No errors to report",state=state)
 
 def get_results_by_week(from_week,to_week):
-    """"""
+    """Selects results for the week range specified by 'from_week' and 'to_week' arguements"""
     # get results only - not error results or fixtures
     results = Result.select().where(Result.week.between(from_week,to_week) &
                                    (Result.is_error == False) &
@@ -667,7 +668,7 @@ def create_weekly_position_table(results):
     For each week results data is processed and for each result the result type is determined (which will either be a home win, away win or a draw).
     Based on this the TeamPosition's points, goals scored and conceded attributes are updated.
     Once these stats are updated the 'positions' list is sorted so TeamPosition objects are in ascending points order (stored in in_points_order list).
-    Now the in_points_order list is looped through getting the index of each TeamPosition object), this index
+    Now the in_points_order list is looped through getting the index of each TeamPosition object, this index
     (when 1 is added to it therefore negating zero based numbering) represents the league position for a team in the week being currently iterated,
     this league position is added the position list for the team - this postion attribute (list) represents the position history of a team through the season.
     """
@@ -746,30 +747,26 @@ def result_is_valid(teams,goals,**kwargs):
     UI_msg, teams_exist = results_validator.validate_teams_exist(teams)
     if not teams_exist:
         res['Errors'].append(UI_msg)
-    # print("4 - Outcome = {}".format(teams_exist))
 
     UI_msg, different_teams = results_validator.validate_home_and_away_teams_different(teams)
     if not different_teams:
         res['Errors'].append(UI_msg)
-    # print("5 - Outcome = {}".format(different_teams))
 
-    #this validation needs to skipped when result is being re-validated after upload
+    #this validation needs to skipped when result is being re-validated after upload as it will exist from the inital upload
     if 'ignore_result_is_new' in kwargs:
         UI_msg = None
         new_result = True
-        # print("6 - Ignored so Outcome = {}".format(new_result))
     else:
         UI_msg, new_result = results_validator.result_is_new(teams)
 
     if not new_result:
         res['Errors'].append(UI_msg)
-    # print("7 - Outcome = {}".format(new_result))
 
     if goal_types_valid and goal_values_valid and team_names_provided and teams_exist and different_teams and new_result:
-        # print("Valid result - {}".format(res))
+        # the result has passed all validation and conforms to the rules for a valid result
         return True
     else:
-        # print("ERROR in {}".format(res))
+        # there are data errors that need to be resolved by end-user
         return res
 
 def team_name_valid(team_name):
@@ -890,6 +887,7 @@ def amend_team_stats(previous_result):
             update_query.execute()
 
 def get_stats_home_form(team):
+    """Works out and returns a team's home performance stats and rating"""
     wins = draws = losses = gs = gc = 0
     results=Result.select().where((Result.home_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
@@ -911,6 +909,7 @@ def get_stats_home_form(team):
 
 
 def get_stats_away_form(team):
+    """Works out and returns a team's away performance stats and rating"""
     wins = draws = losses = gs = gc = 0
     results=Result.select().where((Result.away_team == team.name) & (Result.match_status == 'result') & (Result.is_error == False))
     for r in results:
@@ -931,6 +930,8 @@ def get_stats_away_form(team):
     return dict(Won=wins,Lost=losses,Drawn=draws,GS=gs,GC=gc,Rating=rating,Played=played)
 
 def get_system_state():
+    """Returns current state of the system based on the data stored in the database.
+        The value returned is used to present help text (known as hints) in the page header."""
     if Team.select().count() == 0 and Result.select().count() == 0:
         return "NO DATA"
     elif Team.select().count() < 2 and Result.select().count() == 0:
@@ -943,9 +944,10 @@ def get_system_state():
         return "TEAM DATA EXISTS"
 
 def set_week(result):
+    """Returns an integer which is used to populate the week data attribute of a result entity"""
     return math.ceil(result.result_id/10)
 
 if __name__ == '__main__':
-    app.secret_key ='sum fink' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
+    app.secret_key ='1110bbec2d76fec87a308bab63299b687c7961f5698a00b9' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
     app.send_file_max_age_default = 0
     app.run(debug=True)

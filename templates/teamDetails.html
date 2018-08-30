@@ -1,7 +1,6 @@
 {%extends "master_layout.html"%}
 {%block content%}
   <div id="teamDetails">
-        <!-- <h1 id="team_details_name">{{team.name.title()}} - {{team.points()}} pts</h1> -->
         <h1 id="team_details_name">{{team.name.title()}}</h1>
         <table id="team_results">
           <tr>
@@ -32,12 +31,5 @@
           <a href="{{ url_for('drill_down', team=team.name,page=number+1) }}">{{number + 1}}</a>
         {% endfor %}
       </nav>
-      <!-- {% if page > 1 %}
-        <a href="{{ url_for('drill_down', team=team.name,page=page - 1) }}">Prev</a>
-      {% endif %}
-      {% if page < pagination.get_page_count() %}
-        <a href="{{ url_for('drill_down', team=team.name,page=page + 1) }}">Next</a>
-      {% endif %} -->
   </div>
-
 {%endblock%}

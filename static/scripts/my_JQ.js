@@ -149,7 +149,6 @@ $(document).ready(function() {
       var action_type = $this.find('a').text();
       if (action_type === 'Edit'){
           if ($(this).closest('tr').hasClass('fixture')){
-            // alert("Fixture class row!");
             $(this).closest('tr').css('background-color','#44c154').find('input').prop('disabled', false);
             $(this).after('<td class="action_link"><a class="AL_cancel" href="#">Cancel</a></td>');
             $(this).after('<td class="action_link"><a class="AL_save" href="#">Save</a></td>');
@@ -205,8 +204,6 @@ $(document).ready(function() {
           })
         } //end if action type is *SAVE*
         if (action_type === 'Delete'){
-          // alert("DELETE CALLED")
-          // var r_id = $(this).closest('tr').find('td input[name=ID]').val();
           var r_id = $(this).closest('tr').find('td [name=ID]').val();
           console.log("r-id is " + r_id);
           $.ajax({
@@ -412,19 +409,6 @@ function state_message(state){
       break;
   }
 }
-
-// function set_header() {
-//   if (localStorage.getItem("switch_state") == 'on') {
-//     $("#myonoffswitch").prop("checked",true);
-//     //show hints
-//     $("header").attr( "id", "hints" ).addClass("animated fadeInLeftBig").html("<section class='hint_text'><p>" + hint + "</p></section>");
-//   }
-//   else if (localStorage.getItem("switch_state") == 'off') {
-//     $("#myonoffswitch").prop("checked",false);
-//     //show logo
-//     $("header").attr( "id", "logo").html("<h1><a href='/league/'>Premier League</a></h1>");
-//   }
-// }
 
 // set focus on team name input on create team form
 if (typeof $("#teamName").val() === 'undefined'){

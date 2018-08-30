@@ -1,12 +1,12 @@
 {%extends "master_layout.html"%}
 {%block content%}
 <section id="demo_information" class="animated fadeIn">
-  <p>Welcome to this demo application. My motivation for creating this application is to demonstrate knowledge I have learnt and to show I have the skills to work as a developer.
+  <p>Welcome to this demo application. My motivation for creating this application is to demonstrate knowledge I have learnt and to show I have the skills and learning mindset to work as a developer.
      This application contains features commonly required in business applications such as:</p>
   <ul>
     <li>The creation and management of data using a UI</li>
     <li>Presentation of information using graphical charts</li>
-	<li>Trapping and presenting errors to ensure system integrity</li> 
+	<li>Trapping and presenting errors to ensure system integrity</li>
     <li>Uploading data in bulk</li>
     <li>Presenting clear feedback informing what is happening and next steps to take</li>
   </ul>
@@ -16,9 +16,11 @@
           <p>The application is based on the Premier League. I chose this domain as football results are fairly familiar to most people and provides a set of data that is easy to understand.</p>
           <p>Key domain characteristics supported by the system are:</p>
           <ul>
-              <li>There can be maximum of 20 teams in the league</li>
+              <li>There can be maximum of 20 <i>Teams</i> in the league</li>
               <li>Each team must have a unique name</li>
               <li>A team is awarded 3 points for a win , 1 point for a draw and 0 points for a defeat</li>
+              <li>A <i>Result</i> is the full-time score between 2 teams</li>
+              <li>Teams must exist in order to create results</li>
           </ul>
       </section>
       <h3 class="panel_header">ARCHITECTURE</h3>
@@ -39,7 +41,6 @@
               <li>The ability to set up multiple leagues and seasons</li>
               <li>Results prediction driven by machine learning algorithms</li>
           </ul>
-          <p>However, it is important to recognise when a 'product' is good enough to meet current priorities and the main priority right now for me is securing a fulfilling role.</p>
       </section>
   </div> <!--end CLASS ACCORDIAN-->
   <p class="tool_tip" title="Hint - turn on the hints to help step through the application" id="start_demo"><a href="{{ url_for('home') }}">Go to the demo!</a></p>

@@ -3,7 +3,7 @@
     {% if error %}
       <h3 class="error">{{error}}</h3>
     {% endif %}
-	
+
 	{% if feedback %}
       <h3 class="feedback">{{feedback}}</h3>
     {% endif %}
@@ -11,7 +11,7 @@
       <div id="enter_result_form">
         <form action="/create_result/" id="create_result_form" method="post">
           <p class="teamDropDowns">
-            <!-- <span>Home Team</span> -->
+            <!-- Home Team -->
             <select name="home_team" class="selectmenu">
               {% if error %}
                 <option selected="selected" value='{{teams["Home"]}}'>{{teams['Home'].title()}}</option>
@@ -30,6 +30,7 @@
             <input id="home_full_time" class="spinner tool_tip" title="Enter home teams goals scored by full time" name="hftg" value="0">
           </p>
           <p class="teamDropDowns">
+            <!-- Away Team -->
             <select name="away_team" class="selectmenu">
               {% if error %}
                 <option selected="selected" value='{{teams["Away"]}}'>{{teams['Away'].title()}}</option>
@@ -49,6 +50,5 @@
           </p>
           <p><input type="submit" value="save result" id="submitSaveResult"></p>
         </form>
-      </div> <!--create_team_form-->
-
+      </div>
 {%endblock%}

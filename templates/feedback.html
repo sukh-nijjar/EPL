@@ -1,5 +1,7 @@
 {%extends "master_layout.html"%}
 {%block content%}
+    <!-- this page is used to display feedback messages
+      letting the user know useful information -->
     {% if feedback %}
       <h3 class="feedback">{{feedback}}</h3>
     {% endif %}

@@ -30,19 +30,18 @@
       <header id="hints"></header>
       <nav>
         <ul>
-            <li id="menu_about"><a href="{{url_for('landing_page')}}"><span><img class="icons" src="{{url_for('static', filename='images/about.png')}}"> </span>About</a></li>
-            <li id="menu_league"><a href="{{ url_for('home') }}"><span><img class="icons" src="{{url_for('static', filename='images/league_table.png')}}"> </span>League table</a></li>
-            <li id="menu_load_data"><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"> </span>Load data</a></li>
-            <li id="menu_new_team"><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"> </span>New team</a></li>
-            <li id="menu_enter_result"><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"> </span>Enter result</a></li>
-            <li id="menu_view_results"><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"> </span>View results</a></li>
+            <li id="menu_about"><a href="{{url_for('landing_page')}}"><span><img class="icons" src="{{url_for('static', filename='images/about.png')}}"></span>About</a></li>
+            <li id="menu_league"><a href="{{ url_for('home') }}"><span><img class="icons" src="{{url_for('static', filename='images/league_table.png')}}"></span>League table</a></li>
+            <li id="menu_load_data"><a href="{{url_for('display_upload_form')}}"><span><img class="icons" src="{{url_for('static', filename='images/upload.png')}}"></span>Load data</a></li>
+            <li id="menu_new_team"><a href="{{ url_for('new_team') }}"><span><img class="icons" src="{{url_for('static', filename='images/team.png')}}"></span>New team</a></li>
+            <li id="menu_enter_result"><a href="{{ url_for('enter_result') }}"><span><img class="icons" src="{{url_for('static', filename='images/players.png')}}"></span>Enter result</a></li>
+            <li id="menu_view_results"><a href="{{ url_for('view_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/goalpost.png')}}"></span>View results</a></li>
             <form id="deleteAllTeams" action="/delete_all_teams/" method="post">
-              <li><a  id="submitDeleteAllTeams" href="#"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete teams</a></li>
-              <!-- <input type="hidden"> -->
+              <li><a  id="submitDeleteAllTeams" href="#"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"></span>Delete teams</a></li>
             </form>
-            <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"> </span>Delete results</a></li>
-            <li id="menu_upload_errors"><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/errors.png')}}"> </span>Upload errors</a></li>
-            <li id="menu_charts"><a href="{{url_for('GetCharts')}}"><span><img class="icons" src="{{url_for('static', filename='images/data_visualization.png')}}"> </span>Visualization</a></li>
+            <li><a href="{{ url_for('delete_all_results') }}"><span><img class="icons" src="{{url_for('static', filename='images/delete.png')}}"></span>Delete results</a></li>
+            <li id="menu_upload_errors"><a href="{{url_for('display_upload_errors')}}"><span><img class="icons" src="{{url_for('static', filename='images/errors.png')}}"> </span>Data errors</a></li>
+            <li id="menu_charts"><a href="{{url_for('GetCharts')}}"><span><img class="icons" src="{{url_for('static', filename='images/data_visualization.png')}}"></span>Visualization</a></li>
         </ul>
       </nav>
 

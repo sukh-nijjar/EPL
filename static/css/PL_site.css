@@ -17,7 +17,6 @@ a, a:visited{
 body{
 	margin-top: 5px;
 	overflow-y:scroll;
-	/* background-color: #54ff9f; */
 }
 
 li{
@@ -73,7 +72,6 @@ th, td{
 
 /*ensures only rows of the class have hover effect applied*/
 tr[class='table_rows']:hover{
-	/* background-color: pink; */
 	background-color: black;
 	color: #ffffff;
 }
@@ -82,7 +80,7 @@ tr[class='table_rows']:hover{
 	border-bottom: 1px solid red;
 }
 
-/* doesn't seem below is used anywhere? */
+/* aligns the teams in Teams fieldset on charts_home view */
 td[class='team_filter']{
 	text-align:left;
 	margin: 20px 0;
@@ -117,7 +115,6 @@ header{
 	text-align: center;
 	border-bottom: thick solid black;
 	margin-bottom: 5px; /*specifies gap downwards from header's bottom boundary*/
-	/*outline:  1px solid red;*/
 }
 
 header h1{
@@ -126,11 +123,10 @@ header h1{
 	text-align: center;
 }
 
-header h1 a{
-	/* display: inline-block; /*this allows height to be set*/
+/* header h1 a{
 	height: 120px;
-	/*outline: 2px solid yellow;*/
-}
+	outline: 2px solid yellow;
+} */
 
 section h2{
 	font-weight: 100;
@@ -142,7 +138,6 @@ nav{
 	font-family: 'Baloo', cursive;
 }
 
-
 nav ul{
 	padding: 0px; /*position menu options flush on the left of screen*/
 }
@@ -152,9 +147,7 @@ nav li{
 	margin-bottom: 10px;
 	margin-left: 0px;
 	font-size: 25px;
-	/* float: left; */
 	width: 240px;
-	/* outline: 1px dashed red; */
 }
 
 nav li:hover{
@@ -183,9 +176,9 @@ section{
 	font-size: 18px;
 }
 
-td[class='stats']{
-	/* display:inline-block; */
-}
+/* td[class='stats']{
+	 display:inline-block;
+} */
 
 /* FORM AND FORM CONTROLS */
 #create_team_form{
@@ -239,7 +232,6 @@ td[class='stats']{
 	border: 2px solid #000;
 	border-radius: 4px;
 	width: 25%;
-
 }
 
 .card_title{
@@ -371,12 +363,6 @@ td[class='stats']{
 	background: #dae9e4;
 }
 
-.back_from_error{
-	text-align: center;
-	text-decoration: underline;
-	font-weight: lighter;
-}
-
 .button_upload{
 	background: #ffffff;
 	border: 2px solid #BEBEBE;
@@ -471,7 +457,6 @@ td[class='stats']{
 	padding: 10px;
 	text-align: center;
 	width: 675px;
-	/* outline: 5px solid black; */
 }
 
 .warning{
@@ -594,20 +579,6 @@ td[class='stats']{
 .team_filter a:hover{
 	text-decoration: underline;
 }
-
-/*next 3 classes used in team details view  */
-.win{
-  background-color: green;
-}
-
-.loss{
-  background-color: red;
-}
-
-.drawn{
-  background-color: orange;
-}
-/* ------------------------------ */
 
 #team1, #team2{
 	margin-top: 20px;

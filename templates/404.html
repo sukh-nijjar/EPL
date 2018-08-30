@@ -2,7 +2,8 @@
 {%block content%}
     {% if feedback %}
       <h3 class="feedback">{{feedback}}:
-        <p class="back_from_error"><a href="{{ url_for('view_results') }}">Go back to viewing results</a></p>
+        <!-- use inline style rather than create yet another rule that only applies to this page -->
+        <p style="text-align:center;text-decoration: underline;"><a href="{{ url_for('view_results') }}">Go back to viewing results</a></p>
       </h3>
     {% endif %}
 {%endblock%}

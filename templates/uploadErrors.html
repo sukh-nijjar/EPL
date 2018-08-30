@@ -21,7 +21,6 @@
             <th scope="col">Error</th>
           </tr>
           {% for result in invalid_results %}
-            <!-- <p>We are in item number: {{ loop.index0 }}</p> -->
             {% set outer_loop = loop.index0 %}
             <tr class="table_rows">
               <td hidden name="ID">{{result.result_id}}</td>
@@ -44,6 +43,5 @@
         </table>
         <input class="resolve_error_buttons" id="err_resolve" type="button" value="Resolve Errors"/>
       </div>
-
     {% endif %}
 {%endblock%}
