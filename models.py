@@ -1,4 +1,6 @@
+import hashlib
 from peewee import *
+from flask_login import UserMixin
 
 db = SqliteDatabase("EPL.db", pragmas=(('foreign_keys', 'on'),))
 
@@ -109,6 +111,19 @@ class Error(BaseModel):
     result = ForeignKeyField(Result) #(Result,backref='errors') accessed by Result.errors
     description = TextField()
 
+class User(BaseModel, UserMixin):
+    user_id = PrimaryKeyField()
+    user_name = CharField(default='guest')
+    access_key = CharField(null=True)
+
+    def validate_password(self,submitted_pw):
+        hashed = hashlib.sha256(submitted_pw.encode('utf-8'))
+        hashed_hex = hashed.hexdigest()
+        if hashed_hex == self.access_key:
+            return True
+        else:
+            return False
+
 def init_db():
     db.connect()
-    db.create_tables([Team, Result, Error], safe = True)
+    db.create_tables([Team, Result, Error, User], safe = True)
