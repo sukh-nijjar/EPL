@@ -1,0 +1,36 @@
+4th Jan 18
+Remove redundant db query
+Allow null goal result records in results upload
+
+5th Jan
+Fixed empty table rows issue on upload errorList
+Delete result_upload_errors.csv each time teams are deleted
+Show input fields on fixtures in view results page
+
+4th August
+Switched to minified version of MyCharts.js in charts_home, comparison and stats_breakdown html files
+Introduced new attribute (match_status) on Result model class. This allows for easy identification between results and fixtures.
+In def get_results_by_week(from_week,to_week) function added additional constraint to Result.select().where delete_query
+in order to exclude any results with none values (fixtures).
+
+7th August
+Improved help text
+Gave WDL icons transparent backgrounds
+
+9th August
+Added current menu indicator
+Prevent team upload when team(s) already been manually created
+
+16th August
+Tightened query to omit results with errors and fixtures from drill down view:
+results=Result.select().where(((Result.away_team == team.name) | (Result.home_team == team.name))
+                                & ((Result.is_error == False) & (Result.match_status == 'result')))
+
+Updated result_is_new() method of the ResultsValidator class not to exclude results with errors when checking for duplicate results
+Added check for results upload when week value is missing or contains invalid data (in such a case the result is stored as a fixture)
+
+############################
+
+Heroku git updates
+26/08/2018
+When no results in the system set week value of a result to 1 when the first result is entered manually through Enter result view
