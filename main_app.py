@@ -2,6 +2,8 @@ import csv, math, os, shutil, re
 from collections import defaultdict
 from domain import TeamPosition
 from flask import Flask, Markup, render_template, request, url_for, redirect, flash, json, jsonify, g
+from flask_login import LoginManager, logout_user
+from flask_login.utils import login_required, login_user
 from playhouse.flask_utils import PaginatedQuery, object_list
 from models import *
 from operator import methodcaller, attrgetter
@@ -11,6 +13,16 @@ from statistics import mean
 
 #create application instance
 app = Flask(__name__)
+#instantiate LoginManager
+login_manager = LoginManager()
+#configure login_manager to work with application
+login_manager.init_app(app)
+#set login view for when user attempts to access view without being logged in
+login_manager.login_view = 'enter_password'
+#implement user_loader
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(User.user_id == user_id)
 
 @app.before_request
 def before_request():
@@ -29,12 +41,35 @@ def page_not_found(e):
     state = g.get('state',None)
     return render_template('404.html',feedback="Results not available for week requested",state=state),404
 
-@app.route('/')
+@app.route('/', methods=['GET'])
+def enter_password():
+    return render_template('password.html')
+
+@app.route('/login/', methods=['GET'])
+def login():
+    submitted_pw = request.args['password']
+    user = User.get(user_name='guest')
+    if user.validate_password(submitted_pw):
+        login_user(user)
+        return redirect(url_for('landing_page'))
+    # if password not validated then show password formf
+    flash("Password is incorrect")
+    return render_template('password.html')
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('enter_password'))
+
+@app.route('/landing_page/')
+@login_required
 def landing_page():
     state = g.get('state',None)
     return render_template('landing_page.html',state=state)
 
 @app.route('/league/')
+@login_required
 def home():
     """ display the league table showing teams ordered by points in descending order
     """
@@ -51,11 +86,13 @@ def home():
         return render_template('feedback.html', feedback = feedback,state=state)
 
 @app.route('/new_team/')
+@login_required
 def new_team():
     state = g.get('state',None)
     return render_template('createTeam.html',state=state)
 
 @app.route('/create/', methods=['POST'])
+@login_required
 def create_team():
     """If validation passes creates a team submitted by input form. If validation fails
        a message is displayed informing what the issue is.
@@ -85,12 +122,14 @@ def create_team():
         return render_template('createTeam.html',error=error,state=state)
 
 @app.route('/load_data/')
+@login_required
 def display_upload_form():
     """display view to load data (csv files)"""
     state = g.get('state',None)
     return render_template('upload.html',state=state)
 
 @app.route('/upload_teams/', methods=['POST'])
+@login_required
 def perform_teams_upload():
     """creates teams via upload of csv as long as there are
        less than the allowed maximum 20 teams and any team in the csv doesn't
@@ -145,6 +184,7 @@ def perform_teams_upload():
             return render_template('upload.html',error=error,state=state)
 
 @app.route('/upload_results/', methods=['POST'])
+@login_required
 def perform_results_upload():
     """
     Reads in result data from csv file. Validates each result and creates a dB
@@ -230,6 +270,7 @@ def perform_results_upload():
         return render_template('upload.html',error=error,state=state)
 
 @app.route('/enter_result/')
+@login_required
 def enter_result():
     """display view with form to enter results data"""
     state = g.get('state',None)
@@ -240,6 +281,7 @@ def enter_result():
         return render_template("enterResult.html", feedback = "There must be a minimum of 2 teams before a result can be added",state=state)
 
 @app.route('/create_result/', methods=['POST'])
+@login_required
 def create_result():
     """If validation passes creates result from data submitted by input form,
        if validation fails a message is displayed informing what the issue is.
@@ -301,6 +343,7 @@ def create_result():
         return redirect(url_for('home'))
 
 @app.route('/view_results/')
+@login_required
 def view_results():
     """Display valid results if any exist otherwise present message informing no results are available for display"""
     state = g.get('state',None)
@@ -313,6 +356,7 @@ def view_results():
         return render_template("feedback.html", feedback = feedback,state=state)
 
 @app.route('/delete_result/', methods=['DELETE'])
+@login_required
 def delete_result():
     """Deletes a specific result submitted by input form and update each teams stats
        (matches won, drawn, lost, goals scored and conceded) to reflect data deletion"""
@@ -353,6 +397,7 @@ def delete_result():
     return jsonify({'done' : 'Result deleted and league table updated'})
 
 @app.route('/delete_erroneous_result/', methods=['DELETE'])
+@login_required
 def delete_erroneous_result():
     """Deletes a result which has been flagged as having 1 or more errors.
 	   Both the result and associated error(s) are deleted from the database"""
@@ -361,6 +406,7 @@ def delete_erroneous_result():
     return jsonify({'done' : 'Erroneous Result deleted', 'path' : '/upload_errors/'})
 
 @app.route('/update_score/', methods=['PUT'])
+@login_required
 def update_score():
     """Updates a result record, team stats (matches won, drawn, lost, goals scored and conceded)
        and the league table when a result/fixture is edited"""
@@ -413,6 +459,7 @@ def update_score():
         return jsonify({'error' : UI_msg})
 
 @app.route('/verify_resolved_results/', methods=['PUT'])
+@login_required
 def verify():
     """Re-validates results data which has been re-submitted after errors have been corrected (or not as the case may be)"""
     UI_msg = None
@@ -463,6 +510,7 @@ def verify():
     return jsonify({'done' : 'Re-validation complete'})
 
 @app.route('/delete_all_results/')
+@login_required
 def delete_all_results():
     """Deletes all results and resets every team's stats (matches won, drawn, lost, goals scored and conceded) to zero"""
     delete_query = Error.delete()
@@ -475,6 +523,7 @@ def delete_all_results():
     return redirect(url_for('home'))
 
 @app.route('/delete_all_teams/', methods=['POST'])
+@login_required
 def delete_all_teams():
     """deleting teams also causes all results and errors to be deleted
     """
@@ -489,6 +538,7 @@ def delete_all_teams():
     return redirect(url_for('home'))
 
 @app.route('/team_drill_down/<team>', methods=['GET'])
+@login_required
 def drill_down(team):
     state = g.get('state',None)
     team=Team.get(Team.name == team)
@@ -501,6 +551,7 @@ def drill_down(team):
         return render_template("feedback.html", feedback = "There are no results to view for " + team.name.title(),state=state)
 
 @app.route('/charts/', methods=['GET'])
+@login_required
 def GetCharts():
     state = g.get('state',None)
     results = Result.select().where(Result.is_error == False)
@@ -555,6 +606,7 @@ def GetCharts():
             return render_template('feedback.html', feedback = feedback, state=state)
 
 @app.route('/statiscal_analysis/<team>', methods=['GET'])
+@login_required
 # I should refactor this so only the team is processed by create_weekly_position_table...
 # Actually after investigating all teams have to be processed as weekly positional data
 # is in relation to all the other teams positions...otherwise the stats for a single team
@@ -586,6 +638,7 @@ def stats_drill_down(team):
                             history=positions,Home_Form=home_form_dict,Away_Form=away_form_dict,state=state)
 
 @app.route('/get_comparison_data', methods=['GET'])
+@login_required
 # build up the data requirements for the display_comparison(data) action
 def get_comparison_data():
     teams_filter = request.args.getlist('teams_for_comparison[]');
@@ -615,6 +668,7 @@ def get_comparison_data():
     return jsonify({'teams' : comparison_data})
 
 @app.route('/comparison/<data>', methods=['GET'])
+@login_required
 def display_comparison(data):
     state = g.get('state',None)
     data_in = json.loads(data)
@@ -641,6 +695,7 @@ def display_comparison(data):
                             chart_data=comparison_chart_data,results=results,state=state)
 
 @app.route('/upload_errors/', methods=['GET'])
+@login_required
 def display_upload_errors():
     """Get and display data upload errors if any exist otherwise display message no errors found"""
     state = g.get('state',None)
@@ -950,4 +1005,4 @@ def set_week(result):
 if __name__ == '__main__':
     app.secret_key ='1110bbec2d76fec87a308bab63299b687c7961f5698a00b9' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
     app.send_file_max_age_default = 0
-    app.run(debug=True)
+    app.run(debug=False)
