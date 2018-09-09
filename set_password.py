@@ -2,7 +2,7 @@ import hashlib
 import sqlite3
 
 def set_hash_pw():
-    hashed = hashlib.sha256("!codingisfun!")
+    hashed = hashlib.sha256("PasswordOfYourChoice")
     stored = hashed.hexdigest()
     return stored
 

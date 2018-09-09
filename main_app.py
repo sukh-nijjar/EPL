@@ -583,12 +583,12 @@ def GetCharts():
         if len(teams_filter):
             for team in team_positions:
                 if team.team in teams_filter:
-                    t = dict(TeamName=team.team,Positions=team.position)
+                    t = dict(TeamName=team.team.title(),Positions=team.position)
                     team_positions_dict[team.team] = t
             return render_template('charts_home.html',team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad,state=state)
         else:
             for team in team_positions:
-                t = dict(TeamName=team.team,Positions=team.position)
+                t = dict(TeamName=team.team.title(),Positions=team.position)
                 team_positions_dict[team.team] = t
             return render_template('charts_home.html', team_data=team_positions_dict, team_list = team_list,chartToLoad=chartToLoad,state=state)
     else:
@@ -598,7 +598,7 @@ def GetCharts():
             teams = Team.select()
         teams_in_points_order = sorted(teams, key=methodcaller('points'), reverse=True)
         for team in teams_in_points_order:
-            team_positions_dict[team.name] = team.lost, team.drawn, team.won, team.points(), team.max_possible()
+            team_positions_dict[team.name.title()] = team.lost, team.drawn, team.won, team.points(), team.max_possible()
 
         if len(teams) > 0:
             return render_template('charts_home.html', team_data=team_positions_dict,team_list = team_list,chartToLoad=chartToLoad,state=state)
@@ -1006,4 +1006,4 @@ def set_week(result):
 if __name__ == '__main__':
     # app.secret_key ='1110bbec2d76fec87a308bab63299b687c7961f5698a00b9' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
     app.send_file_max_age_default = 0
-    app.run(debug=False)
+    app.run(debug=True)
