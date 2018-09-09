@@ -7,11 +7,6 @@ Functions implemented include those you would find in any business application:
 * Validation to confirm data conforms to domain/business rules
 * Identifying and flagging errors to system users providing feedback on how to resolve data issues
 * Data dashboards providing visualisation of key metrics related to a team’s performance.  
-![](read_me_images/GH_1.png)  
-
-![](read_me_images/GH_2.png)  
-
-![](read_me_images/GH_3.png)  
 ## Pre-requisites
 * An installation of Python
 ## Setting up and running application
