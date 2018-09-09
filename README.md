@@ -1,12 +1,12 @@
 # Football League Web Application Demo
 This project is a demo web app to showcase software design and development skills I have acquired with a view to changing careers from a business analyst to a developer role.  
 
-The application creates and manages data related to football results and includes graphical  visualisation of key statistics.  
+The application creates and manages data related to football results and includes graphical visualisation of key statistics.  
 Functions implemented include those you would find in any business application:
 * Creation of data through UI forms or bulk data uploads
 * Validation to confirm data conforms to domain/business rules
 * Identifying and flagging errors to system users providing feedback on how to resolve data issues
-* Data dashboards providing visualisation of key metrics related to a team’s performance.
+* Data dashboards providing visualisation of key metrics related to a team’s performance.  
 ## Pre-requisites
 * An installation of Python
 ## Setting up and running application
