@@ -13,6 +13,7 @@ from statistics import mean
 
 #create application instance
 app = Flask(__name__)
+app.secret_key ='1110bbec2d76fec87a308bab63299b687c7961f5698a00b9' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
 #instantiate LoginManager
 login_manager = LoginManager()
 #configure login_manager to work with application
@@ -1003,6 +1004,6 @@ def set_week(result):
     return math.ceil(result.result_id/10)
 
 if __name__ == '__main__':
-    app.secret_key ='1110bbec2d76fec87a308bab63299b687c7961f5698a00b9' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
+    # app.secret_key ='1110bbec2d76fec87a308bab63299b687c7961f5698a00b9' #THIS SHOULD BE SET IN CONFIG - SECRET_KEY = 'string'
     app.send_file_max_age_default = 0
     app.run(debug=False)
