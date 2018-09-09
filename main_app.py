@@ -534,8 +534,6 @@ def delete_all_teams():
     delete_query.execute()
     delete_query = Result.delete()
     delete_query.execute()
-    if os.path.exists('result_upload_errors.csv'):
-        os.remove('result_upload_errors.csv')
     return redirect(url_for('home'))
 
 @app.route('/team_drill_down/<team>', methods=['GET'])

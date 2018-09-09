@@ -50,7 +50,7 @@ input[type="submit"]:hover{
 }
 
 /* INPUT TEXT BOX STYLES */
-input[type="text"]{
+input[type="text"], input[type="password"]{
 	font-size: 24px;
 	letter-spacing: 0.1em;
 	padding: 10px;
@@ -324,7 +324,7 @@ section{
 	background: #0bff01;
 }
 
-#teamName{
+#teamName, #pw{
 	width: 300px;
 	margin-bottom: 15px;
 	width:555px;
