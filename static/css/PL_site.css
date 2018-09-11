@@ -171,10 +171,6 @@ section{
 	font-size: 18px;
 }
 
-/* td[class='stats']{
-	 display:inline-block;
-} */
-
 /* FORM AND FORM CONTROLS */
 #create_team_form{
 	margin-left: 62px;
@@ -201,7 +197,7 @@ section{
 	margin-top: 50px;
 }
 
-/*the div that holds the table of invalid results in upload errors*/
+/*div that holds the table of invalid results in upload errors*/
 #invalid_results{
 	margin: 25px 0 0 -15px;
 }
@@ -673,8 +669,6 @@ section{
 
 .active_header{
 	background: #ef8d22;
-  /*setting margin to zero prevents a jerky panel close*/
-  /* margin: 0; erm don't think so cos with commented out still smooth*/
 }
 
 #start_demo{

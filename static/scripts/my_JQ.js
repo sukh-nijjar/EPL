@@ -129,7 +129,6 @@ $(document).ready(function() {
            $("#dialog-confirm").dialog({
              title: "Delete teams? (this also deletes results)",
              resizable: false,
-             //autoOpen: false,
              height: "auto",
              width: 400,
              modal: true,
