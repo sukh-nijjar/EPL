@@ -1,5 +1,5 @@
 # Football League Web Application Demo
-This project demonstrates software design and development skills I have acquired with a view to changing careers from a business analyst to a developer role.  
+This project demonstrates software design and development skills I have acquired with a view to changing careers from an analyst to a developer role.  
 
 The application creates and manages data related to football results and includes graphical visualisation of key statistics.  
 Functions implemented include those you would find in any business application:
